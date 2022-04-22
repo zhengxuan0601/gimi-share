@@ -1,0 +1,12 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 5555
+  },
+  "mysql": {
+    "host": "localhost",
+    "user": "root",
+    "port": "3306",
+    "database": "gimibase"
+  }
+}
