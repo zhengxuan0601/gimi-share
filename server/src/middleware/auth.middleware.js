@@ -8,7 +8,7 @@ const auth = () => {
     try {
       const headers = req.headers
       if (!headers.accesstoken) {
-        return JsonResult.httpStatus(response, 401, {
+        return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',
           code: '9999'
         })
@@ -16,7 +16,7 @@ const auth = () => {
       const decodedToken = jwt.verify(headers.accesstoken, trash.jsonSecretkey)
       const user = await UserModel.findOne({ id: decodedToken.id })
       if (!user) {
-        return JsonResult.httpStatus(response, 401, {
+        return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',
           code: '9999'
         })
@@ -24,7 +24,7 @@ const auth = () => {
       req.sessionuser = user
       next()
     } catch (error) {
-      return JsonResult.httpStatus(response, 401, {
+      return JsonResult.httpStatus(req, response, 401, {
         message: 'Authentication failed!',
         code: '9999'
       })

@@ -20,6 +20,7 @@ class UserController {
         }
       })
       JsonResult.success({
+        req,
         response,
         data,
         message: '查询用户列表成功'
@@ -39,6 +40,7 @@ class UserController {
       const data = await UserModel.findOne(req.query)
       const { password, ...nopasswordUser } = data || {}
       JsonResult.success({
+        req,
         response,
         data: nopasswordUser,
         message: '查询用户信息成功'
@@ -59,6 +61,7 @@ class UserController {
       const { id } = req.query
       await UserModel.delete(id)
       JsonResult.success({
+        req,
         response,
         message: '删除用户成功'
       })
@@ -76,6 +79,7 @@ class UserController {
     try {
       await UserModel.create(req.body)
       JsonResult.success({
+        req,
         response,
         message: '用户注册成功'
       })
@@ -93,6 +97,7 @@ class UserController {
     try {
       await UserModel.update(req.body)
       JsonResult.success({
+        req,
         response,
         message: '更新成功'
       })
@@ -126,6 +131,7 @@ class UserController {
         ...user
       }, trash.jsonSecretkey, { expiresIn: trash.expiresIn })
       JsonResult.success({
+        req,
         response,
         message: '用户登陆成功',
         data: { ...user, accessToken }
