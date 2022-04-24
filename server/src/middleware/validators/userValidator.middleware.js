@@ -16,7 +16,6 @@ exports.registeruserSchema = [
       }
       return true
     }),
-
   body('password')
     .exists()
     .custom(password => {
@@ -35,11 +34,20 @@ exports.loginuserShema = [
       }
       return true
     }),
-
   body('password')
     .custom(password => {
       if (!password) {
         throw new Error('password is required')
+      }
+      return true
+    })
+]
+
+exports.updateuserShema = [
+  body('id')
+    .custom(id => {
+      if (!id) {
+        throw new Error('user_id is required')
       }
       return true
     })

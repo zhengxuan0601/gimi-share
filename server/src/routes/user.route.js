@@ -1,169 +1,90 @@
+/**
+ * @typedef LoginInfo
+ * @property {string} username.required -用户名
+ * @property {string} password.required -密码
+ */
+
+/**
+ * @typedef UpdateInfo
+ * @property {string} id.required -用户标识
+ * @property {string} nickname -用户昵称
+ * @property {enum} gender -用户性别 0 - 男 1 - 女
+ * @property {string} email -邮箱
+ * @property {string} avatar -头像url
+ * @property {string} tel -手机号
+ * @property {string} job -职业
+ * @property {integer} age -年龄
+ * @property {string} description -简介
+ */
+
 const express = require('express')
 const router = express.Router()
 const auth = require('@/middleware/auth.middleware')
 const userController = require('@/controllers/user.controller')
 const handlerValidate = require('@/middleware/handlerValidate.middleware')
-const { registeruserSchema, loginuserShema } = require('@/middleware/validators/userValidator.middleware')
+const { registeruserSchema, loginuserShema, updateuserShema } = require('@/middleware/validators/userValidator.middleware')
 
+/**
+ * 用户列表分页查询
+ * @route GET /users
+ * @group 用户管理
+ * @param {string} pageNo.query.required
+ * @param {string} pageSize.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
 router.get('/', userController.getAllUsers)
+
+/**
+ * 根据用户id查询用户详情
+ * @route GET /users/userinfo
+ * @group 用户管理
+ * @param {string} id.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
 router.get('/userinfo', userController.getUserById)
+
+/**
+ * 根据用户id删除用户
+ * @route GET /users/deleteuser
+ * @group 用户管理
+ * @param {string} id.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
 router.get('/deleteuser', auth(), userController.deleteById)
+
+/**
+ * 用户注册
+ * @route POST /users/registeruser
+ * @group 用户管理
+ * @param {LoginInfo.model} loginInfo.body.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
 router.post('/registeruser', registeruserSchema, handlerValidate(userController.createUser))
-router.post('/updateuser', auth(), userController.updateUser)
+
+/**
+ * 用户信息更新
+ * @route POST /users/updateuser
+ * @group 用户管理
+ * @param {UpdateInfo.model} updateInfo.body.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.post('/updateuser', auth(), updateuserShema, handlerValidate(userController.updateUser))
+
+/**
+ * 用户登录
+ * @route POST /users/login
+ * @group 用户管理
+ * @param {LoginInfo.model} loginInfo.body.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
 router.post('/login', loginuserShema, handlerValidate(userController.userLogin))
 
 module.exports = router
-
-/** ,
- * @swagger
- * /api/v1/users:
- *    get:
- *      tags:
- *      - 用户管理
- *      summary: 查询用户分页列表
- *      produces:
- *      - application/json
- *      parameters:
- *      - name: pageSize
- *        in: query
- *        description: 每页数据量
- *        required: false
- *        type: integer
- *      - name: pageNo
- *        in: query
- *        description: 指定数据分页
- *        required: false
- *        type: integer
- *      responses:
- *        200:
- *          description: successful operation
- *          schema:
- *            ref: #/definitions/Order
- *        400:
- *          description: Invalid ID supplied
- *        404:
- *          description: Order not found
- * */
-
-/** ,
- * @swagger
- * /api/v1/users/userinfo:
- *    get:
- *      tags:
- *      - 用户管理
- *      summary: 根据用户id查询用户详细信息
- *      produces:
- *      - application/json
- *      parameters:
- *      - name: id
- *        in: query
- *        description: 用户id
- *        required: true
- *        type: string
- *      responses:
- *        200:
- *          description: successful operation
- *          schema:
- *            ref: #/definitions/Order
- *        400:
- *          description: Invalid ID supplied
- *        404:
- *          description: Order not found
- * */
-
-/** ,
- * @swagger
- * /api/v1/users/login:
- *    post:
- *      tags:
- *      - 用户管理
- *      summary: 用户登录
- *      produces:
- *      - application/json
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      properties:
- *                          username:
- *                                  type: string
- *                                  description: 用户名
- *                          password:
- *                                  type: string
- *                                  description: 密码
- *                  example:
- *                      username: "string"
- *                      password: "string"
- *      responses:
- *        200:
- *          description: successful operation
- *          schema:
- *            ref: #/definitions/Order
- *        400:
- *          description: Invalid ID supplied
- *        404:
- *          description: Order not found
- * */
-
-/** ,
- * @swagger
- * /api/v1/users/updateuser:
- *    post:
- *      tags:
- *      - 用户管理
- *      summary: 用户修改信息
- *      produces:
- *      - application/json
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      properties:
- *                          id:
- *                                  required: true
- *                                  type: string
- *                                  description: 用户标识
- *                          nickname:
- *                                  type: string
- *                                  description: 昵称
- *                          gender:
- *                                  type: string
- *                                  description: 性别
- *                          avatar:
- *                                  type: string
- *                                  description: 头像地址
- *                          email:
- *                                  type: string
- *                                  description: 邮箱
- *                          age:
- *                                  type: string
- *                                  description: 年龄
- *                          job:
- *                                  type: string
- *                                  description: 职业
- *                          description:
- *                                  type: string
- *                                  description: 简介
- *                  example:
- *                      id: "string"
- *                      nickname: "string"
- *                      gender: "string"
- *                      avatar: "string"
- *                      email: "string"
- *                      age: "string"
- *                      job: "string"
- *                      description: "string"
- *      responses:
- *        200:
- *          description: successful operation
- *          schema:
- *            ref: #/definitions/Order
- *        400:
- *          description: Invalid ID supplied
- *        404:
- *          description: Order not found
- * */

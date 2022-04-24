@@ -17,18 +17,21 @@ class UserModel {
     try {
       const { pageNo = 1, pageSize = 10, ...object } = param
 
+      const { columnSet, values } = multipleColumnSet(object)
+
       let sql = `SELECT * FROM ${this.tableName}`
 
-      const { columnSet, values } = multipleColumnSet(object)
       if (!columnSet) {
         const totalSql = `SELECT COUNT(*) as total FROM ${this.tableName}`
+
+        const list = await db.query(sql)
 
         const total = await db.query(totalSql)
 
         sql += ` LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
         return {
-          list: await db.query(sql),
+          list,
           total: total[0].total,
           pageNo
         }
@@ -38,9 +41,11 @@ class UserModel {
 
       const totalSql = `SELECT COUNT(*) as total FROM ${this.tableName}  WHERE ${columnSet}`
 
+      const list = await db.query(sql, values)
+
       const total = await db.query(totalSql, values)
       return {
-        list: await db.query(sql, values),
+        list,
         total: total[0].total,
         pageNo
       }
@@ -104,6 +109,7 @@ class UserModel {
 
   /**
    * update user
+   * @param {*} param0
    * @param {*}
    */
   async update ({ id, username, password, ...object }) {
