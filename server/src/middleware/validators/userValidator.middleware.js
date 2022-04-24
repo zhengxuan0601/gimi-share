@@ -42,13 +42,3 @@ exports.loginuserShema = [
       return true
     })
 ]
-
-exports.updateuserShema = [
-  body('id')
-    .custom(id => {
-      if (!id) {
-        throw new Error('user_id is required')
-      }
-      return true
-    })
-]

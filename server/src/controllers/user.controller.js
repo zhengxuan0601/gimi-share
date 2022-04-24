@@ -95,14 +95,17 @@ class UserController {
    */
   async updateUser (req, response) {
     try {
-      await UserModel.update(req.body)
+      await UserModel.update({
+        ...req.body,
+        id: req.sessionuser.id
+      })
       JsonResult.success({
         req,
         response,
-        message: '更新成功'
+        message: '编辑用户资料成功'
       })
     } catch (error) {
-      JsonResult.fail({ req, response, error, message: '更新用户失败' })
+      JsonResult.fail({ req, response, error, message: '编辑用户资料失败' })
     }
   }
 

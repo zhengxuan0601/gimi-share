@@ -6,7 +6,6 @@
 
 /**
  * @typedef UpdateInfo
- * @property {string} id.required -用户标识
  * @property {string} nickname -用户昵称
  * @property {enum} gender -用户性别 0 - 男 1 - 女
  * @property {string} email -邮箱
@@ -22,7 +21,7 @@ const router = express.Router()
 const auth = require('@/middleware/auth.middleware')
 const userController = require('@/controllers/user.controller')
 const handlerValidate = require('@/middleware/handlerValidate.middleware')
-const { registeruserSchema, loginuserShema, updateuserShema } = require('@/middleware/validators/userValidator.middleware')
+const { registeruserSchema, loginuserShema } = require('@/middleware/validators/userValidator.middleware')
 
 /**
  * 用户列表分页查询
@@ -75,7 +74,7 @@ router.post('/registeruser', registeruserSchema, handlerValidate(userController.
  * @returns {Error}  default - Unexpected error
  * @security JWT
  */
-router.post('/updateuser', auth(), updateuserShema, handlerValidate(userController.updateUser))
+router.post('/updateuser', auth(), handlerValidate(userController.updateUser))
 
 /**
  * 用户登录
