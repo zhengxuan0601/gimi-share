@@ -34,6 +34,7 @@ const { updateArticleShema } = require('@/middleware/validators/articleValidator
  * @group 文章管理
  * @param {string} pageNo.query.required
  * @param {string} pageSize.query.required
+ * @param {string} userId.query
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */

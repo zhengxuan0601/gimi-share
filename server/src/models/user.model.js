@@ -57,17 +57,25 @@ class UserModel {
   /**
    * search userInfo by id or username
    * @param {*} param
+   * @param {*} hidepassword
    * @returns
    */
-  async findOne (param) {
+  async findOne (param, hidepassword) {
     try {
       const { columnSet, values } = multipleColumnSet(param)
 
       const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
 
-      const result = await db.query(sql, values)
+      const result = (await db.query(sql, values))[0]
 
-      return result[0]
+      if (!result) {
+        return null
+      }
+
+      return {
+        ...result,
+        password: hidepassword ? undefined : result.password
+      }
     } catch (error) {
       throw new Error(error)
     }

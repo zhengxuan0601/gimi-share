@@ -1,3 +1,5 @@
+-- CREATE ARTICLE TABLE
+
 CREATE TABLE article (
   `id` varchar(24) NOT NULL COMMENT '文章标识',
   `userId` varchar(24) NOT NULL COMMENT '文章所属用户标识',
@@ -9,5 +11,7 @@ CREATE TABLE article (
   `description` varchar(255) NOT NULL COMMENT '文章描述信息',
   `linkUrl` varchar(255) NULL COMMENT '参考文章链接',
   `createTime` varchar(24) NOT NULL COMMENT '文章创建时间',
-  `updateTime` varchar(24) NULL COMMENT '文章更新时间'
+  `updateTime` varchar(24) NULL COMMENT '文章更新时间',
+  `viewCounts` int NULL DEFAULT 0 COMMENT '文章浏览器次数',
+  PRIMARY KEY (`id`)
 )

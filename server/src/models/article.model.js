@@ -1,5 +1,6 @@
-const { query } = require('express')
 const db = require('@/db/db-connection')
+const UserModel = require('@/models/user.model')
+const UserArticleCollectModel = require('@/models/user_article_collect.model')
 const { multipleColumnSet, newRandomId, dateFormat } = require('@/utils/common.util')
 
 class ArticleModel {
@@ -28,6 +29,12 @@ class ArticleModel {
 
         const list = await db.query(sql)
 
+        const users = await Promise.all(list.map(arc => UserModel.findOne({ id: arc.userId }, true)))
+
+        list.forEach((arc, idx) => {
+          arc.author = users[idx]
+        })
+
         return {
           list,
           total: total[0].total,
@@ -39,7 +46,13 @@ class ArticleModel {
 
       const totalSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE ${columnSet}`
 
-      const [list, total] = [await db.query(sql, values), await query.db(totalSql, values)]
+      const [list, total] = [await db.query(sql, values), await db.query(totalSql, values)]
+
+      const users = await Promise.all(list.map(arc => UserModel.findOne({ id: arc.userId }, true)))
+
+      list.forEach((arc, idx) => {
+        arc.author = users[idx]
+      })
 
       return {
         list,
@@ -61,9 +74,23 @@ class ArticleModel {
 
       const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
 
-      const result = await db.query(sql, values)
+      const result = (await db.query(sql, values))[0]
 
-      return result[0]
+      if (!result) {
+        return null
+      }
+
+      const author = await UserModel.findOne({ id: result.userId }, true)
+
+      const collects = await UserArticleCollectModel.find({ articleId: result.id })
+
+      const follower = await Promise.all(collects.map(c => UserModel.findOne({ id: c.userId }, true)))
+
+      return {
+        ...result,
+        author,
+        follower
+      }
     } catch (error) {
       throw new Error(error)
     }
@@ -110,12 +137,31 @@ class ArticleModel {
     }
   }
 
+  /**
+   * delete article
+   * @param {*} id
+   */
   async delete (id) {
     try {
       const sql = `DELETE FROM ${this.tableName} WHERE id = ?`
 
       await db.query(sql, [id])
     } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * auto increment viewscount
+   * @param {*} id
+   */
+  async autoIncre (id) {
+    try {
+      const sql = `UPDATE ${this.tableName} SET viewCounts = viewCounts + 1 WHERE id = ?`
+
+      await db.query(sql, [id])
+    } catch (error) {
+      console.log(error)
       throw new Error(error)
     }
   }

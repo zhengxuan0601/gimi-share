@@ -7,6 +7,10 @@
     "host": "localhost",
     "user": "root",
     "port": "3306",
-    "database": "gimibase"
+    "database": "gimibase",
+    "acquireTimeout": 15000,
+    "connectionLimit": 100, 
+    "waitForConnections": true,
+    "queueLimit": 0
   }
 }

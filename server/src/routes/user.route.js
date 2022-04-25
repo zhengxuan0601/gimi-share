@@ -86,4 +86,26 @@ router.post('/updateuser', auth(), handlerValidate(userController.updateUser))
  */
 router.post('/login', loginuserShema, handlerValidate(userController.userLogin))
 
+/**
+ * 用户收藏文章
+ * @route GET /users/collectarticle
+ * @group 用户管理
+ * @param {string} articleId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/collectarticle', auth(), handlerValidate(userController.userFocusArticle))
+
+/**
+ * 用户取消收藏文章
+ * @route GET /users/uncollectarticle
+ * @group 用户管理
+ * @param {string} articleId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/uncollectarticle', auth(), handlerValidate(userController.userUnFocusArticle))
+
 module.exports = router

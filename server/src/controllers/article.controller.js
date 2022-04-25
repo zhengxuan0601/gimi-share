@@ -1,5 +1,6 @@
 const JsonResult = require('@/utils/httpResponse.unit')
 const ArticleModel = require('@/models/article.model')
+const UserArticleCollectModel = require('@/models/user_article_collect.model')
 
 class ArticleController {
   /**
@@ -28,7 +29,9 @@ class ArticleController {
    */
   async getArticleInfo (req, response) {
     try {
+      const articleId = req.query.id
       const data = await ArticleModel.findOne(req.query)
+      await ArticleModel.autoIncre(articleId)
       JsonResult.success({
         req,
         response,
@@ -85,10 +88,19 @@ class ArticleController {
     }
   }
 
+  /**
+   * delete article
+   * @param {*} req
+   * @param {*} response
+   * @returns
+   */
   async deleteArticle (req, response) {
     try {
       const id = req.query.id
       const articleInfo = await ArticleModel.findOne({ id })
+      if (!articleInfo) {
+        JsonResult.fail({ req, response, message: '文章不存在' })
+      }
       if (articleInfo.userId !== req.sessionuser.id) {
         return JsonResult.httpStatus(req, response, 403, {
           message: 'No permission to delete article',
@@ -96,6 +108,7 @@ class ArticleController {
         })
       }
       await ArticleModel.delete(id)
+      await UserArticleCollectModel.delete({ articleId: id })
       JsonResult.success({
         req,
         response,

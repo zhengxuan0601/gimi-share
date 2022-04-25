@@ -5,7 +5,7 @@ const trash = require('@/utils/ini.unit')
 
 class DBConnection {
   constructor () {
-    this.db = mysql.createConnection({
+    this.db = mysql.createPool({
       ...config.get('mysql'),
       password: trash.sqlpassword
     })
@@ -13,12 +13,22 @@ class DBConnection {
   }
 
   checkConnection () {
-    this.db.connect(function (err) {
+    this.db.getConnection(function (err, connection) {
       if (err) {
-        console.log(chalk.red('connect mysql fail!'))
-      } else {
-        console.log(chalk.green('connect mysql success!'))
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+          console.log(chalk.red('Database connection was closed.'))
+        }
+        if (err.code === 'ER_CON_COUNT_ERROR') {
+          console.log(chalk.red('Database has too many connections.'))
+        }
+        if (err.code === 'ECONNREFUSED') {
+          console.log(chalk.red('Database connection was refused.'))
+        }
       }
+      if (connection) {
+        connection.release()
+      }
+      console.log(chalk.green('connect mysql success!'))
     })
   }
 

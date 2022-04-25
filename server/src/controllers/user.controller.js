@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken')
 const trash = require('@/utils/ini.unit')
 const UserModel = require('@/models/user.model')
+const Article = require('@/models/article.model')
 const { decrypt } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
+const UserArticleCollectModel = require('@/models/user_article_collect.model')
 
 class UserController {
   /**
@@ -12,12 +14,9 @@ class UserController {
    */
   async getAllUsers (req, response) {
     try {
-      const data = await UserModel.find(req.query)
+      const data = await UserModel.find(req.query, true)
       data.list = data.list.map(user => {
-        return {
-          ...user,
-          password: undefined
-        }
+        return user
       })
       JsonResult.success({
         req,
@@ -37,12 +36,11 @@ class UserController {
    */
   async getUserById (req, response) {
     try {
-      const data = await UserModel.findOne(req.query)
-      const { password, ...nopasswordUser } = data || {}
+      const data = await UserModel.findOne(req.query, true)
       JsonResult.success({
         req,
         response,
-        data: nopasswordUser,
+        data,
         message: '查询用户信息成功'
       })
     } catch (error) {
@@ -141,6 +139,54 @@ class UserController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '用户登陆失败' })
+    }
+  }
+
+  /**
+   * user focus article
+   * @param {*} req
+   * @param {*} response
+   */
+  async userFocusArticle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const articleId = req.query.articleId
+      const exist = await UserArticleCollectModel.findOne(userId, articleId)
+      const article = await Article.findOne({ id: articleId })
+      if (!article) {
+        return JsonResult.fail({ req, response, message: '文章不存在' })
+      }
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '用户已收藏' })
+      }
+      await UserArticleCollectModel.add(userId, articleId)
+      JsonResult.success({
+        req,
+        response,
+        message: '收藏成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '收藏文章失败' })
+    }
+  }
+
+  /**
+     * user unfocus article
+     * @param {*} req
+     * @param {*} response
+     */
+  async userUnFocusArticle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const articleId = req.query.articleId
+      await UserArticleCollectModel.delete({ userId, articleId })
+      JsonResult.success({
+        req,
+        response,
+        message: '取消收藏成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '取消收藏失败' })
     }
   }
 }

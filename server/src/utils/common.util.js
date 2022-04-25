@@ -5,13 +5,13 @@ const cryptoJs = require('crypto-js')
  * @param {*} object
  * @returns
  */
-exports.multipleColumnSet = object => {
+exports.multipleColumnSet = (object, joinstr) => {
   if (typeof object !== 'object') {
     throw new Error('Invalid input')
   }
   const keys = Object.keys(object)
   const values = Object.values(object)
-  const columnSet = keys.map(key => `${key} = ?`).join(', ')
+  const columnSet = keys.map(key => `${key} = ?`).join(joinstr || ', ')
 
   return {
     columnSet,
