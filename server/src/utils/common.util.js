@@ -1,4 +1,6 @@
+const jwt = require('jsonwebtoken')
 const cryptoJs = require('crypto-js')
+const trash = require('@/utils/ini.unit')
 
 /**
  * 查询条件sql拼接
@@ -90,4 +92,69 @@ exports.decrypt = (data, key, iv) => {
     padding: cryptoJs.pad.ZeroPadding
   })
   return decrypted.toString(cryptoJs.enc.Utf8)
+}
+
+/**
+ * 获取当前登录用户的userId
+ * @param {*} req
+ */
+exports.getSessionuserId = (req) => {
+  return new Promise(resolve => {
+    try {
+      const headers = req.headers
+      if (!headers.accesstoken) {
+        resolve(null)
+      }
+      const decodedToken = jwt.verify(headers.accesstoken, trash.jsonSecretkey)
+      resolve(decodedToken.id)
+    } catch (error) {
+      resolve(null)
+    }
+  })
+}
+
+/**
+ * list transform tree
+ * @param {*} data
+ */
+exports.transformTree = (data, key, pkey) => {
+  if (!Array.isArray(data)) {
+    throw new Error('data is must be array.')
+  }
+  const clonedata = this.deepClone(data)
+  const map = clonedata.reduce((prev, cur) => {
+    prev[cur[key]] = cur
+    return prev
+  }, {})
+  const transformdata = []
+  for (let i = 0; i < clonedata.length; i++) {
+    const parent = map[clonedata[i][pkey]]
+    if (!parent) {
+      transformdata.push(clonedata[i])
+    } else {
+      parent.children = [...(parent.children || []), clonedata[i]]
+    }
+  }
+  return transformdata
+}
+
+/**
+ * deepclone target
+ * @param {*} obj
+ * @param {*} cache
+ * @returns
+ */
+exports.deepClone = (obj, cache = new WeakMap()) => {
+  if (typeof obj !== 'object' || obj === null) return obj
+  if (obj instanceof Date) return new Date(obj)
+  if (obj instanceof RegExp) return new RegExp(obj)
+  if (cache.get(obj)) return cache.get(obj)
+  const cloneObj = new obj.constructor()
+  cache.set(obj, cloneObj)
+  for (const k in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, k)) {
+      cloneObj[k] = this.deepClone(obj[k], cache)
+    }
+  }
+  return cloneObj
 }

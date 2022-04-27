@@ -10,8 +10,22 @@
         <div class="right-operate">
           <div class="search-model">
             <a-icon type="search" />
-            <input type="text" placeholder="" class="s-input">
+            <input type="text" placeholder="关键字搜索" class="s-input">
           </div>
+          <button class="a-primary create-button">创作者中心</button>
+          <button v-if="false" class="a-primary dashed">登录</button>
+          <a-popover trigger="click" placement="bottom">
+            <div slot="content" class="cover-image-popover">
+              <p><a-icon type="snippets" />写文章</p>
+              <p><a-icon type="user" />我的主页</p>
+              <p><a-icon type="form" />修改资料</p>
+              <p><a-icon type="poweroff" />退出登录</p>
+            </div>
+            <div class="cover-img">
+              <img src="https://p26-passport.byteacctimg.com/img/user-avatar/5ba0ae3b112a83b512e2ad3a0813aac4~300x300.image" alt="">
+            </div>
+          </a-popover>
+         
         </div>
       </div>
     </header>
@@ -31,7 +45,9 @@ export default {
 .base-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 30px;
   header {
     height: 60px;
     position: fixed;
@@ -55,6 +71,8 @@ export default {
         }
       }
       .right-operate {
+        display: flex;
+        align-items: center;
         .search-model {
           position: relative;
           width: 216px;
@@ -82,11 +100,24 @@ export default {
             color: #999;
           }
         }
+        .create-button {
+          margin: 0 16px;
+        }
+        .cover-img {
+          width: 36px;
+          height: 36px;
+          overflow: hidden;
+          border-radius: 50%;
+          cursor: pointer;
+          img {
+            width: 100%;
+          }
+        }
       }
     }
   }
   section {
-    padding-top: 60px;
+    padding-top: 70px;
     flex: 1;
     height: 0;
     width: 1100px;

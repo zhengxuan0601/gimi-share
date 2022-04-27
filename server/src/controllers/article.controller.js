@@ -1,6 +1,7 @@
-const JsonResult = require('@/utils/httpResponse.unit')
 const ArticleModel = require('@/models/article.model')
-const UserArticleCollectModel = require('@/models/user_article_collect.model')
+const JsonResult = require('@/utils/httpResponse.unit')
+const { getSessionuserId } = require('@/utils/common.util')
+const UserCollectArticleModel = require('@/models/user_collect_article.model')
 
 class ArticleController {
   /**
@@ -30,8 +31,10 @@ class ArticleController {
   async getArticleInfo (req, response) {
     try {
       const articleId = req.query.id
-      const data = await ArticleModel.findOne(req.query)
-      await ArticleModel.autoIncre(articleId)
+      const sessionId = await getSessionuserId(req)
+      console.log(sessionId)
+      const data = await ArticleModel.findOne(req.query, sessionId)
+      await ArticleModel.autoIncre(articleId, 'viewCounts')
       JsonResult.success({
         req,
         response,
@@ -108,7 +111,7 @@ class ArticleController {
         })
       }
       await ArticleModel.delete(id)
-      await UserArticleCollectModel.delete({ articleId: id })
+      await UserCollectArticleModel.delete({ articleId: id })
       JsonResult.success({
         req,
         response,

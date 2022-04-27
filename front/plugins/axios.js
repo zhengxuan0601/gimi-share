@@ -1,7 +1,6 @@
 import { message } from 'ant-design-vue'
 
 export default function ({ store, redirect, app: { $axios } }) {
-  // $axios.defaults.baseURL = '/feedbook'
   $axios.onRequest((config) => {
     return config
   })

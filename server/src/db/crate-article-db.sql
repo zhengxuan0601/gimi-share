@@ -13,5 +13,8 @@ CREATE TABLE article (
   `createTime` varchar(24) NOT NULL COMMENT '文章创建时间',
   `updateTime` varchar(24) NULL COMMENT '文章更新时间',
   `viewCounts` int NULL DEFAULT 0 COMMENT '文章浏览器次数',
+  `collectCounts` int NULL DEFAULT 0 COMMENT '文章被收藏次数',
+  `likeCounts` int NULL DEFAULT 0 COMMENT '文章被点赞次数',
+  `commentCounts` int NULL DEFAULT 0 COMMENT '文章被评论次数',
   PRIMARY KEY (`id`)
 )

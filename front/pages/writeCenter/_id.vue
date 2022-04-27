@@ -86,7 +86,7 @@ export default {
       return true
     }
     try {
-      const { data } = await $axios.get(`/v1/gimshare/articleDetail?id=${params.id}`)
+      const { data } = await $axios.get(`/api/v1/articles/articleinfo?id=${params.id}`)
       if (!data) {
         return false
       }
@@ -99,7 +99,7 @@ export default {
   async asyncData ({ $axios, params }) {
     const id = params.id
     if (id) {
-      const { data } = await $axios.get(`/v1/gimshare/articleDetail?id=${id}`)
+      const { data } = await $axios.get(`/api/v1/articles/articleinfo?id=${id}`)
       return {
         id,
         initTitle: data.articleTitle,

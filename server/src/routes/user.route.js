@@ -45,6 +45,16 @@ router.get('/', userController.getAllUsers)
 router.get('/userinfo', userController.getUserById)
 
 /**
+ * 查询当前登录用户的信息
+ * @route GET /users/sessionuserinfo
+ * @group 用户管理
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/sessionuserinfo', auth(), handlerValidate(userController.getSessionUserInfo))
+
+/**
  * 根据用户id删除用户
  * @route GET /users/deleteuser
  * @group 用户管理
@@ -95,7 +105,7 @@ router.post('/login', loginuserShema, handlerValidate(userController.userLogin))
  * @returns {Error}  default - Unexpected error
  * @security JWT
  */
-router.get('/collectarticle', auth(), handlerValidate(userController.userFocusArticle))
+router.get('/collectarticle', auth(), handlerValidate(userController.userCollectArticle))
 
 /**
  * 用户取消收藏文章
@@ -106,6 +116,28 @@ router.get('/collectarticle', auth(), handlerValidate(userController.userFocusAr
  * @returns {Error}  default - Unexpected error
  * @security JWT
  */
-router.get('/uncollectarticle', auth(), handlerValidate(userController.userUnFocusArticle))
+router.get('/uncollectarticle', auth(), handlerValidate(userController.userUnCollectArticle))
+
+/**
+ * 用户点赞文章
+ * @route GET /users/agreearticle
+ * @group 用户管理
+ * @param {string} articleId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/agreearticle', auth(), handlerValidate(userController.userAgreeArticle))
+
+/**
+  * 用户取消点赞文章
+  * @route GET /users/unagreearticle
+  * @group 用户管理
+  * @param {string} articleId.query.required
+  * @returns {object} 200
+  * @returns {Error}  default - Unexpected error
+  * @security JWT
+  */
+router.get('/unagreearticle', auth(), handlerValidate(userController.userUnAgreeArticle))
 
 module.exports = router

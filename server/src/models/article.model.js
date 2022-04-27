@@ -1,6 +1,9 @@
 const db = require('@/db/db-connection')
 const UserModel = require('@/models/user.model')
-const UserArticleCollectModel = require('@/models/user_article_collect.model')
+// eslint-disable-next-line no-unused-vars
+const UserCollectArticleModel = require('@/models/user_collect_article.model')
+// eslint-disable-next-line no-unused-vars
+const UserAgreeArticleModel = require('@/models/user_agree_article.model')
 const { multipleColumnSet, newRandomId, dateFormat } = require('@/utils/common.util')
 
 class ArticleModel {
@@ -33,6 +36,7 @@ class ArticleModel {
 
         list.forEach((arc, idx) => {
           arc.author = users[idx]
+          arc.content = undefined
         })
 
         return {
@@ -67,8 +71,9 @@ class ArticleModel {
   /**
    * search articleInfo by id
    * @param {*} param
+   * @param {*} sessionId
    */
-  async findOne (param) {
+  async findOne (param, sessionId) {
     try {
       const { columnSet, values } = multipleColumnSet(param)
 
@@ -82,14 +87,15 @@ class ArticleModel {
 
       const author = await UserModel.findOne({ id: result.userId }, true)
 
-      const collects = await UserArticleCollectModel.find({ articleId: result.id })
+      const isflower = await UserCollectArticleModel.findOne(sessionId, result.id)
 
-      const follower = await Promise.all(collects.map(c => UserModel.findOne({ id: c.userId }, true)))
+      const isliker = await UserAgreeArticleModel.findOne(sessionId, result.id)
 
       return {
         ...result,
-        author,
-        follower
+        isflower: Boolean(isflower),
+        isliker: Boolean(isliker),
+        author
       }
     } catch (error) {
       throw new Error(error)
@@ -143,7 +149,24 @@ class ArticleModel {
    */
   async delete (id) {
     try {
-      const sql = `DELETE FROM ${this.tableName} WHERE id = ?`
+      const sql = `DELETE ${this.tableName}, comment, user_collect_article, user_agree_article 
+        FROM ${this.tableName}, comment, user_collect_article, user_agree_article  
+        WHERE ${this.tableName}.id = ? AND comment.articleId = ? AND user_collect_article.articleId = ? AND user_agree_article.articleId = ?`
+
+      await db.query(sql, [id, id, id, id])
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * auto increment fields
+   * @param {*} id
+   * @param {*} fields
+   */
+  async autoIncre (id, fields) {
+    try {
+      const sql = `UPDATE ${this.tableName} SET ${fields} = ${fields} + 1 WHERE id = ?`
 
       await db.query(sql, [id])
     } catch (error) {
@@ -152,16 +175,16 @@ class ArticleModel {
   }
 
   /**
-   * auto increment viewscount
+   * auto decrement fields
    * @param {*} id
+   * @param {*} fields
    */
-  async autoIncre (id) {
+  async autoDec (id, fields) {
     try {
-      const sql = `UPDATE ${this.tableName} SET viewCounts = viewCounts + 1 WHERE id = ?`
+      const sql = `UPDATE ${this.tableName} SET ${fields} = ${fields} - 1 WHERE id = ?`
 
       await db.query(sql, [id])
     } catch (error) {
-      console.log(error)
       throw new Error(error)
     }
   }

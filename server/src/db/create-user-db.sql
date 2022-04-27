@@ -1,6 +1,6 @@
 -- CREATE USER TABLE
 
-CREATE TABLE user  (
+CREATE TABLE user (
   `id` varchar(24) NOT NULL COMMENT '用户编码',
   `username` varchar(16) NOT NULL COMMENT '用户登录账号',
   `password` varchar(255) NOT NULL COMMENT '用户密码',

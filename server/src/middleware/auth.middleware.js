@@ -14,7 +14,7 @@ const auth = () => {
         })
       }
       const decodedToken = jwt.verify(headers.accesstoken, trash.jsonSecretkey)
-      const user = await UserModel.findOne({ id: decodedToken.id })
+      const user = await UserModel.findOne({ id: decodedToken.id }, true)
       if (!user) {
         return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',

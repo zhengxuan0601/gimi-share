@@ -1,21 +1,22 @@
 const db = require('@/db/db-connection')
 const { multipleColumnSet } = require('@/utils/common.util')
 
-class UserArticleCollectModel {
+class UserCollectArticleModel {
   constructor () {
-    this.tableName = 'user_article_collect'
+    this.tableName = 'user_collect_article'
   }
 
   /**
-   * find user_article focus map List
+   * find user_article collect map List
    * @param {*} param
+   * @param {*} fields
    * @returns
    */
-  async find (param) {
+  async find (param, fields) {
     try {
       const { columnSet, values } = multipleColumnSet(param)
 
-      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+      const sql = `SELECT ${fields || '*'} FROM ${this.tableName} WHERE ${columnSet}`
 
       const result = await db.query(sql, values)
 
@@ -26,7 +27,7 @@ class UserArticleCollectModel {
   }
 
   /**
-   * find one user_article focus
+   * find one user_article collect
    * @param {*} userId
    * @param {*} articleId
    * @returns
@@ -39,13 +40,12 @@ class UserArticleCollectModel {
 
       return result[0]
     } catch (error) {
-      console.log(error)
       throw new Error(error)
     }
   }
 
   /**
-   * get user_article focus total
+   * get user_article collect total
    * @param {*} param
    */
   async total (param) {
@@ -73,7 +73,6 @@ class UserArticleCollectModel {
 
       await db.query(sql, [userId, articleId])
     } catch (error) {
-      console.log(error)
       throw new Error(error)
     }
   }
@@ -96,4 +95,4 @@ class UserArticleCollectModel {
   }
 }
 
-module.exports = new UserArticleCollectModel()
+module.exports = new UserCollectArticleModel()

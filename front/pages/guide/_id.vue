@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="article-content-block">
     <client-only>
       <div slot="placeholder">
         <div class="arc-skeleton">
@@ -12,15 +12,22 @@
       </div>
       <div class="article-content">
         <div class="title">{{ articleDetail.articleTitle }}</div>
-        <p class="nickname">需要坚持的人</p>
-        <p class="time">{{ articleDetail.createTime.replace('-', '年').replace('-', '月').replace(' ', '日 ') }}</p>
+        <div class="user-model">
+          <div class="img">
+            <img :src="articleDetail.author.avatar" alt="avatar">
+          </div>
+          <div class="info">
+            <p class="nickname">{{ articleDetail.author.nickname }}</p>
+            <p class="time">{{ articleDetail.createTime.replace('-', '年').replace('-', '月').replace(' ', '日 ') }} <span>· 阅读 {{ articleDetail.viewCounts }}</span></p>
+          </div>
+        </div>
         <img 
-          v-if="articleDetail.articleCover"
+          v-if="articleDetail.coverImage"
           class="article-cover" 
-          :src="articleDetail.articleCover" 
+          :src="articleDetail.coverImage" 
           alt="cover">
         <mavon-editor 
-          :value="articleDetail.context"
+          :value="articleDetail.content"
           class="md"
           :subfield = "false"
           :default-open = "'preview'"
@@ -31,7 +38,7 @@
         <div class="article-tag">
           <em>标签：</em>
           <span 
-            v-for="(item, index) in articleDetail.keywords.split(';')"
+            v-for="(item, index) in articleDetail.tag.split(';')"
             :key="index">{{ item }}</span>
         </div>
         <div class="bottom-jy">
@@ -50,7 +57,7 @@ export default {
       return true
     }
     try {
-      const { data } = await $axios.get(`/v1/gimshare/articleDetail?id=${params.id}`)
+      const { data } = await $axios.get(`/api/v1/articles/articleinfo?id=${params.id}`)
       if (!data) {
         return false
       }
@@ -62,7 +69,7 @@ export default {
 
   async asyncData ({ $axios, params }) {
     try {
-      const articleDetail = (await $axios.get(`/v1/gimshare/articleDetail?id=${params.id}`)).data || {}
+      const articleDetail = (await $axios.get(`/api/v1/articles/articleinfo?id=${params.id}`)).data || {}
       return {
         articleDetail
       }
@@ -87,19 +94,42 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.article-content-block {
+  width: 860px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 50px;
+}
 .article-content {
   .title {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 30px;
+    margin-bottom: 20px;
     color: #4c4c4c;
     font-weight: bold;
   }
-  .time {
-    color: #999;
+  .user-model {
+    display: flex;
+    align-items: center;
     margin-bottom: 20px;
-  }
-  .nickname {
-    color: #4c4c4c;
+    .img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 10px;
+      img {
+        width: 100%;
+        display: block;
+      }
+    }
+    .info {
+      .time {
+        color: #999;
+      }
+      .nickname {
+        color: #4c4c4c;
+      }
+    }
   }
   .article-cover {
     display: block;

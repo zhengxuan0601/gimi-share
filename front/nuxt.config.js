@@ -24,6 +24,10 @@ export default {
     '@/assets/style/common.css'
   ],
 
+  styleResources: {
+    less: '@/assets/style/common.less'
+  },
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '@/plugins/antd-ui',
@@ -43,6 +47,7 @@ export default {
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
+    '@nuxtjs/style-resources'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -54,16 +59,16 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    prefix: '/feedbook',
+    prefix: '/gimishare',
     proxy: true
   },
 
   proxy: {
-    '/feedbook': {
-      target: "http://localhost:3000/feedbook", // 代理地址
+    '/gimishare': {
+      target: "http://localhost:5555/gimishare", // 代理地址
       changeOrigin: true,
       pathRewrite: {
-        '^/feedbook': ''
+        '^/gimishare': ''
       },
     }
   },

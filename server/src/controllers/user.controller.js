@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken')
 const trash = require('@/utils/ini.unit')
 const UserModel = require('@/models/user.model')
-const Article = require('@/models/article.model')
+const ArticleModel = require('@/models/article.model')
 const { decrypt } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
-const UserArticleCollectModel = require('@/models/user_article_collect.model')
+const UserCollectArticleModel = require('@/models/user_collect_article.model')
+const UserAgreeArticleModel = require('@/models/user_agree_article.model')
 
 class UserController {
   /**
@@ -44,7 +45,24 @@ class UserController {
         message: '查询用户信息成功'
       })
     } catch (error) {
-      console.log(error)
+      JsonResult.fail({ req, response, error, message: '查询用户信息失败' })
+    }
+  }
+
+  /**
+   * get current login userInfo
+   * @param {*} req
+   * @param {*} response
+   */
+  async getSessionUserInfo (req, response) {
+    try {
+      JsonResult.success({
+        req,
+        response,
+        data: req.sessionuser,
+        message: '查询用户信息成功'
+      })
+    } catch (error) {
       JsonResult.fail({ req, response, error, message: '查询用户信息失败' })
     }
   }
@@ -117,25 +135,20 @@ class UserController {
     const { username, password } = req.body
     try {
       const user = await UserModel.findOne({ username })
-
       if (!user) {
         return JsonResult.fail({ req, response, message: '该用户还未注册' })
       }
-
       const depassword = decrypt(user.password, trash.aesKey, trash.aesIIv)
       if (depassword !== password) {
         return JsonResult.fail({ req, response, message: '用户名或密码错误' })
       }
-
-      delete user.password
-      const accessToken = jwt.sign({
-        ...user
-      }, trash.jsonSecretkey, { expiresIn: trash.expiresIn })
+      const sessionuser = { ...user, password: undefined }
+      const accessToken = jwt.sign(sessionuser, trash.jsonSecretkey, { expiresIn: trash.expiresIn })
       JsonResult.success({
         req,
         response,
         message: '用户登陆成功',
-        data: { ...user, accessToken }
+        data: { ...sessionuser, accessToken }
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '用户登陆失败' })
@@ -143,23 +156,24 @@ class UserController {
   }
 
   /**
-   * user focus article
+   * user collect article
    * @param {*} req
    * @param {*} response
    */
-  async userFocusArticle (req, response) {
+  async userCollectArticle (req, response) {
     try {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
-      const exist = await UserArticleCollectModel.findOne(userId, articleId)
-      const article = await Article.findOne({ id: articleId })
+      const exist = await UserCollectArticleModel.findOne(userId, articleId)
+      const article = await ArticleModel.findOne({ id: articleId })
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
       if (exist) {
         return JsonResult.fail({ req, response, message: '用户已收藏' })
       }
-      await UserArticleCollectModel.add(userId, articleId)
+      await UserCollectArticleModel.add(userId, articleId)
+      await ArticleModel.autoIncre(articleId, 'collectCounts')
       JsonResult.success({
         req,
         response,
@@ -171,15 +185,24 @@ class UserController {
   }
 
   /**
-     * user unfocus article
-     * @param {*} req
-     * @param {*} response
-     */
-  async userUnFocusArticle (req, response) {
+   * user uncollect article
+   * @param {*} req
+   * @param {*} response
+   */
+  async userUnCollectArticle (req, response) {
     try {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
-      await UserArticleCollectModel.delete({ userId, articleId })
+      const exist = await UserCollectArticleModel.findOne(userId, articleId)
+      const article = await ArticleModel.findOne({ id: articleId })
+      if (!article) {
+        return JsonResult.fail({ req, response, message: '文章不存在' })
+      }
+      if (!exist) {
+        return JsonResult.fail({ req, response, message: '还未收藏' })
+      }
+      await UserCollectArticleModel.delete({ userId, articleId })
+      await ArticleModel.autoDec(articleId, 'collectCounts')
       JsonResult.success({
         req,
         response,
@@ -187,6 +210,64 @@ class UserController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '取消收藏失败' })
+    }
+  }
+
+  /**
+   * user agree article
+   * @param {*} req
+   * @param {*} response
+   */
+  async userAgreeArticle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const articleId = req.query.articleId
+      const exist = await UserAgreeArticleModel.findOne(userId, articleId)
+      const article = await ArticleModel.findOne({ id: articleId })
+      if (!article) {
+        return JsonResult.fail({ req, response, message: '文章不存在' })
+      }
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '重复点赞' })
+      }
+      await UserAgreeArticleModel.add(userId, articleId)
+      await ArticleModel.autoIncre(articleId, 'likeCounts')
+      JsonResult.success({
+        req,
+        response,
+        message: '点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '点赞失败' })
+    }
+  }
+
+  /**
+   * user unagree article
+   * @param {*} req
+   * @param {*} response
+   */
+  async userUnAgreeArticle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const articleId = req.query.articleId
+      const exist = await UserAgreeArticleModel.findOne(userId, articleId)
+      const article = await ArticleModel.findOne({ id: articleId })
+      if (!article) {
+        return JsonResult.fail({ req, response, message: '文章不存在' })
+      }
+      if (!exist) {
+        return JsonResult.fail({ req, response, message: '还未点赞' })
+      }
+      await UserAgreeArticleModel.delete({ userId, articleId })
+      await ArticleModel.autoDec(articleId, 'likeCounts')
+      JsonResult.success({
+        req,
+        response,
+        message: '取消点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '取消点赞失败' })
     }
   }
 }
