@@ -2,10 +2,11 @@ const jwt = require('jsonwebtoken')
 const trash = require('@/utils/ini.unit')
 const UserModel = require('@/models/user.model')
 const ArticleModel = require('@/models/article.model')
-const { decrypt } = require('@/utils/common.util')
+const { decrypt, getSessionuserId } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
-const UserCollectArticleModel = require('@/models/user_collect_article.model')
+const UserFocusUserModel = require('@/models/user_focus_user.model')
 const UserAgreeArticleModel = require('@/models/user_agree_article.model')
+const UserCollectArticleModel = require('@/models/user_collect_article.model')
 
 class UserController {
   /**
@@ -93,6 +94,11 @@ class UserController {
    */
   async createUser (req, response) {
     try {
+      const { code } = req.body
+      const captcha = req.session.captcha
+      if (!captcha || (code.toLowerCase() !== captcha.toLowerCase())) {
+        return JsonResult.fail({ req, response, message: '验证码错误' })
+      }
       await UserModel.create(req.body)
       JsonResult.success({
         req,
@@ -132,14 +138,20 @@ class UserController {
    * @returns
    */
   async userLogin (req, response) {
-    const { username, password } = req.body
+    const { username, password, code } = req.body
     try {
+      const captcha = req.session.captcha
+      if (!captcha || (code.toLowerCase() !== captcha.toLowerCase())) {
+        return JsonResult.fail({ req, response, message: '验证码错误' })
+      }
       const user = await UserModel.findOne({ username })
       if (!user) {
         return JsonResult.fail({ req, response, message: '该用户还未注册' })
       }
       const depassword = decrypt(user.password, trash.aesKey, trash.aesIIv)
-      if (depassword !== password) {
+      const { aesKey, aesIv } = req.session.publicAes
+      const userdepassword = decrypt(password, aesKey, aesIv)
+      if (depassword !== userdepassword) {
         return JsonResult.fail({ req, response, message: '用户名或密码错误' })
       }
       const sessionuser = { ...user, password: undefined }
@@ -268,6 +280,88 @@ class UserController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '取消点赞失败' })
+    }
+  }
+
+  /**
+   * user focus user
+   * @param {*} req
+   * @param {*} response
+   */
+  async userFocusUser (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const focusId = req.query.focusId
+      const exist = await UserFocusUserModel.findOne(userId, focusId)
+      const user = await UserModel.findOne({ id: focusId })
+      if (!user) {
+        return JsonResult.fail({ req, response, message: '关注的用户不存在' })
+      }
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '已关注' })
+      }
+      await UserFocusUserModel.add(userId, focusId)
+      JsonResult.success({
+        req,
+        response,
+        message: '关注成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '关注失败' })
+    }
+  }
+
+  /**
+   * user unfocus user
+   * @param {*} req
+   * @param {*} response
+   */
+  async userUnFocusUser (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const focusId = req.query.focusId
+      const exist = await UserFocusUserModel.findOne(userId, focusId)
+      const user = await UserModel.findOne({ id: focusId })
+      if (!user) {
+        return JsonResult.fail({ req, response, message: '用户不存在' })
+      }
+      if (!exist) {
+        return JsonResult.fail({ req, response, message: '还未关注' })
+      }
+      await UserFocusUserModel.delete({ userId, focusId })
+      JsonResult.success({
+        req,
+        response,
+        message: '取消关注成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '取消关注失败' })
+    }
+  }
+
+  /**
+   * find user is focus user
+   * @param {*} req
+   * @param {*} response
+   */
+  async userIsFocus (req, response) {
+    try {
+      const { focusId } = req.query
+      const userId = await getSessionuserId(req)
+      const data = await UserFocusUserModel.findOne(userId, focusId)
+      JsonResult.success({
+        req,
+        response,
+        data: Boolean(data),
+        message: '查询成功'
+      })
+    } catch (error) {
+      JsonResult.success({
+        req,
+        response,
+        data: false,
+        message: '查询成功'
+      })
     }
   }
 }

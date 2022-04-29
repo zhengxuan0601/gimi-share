@@ -11,7 +11,8 @@ class ArticleController {
    */
   async getAllArticles (req, response) {
     try {
-      const data = await ArticleModel.find(req.query)
+      const sessionId = await getSessionuserId(req)
+      const data = await ArticleModel.find(req.query, sessionId)
       JsonResult.success({
         req,
         response,
@@ -32,7 +33,6 @@ class ArticleController {
     try {
       const articleId = req.query.id
       const sessionId = await getSessionuserId(req)
-      console.log(sessionId)
       const data = await ArticleModel.findOne(req.query, sessionId)
       await ArticleModel.autoIncre(articleId, 'viewCounts')
       JsonResult.success({

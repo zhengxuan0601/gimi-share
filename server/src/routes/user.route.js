@@ -2,6 +2,7 @@
  * @typedef LoginInfo
  * @property {string} username.required -用户名
  * @property {string} password.required -密码
+ * @property {string} code.required -验证码
  */
 
 /**
@@ -139,5 +140,38 @@ router.get('/agreearticle', auth(), handlerValidate(userController.userAgreeArti
   * @security JWT
   */
 router.get('/unagreearticle', auth(), handlerValidate(userController.userUnAgreeArticle))
+
+/**
+ * 关注用户
+ * @route GET /users/focususer
+ * @group 用户管理
+ * @param {string} focusId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/focususer', auth(), handlerValidate(userController.userFocusUser))
+
+/**
+   * 取消关注用户
+   * @route GET /users/unfocursuse
+   * @group 用户管理
+   * @param {string} focusId.query.required
+   * @returns {object} 200
+   * @returns {Error}  default - Unexpected error
+   * @security JWT
+   */
+router.get('/unfocususer', auth(), handlerValidate(userController.userUnFocusUser))
+
+/**
+ * 查询登录用户是否关注指定用户
+ * @route GET /users/isfocususer
+ * @group 用户管理
+ * @param {string} focusId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/isfocususer', userController.userIsFocus)
 
 module.exports = router

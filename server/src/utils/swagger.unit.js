@@ -9,7 +9,7 @@ const options = {
       version: '1.0.0'
     },
     host: `${config.get('server.host')}:${config.get('server.port')}`,
-    basePath: '/api/v1',
+    basePath: '/gimishare/api/v1',
     produces: [
       'application/json',
       'application/xml'

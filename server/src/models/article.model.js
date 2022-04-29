@@ -15,7 +15,7 @@ class ArticleModel {
    * search articles
    * @param {*} param
    */
-  async find (param) {
+  async find (param, sessionId) {
     try {
       const { pageNo = 1, pageSize = 10, ...object } = param
 
@@ -34,9 +34,12 @@ class ArticleModel {
 
         const users = await Promise.all(list.map(arc => UserModel.findOne({ id: arc.userId }, true)))
 
+        const isLikers = await Promise.all(list.map(arc => UserAgreeArticleModel.findOne(sessionId, arc.id)))
+
         list.forEach((arc, idx) => {
           arc.author = users[idx]
           arc.content = undefined
+          arc.isLiker = Boolean(isLikers[idx])
         })
 
         return {
@@ -54,8 +57,12 @@ class ArticleModel {
 
       const users = await Promise.all(list.map(arc => UserModel.findOne({ id: arc.userId }, true)))
 
+      const isLikers = await Promise.all(list.map(arc => UserAgreeArticleModel.findOne(sessionId, arc.id)))
+
       list.forEach((arc, idx) => {
         arc.author = users[idx]
+        arc.content = undefined
+        arc.isLiker = Boolean(isLikers[idx])
       })
 
       return {
@@ -87,14 +94,14 @@ class ArticleModel {
 
       const author = await UserModel.findOne({ id: result.userId }, true)
 
-      const isflower = await UserCollectArticleModel.findOne(sessionId, result.id)
+      const isFlower = await UserCollectArticleModel.findOne(sessionId, result.id)
 
-      const isliker = await UserAgreeArticleModel.findOne(sessionId, result.id)
+      const isLiker = await UserAgreeArticleModel.findOne(sessionId, result.id)
 
       return {
         ...result,
-        isflower: Boolean(isflower),
-        isliker: Boolean(isliker),
+        isFlower: Boolean(isFlower),
+        isLiker: Boolean(isLiker),
         author
       }
     } catch (error) {

@@ -13,31 +13,56 @@
             <input type="text" placeholder="关键字搜索" class="s-input">
           </div>
           <button class="a-primary create-button">创作者中心</button>
-          <button v-if="false" class="a-primary dashed">登录</button>
-          <a-popover trigger="click" placement="bottom">
+          <button 
+            v-if="!userInfo"
+            class="a-primary dashed"
+            @click="$store.commit('UPDATE_LOGIN_VISIBLE', true)">登录</button>
+          <a-popover v-else trigger="hover" placement="bottom">
             <div slot="content" class="cover-image-popover">
-              <p><a-icon type="snippets" />写文章</p>
+              <div class="nickname">{{ userInfo.nickname }}</div>
+              <p><nuxt-link to="/writecenter"><a-icon type="file-add" />写文章</nuxt-link></p>
               <p><a-icon type="user" />我的主页</p>
               <p><a-icon type="form" />修改资料</p>
-              <p><a-icon type="poweroff" />退出登录</p>
+              <p @click="userLogout"><a-icon type="poweroff" />退出登录</p>
             </div>
             <div class="cover-img">
-              <img src="https://p26-passport.byteacctimg.com/img/user-avatar/5ba0ae3b112a83b512e2ad3a0813aac4~300x300.image" alt="">
+              <img :src="userInfo.avatar" alt="">
             </div>
           </a-popover>
-         
         </div>
       </div>
     </header>
     <section>
       <Nuxt></Nuxt>
     </section>
+    <LoginModal
+      v-if="loginModalVisible" />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import LoginModal from '@/components/LoginModal'
 export default {
+  components: { LoginModal },
+  computed: {
+    ...mapState({
+      loginModalVisible: state => state.loginModalVisible,
+      userInfo: state => state.userInfo
+    })
+  },
 
+  methods: {
+    userLogout () {
+      this.$cookies.remove('ACCESS_TOKEN')
+      localStorage.removeItem('accessToken')
+      this.$store.commit('UPDATE_USER_INFO', '')
+      this.$router.replace('/')
+      setTimeout(() => {
+        location.reload()
+      }, 200)
+    }
+  }
 }
 </script>
 
@@ -117,7 +142,7 @@ export default {
     }
   }
   section {
-    padding-top: 70px;
+    padding-top: 80px;
     flex: 1;
     height: 0;
     width: 1100px;

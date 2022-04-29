@@ -12,5 +12,16 @@
     "connectionLimit": 100, 
     "waitForConnections": true,
     "queueLimit": 0
+  },
+  "session": {
+    "name": "SESSIONID",
+    "secret": "user_access_session", 
+    "cookie": { 
+      "maxAge": 60000,
+      "httpOnly": true,
+      "secure": false
+    },
+    "resave": false,
+    "saveUninitialized": true
   }
 }

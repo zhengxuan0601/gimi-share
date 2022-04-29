@@ -15,14 +15,16 @@
               :rules="rules"
               :label-col="{ span: 6 }" 
               :wrapper-col="{ span: 18 }">
-              <a-form-model-item label="文章分类" prop="articleClassify">
-                <a-radio-group v-model="articleInfo.articleClassify">
-                  <a-radio :value="1">旅行攻略</a-radio>
-                  <a-radio :value="2"> 生活常识</a-radio>
+              <a-form-model-item label="文章分类" prop="category">
+                <a-radio-group v-model="articleInfo.category">
+                  <a-radio 
+                    v-for="item in categoryOption" 
+                    :key="item.value" 
+                    :value="item.value">{{ item.label }}</a-radio>
                 </a-radio-group>
               </a-form-model-item>
-              <a-form-model-item label="关键字" prop="keywords">
-                <a-input v-model="articleInfo.keywords" placeholder="输入关键字，用;进行分隔" />
+              <a-form-model-item label="关键字" prop="tag">
+                <a-input v-model="articleInfo.tag" placeholder="输入关键字，用;进行分隔" />
               </a-form-model-item>
               <a-form-model-item label="文章封面" style="margin-bottom: 0">
                 <a-upload
@@ -33,7 +35,7 @@
                   action="https://zdxblog.cn/upload/uploadFile"
                   @change="handleChange"
                 >
-                  <img v-if="articleInfo.articleCover" :src="articleInfo.articleCover" alt="avatar" />
+                  <img v-if="articleInfo.coverImage" :src="articleInfo.coverImage" alt="avatar" />
                   <div v-else>
                     <a-icon :type="loading ? 'loading' : 'plus'" />
                     <div class="ant-upload-text">
@@ -42,11 +44,14 @@
                   </div>
                 </a-upload>
               </a-form-model-item>
+              <a-form-model-item label="文章描述" prop="description">
+                <a-textarea v-model="articleInfo.description" placeholder="请输入文章描述" :rows="4" />
+              </a-form-model-item>
               <a-form-model-item 
                 style="margin-bottom: 0"
                 :wrapper-col="{ span: 4, offset: 20 }">
                 <a-button
-                  :disabled="!articleInfo.articleTitle || !articleInfo.context"
+                  :disabled="!articleInfo.articleTitle || !articleInfo.content"
                   type="primary"
                   @click="saveShareArticle">发布</a-button>
               </a-form-model-item>
@@ -62,7 +67,7 @@
         <server-loading slot="placeholder"></server-loading>
         <mavon-editor 
           ref='md'
-          v-model="articleInfo.context"
+          v-model="articleInfo.content"
           :toolbars="toolbars" 
           :tab-size="4"
           :box-shadow="false"
@@ -76,26 +81,11 @@
 
 <script>
 import axios from 'axios'
+import { categoryOption } from '@/util/options'
 import ServerLoading from '@/components/ServerLoading'
 export default {
   name: 'WriteCenter',
   components: { ServerLoading },
-  
-  async validate ({ params, $axios }) {
-    if (!params.id) {
-      return true
-    }
-    try {
-      const { data } = await $axios.get(`/api/v1/articles/articleinfo?id=${params.id}`)
-      if (!data) {
-        return false
-      }
-      return true
-    } catch (error) {
-      return false
-    }
-  },
-
   async asyncData ({ $axios, params }) {
     const id = params.id
     if (id) {
@@ -109,10 +99,11 @@ export default {
       return {
         articleInfo: {
           articleTitle: '',
-          context: '',
-          articleClassify: '',
-          keywords: '',
-          articleCover: ''
+          content: '',
+          category: '',
+          tag: '',
+          coverImage: '',
+          description: ''
         }
       }
     }
@@ -147,13 +138,17 @@ export default {
         preview: true
       },
       rules: {
-        articleClassify: [
+        category: [
           { required: true, message: '请选择文章分类', trigger: 'change' }
         ],
-        keywords: [
+        tag: [
           { required: true, message: '请输入文章关键字', trigger: 'change' }
+        ],
+        description: [
+          { required: true, message: '请输入文章描述', trigger: 'change' }
         ]
-      }
+      },
+      categoryOption
     }
   },
 
@@ -168,10 +163,10 @@ export default {
       this.$refs.articleForm.validate(async valid => {
         if (valid) {
            try {
-            const API = this.id ? '/v1/gimshare/editArticle' : '/v1/gimshare/additionArticle'
+            const API = this.id ? '/api/v1/articles/updatearticle' : '/api/v1/articles/createarticle'
             await this.$axios.post(API, this.articleInfo)
             this.$message.success(this.id ? '编辑文章成功' : '添加文章成功')
-            this.$router.push('/articleList')
+            this.$router.replace('/')
           } catch (error) {
             console.log(error)
           }
@@ -200,7 +195,7 @@ export default {
         return
       }
       if (info.file.status === 'done') {
-        this.articleInfo.articleCover = info.file.response.data
+        this.articleInfo.coverImage = info.file.response.data
         this.loading = false
       }
       if (info.file.status === 'error') {
@@ -270,10 +265,6 @@ export default {
     border-top: 1px solid #f1f1f1;
     background: #fff;
   }
-}
-::v-deep.bottom-btn {
-  text-align: right;
-  padding-top: 20px;
 }
 
 .popover-form {

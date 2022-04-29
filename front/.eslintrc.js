@@ -18,6 +18,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     "no-console": "off",
-    "no-async-promise-executor": "off"
+    "no-async-promise-executor": "off",
+    "no-v-html": "off"
   }
 }

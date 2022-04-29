@@ -23,6 +23,13 @@ exports.registeruserSchema = [
         throw new Error('password is required')
       }
       return true
+    }),
+  body('code')
+    .custom(code => {
+      if (!code) {
+        throw new Error('code is required')
+      }
+      return true
     })
 ]
 
@@ -38,6 +45,13 @@ exports.loginuserShema = [
     .custom(password => {
       if (!password) {
         throw new Error('password is required')
+      }
+      return true
+    }),
+  body('code')
+    .custom(code => {
+      if (!code) {
+        throw new Error('code is required')
       }
       return true
     })

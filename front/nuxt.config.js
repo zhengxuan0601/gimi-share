@@ -21,7 +21,8 @@ export default {
   css: [
     'ant-design-vue/dist/antd.css',
     'mavon-editor/dist/css/index.css',
-    '@/assets/style/common.css'
+    '@/assets/style/common.css',
+    '@/assets/iconfont/iconfont.css'
   ],
 
   styleResources: {
@@ -54,6 +55,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    'cookie-universal-nuxt'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

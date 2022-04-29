@@ -1,0 +1,44 @@
+{
+  "id": "3367936",
+  "name": "gimishare",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "724330",
+      "name": "公文包",
+      "font_class": "ai-briefcase",
+      "unicode": "e624",
+      "unicode_decimal": 58916
+    },
+    {
+      "icon_id": "2742648",
+      "name": "名片",
+      "font_class": "mingpian",
+      "unicode": "e671",
+      "unicode_decimal": 58993
+    },
+    {
+      "icon_id": "689288",
+      "name": "收藏 星 2",
+      "font_class": "shoucangxing2",
+      "unicode": "e812",
+      "unicode_decimal": 59410
+    },
+    {
+      "icon_id": "26163309",
+      "name": "点赞",
+      "font_class": "JC_052",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "902050",
+      "name": "评论",
+      "font_class": "pinglun",
+      "unicode": "e63a",
+      "unicode_decimal": 58938
+    }
+  ]
+}

@@ -5,6 +5,9 @@
 .ant-btn {
   border-radius: 2px;
 }
+.ant-input {
+  border-radius: 2px;
+}
 .avatar-uploader > .ant-upload {
   width: 128px;
   height: 128px;
@@ -32,25 +35,59 @@
   cursor: pointer;
   line-height: 36px;
   transition: .2s;
+  i {
+    margin-right: 4px;
+  }
+  &:hover {
+    background: #26d658;
+  }
   &.dashed {
     background: transparent;
     border: 1px solid #80dd9a;
     color: #19c54a;
+    background: rgba(25, 197, 74, 0.1);
   }
   &:active {
     opacity: .6;
   }
+  em {
+    font-style: normal;
+    font-size: 13px;
+  }
+  .dis {
+    display: none;
+  }
+  &:hover {
+    .dis {
+      display: inline-block;
+    }
+    .has {
+      display: none;
+    }
+  }
 }
 
 .ant-popover-inner-content {
+  padding: 0;
   .cover-image-popover {
+    padding: 12px 0;
+    .nickname {
+      color: #2080f7;
+      font-size: 12px;
+      margin-bottom: 6px;
+      padding: 0 16px;
+    }
     p {
       line-height: 28px;
       font-size: 12px;
       cursor: pointer;
+      padding: 0 16px;
       transition: .2s;
+      a {
+        color: #4c4c4c;
+      }
       &:hover {
-        color: #3ab859;
+        background: rgb(248, 248, 248);
       }
       &:active {
         opacity: .6;
