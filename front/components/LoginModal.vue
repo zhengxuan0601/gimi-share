@@ -17,10 +17,10 @@
             size="large" />
         </a-form-model-item>
         <a-form-model-item prop="password">
-        <a-input-password
-          v-model="loginForm.password"
-          size="large" 
-          placeholder="请输入密码" />
+          <a-input-password
+            v-model="loginForm.password"
+            size="large" 
+            placeholder="请输入密码" />
         </a-form-model-item>
         <a-form-model-item prop="code" style="display: flex;">
           <a-input
@@ -102,7 +102,6 @@ export default {
             })
             this.$message.success(this.isRegister ? '注册成功' : '登录成功')
             if (!this.isRegister) {
-              localStorage.setItem('accessToken', data.accessToken)
               this.$cookies.set('ACCESS_TOKEN', data.accessToken, {
                 path: '/', 
                 maxAge: 60 * 60 * 24
@@ -110,6 +109,8 @@ export default {
               this.$store.commit('UPDATE_LOGIN_VISIBLE', false)
               this.$store.commit('UPDATE_USER_INFO', data)
               location.reload()
+            } else {
+              this.getVerificationcode()
             }
           } catch (error) {
             console.log(error)
@@ -162,9 +163,6 @@ export default {
           .ant-form-item-control {
             line-height: normal;
           }
-        }
-        .ant-input-lg {
-          font-size: 14px;
         }
         .ant-form-item-children {
           display: flex;

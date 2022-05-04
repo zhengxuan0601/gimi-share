@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken')
 const trash = require('@/utils/ini.unit')
 const UserModel = require('@/models/user.model')
+const { getAsync, delAsync } = require('@/redis')
 const ArticleModel = require('@/models/article.model')
-const { decrypt, getSessionuserId } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
 const UserFocusUserModel = require('@/models/user_focus_user.model')
 const UserAgreeArticleModel = require('@/models/user_agree_article.model')
 const UserCollectArticleModel = require('@/models/user_collect_article.model')
+const { decrypt, getSessionuserId, encrypt } = require('@/utils/common.util')
 
 class UserController {
   /**
@@ -99,7 +100,12 @@ class UserController {
       if (!captcha || (code.toLowerCase() !== captcha.toLowerCase())) {
         return JsonResult.fail({ req, response, message: '验证码错误' })
       }
-      await UserModel.create(req.body)
+      const { aesKey, aesIv } = req.session.publicAes
+      const userdepassword = decrypt(req.body.password, aesKey, aesIv)
+      await UserModel.create({
+        ...req.body,
+        password: encrypt(userdepassword, trash.aesKey, trash.aesIIv)
+      })
       JsonResult.success({
         req,
         response,
@@ -111,14 +117,19 @@ class UserController {
   }
 
   /**
-   * get userInfo by id
+   * update userInfo by id
    * @param {*} req
    * @param {*} response
    */
   async updateUser (req, response) {
     try {
+      const { nickname, job, avatar, description, gender } = req.body
       await UserModel.update({
-        ...req.body,
+        nickname,
+        job,
+        avatar,
+        description,
+        gender,
         id: req.sessionuser.id
       })
       JsonResult.success({
@@ -128,6 +139,32 @@ class UserController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '编辑用户资料失败' })
+    }
+  }
+
+  /**
+   * user bind email
+   * @param {*} req
+   * @param {*} response
+   * @returns
+   */
+  async bindEmail (req, response) {
+    try {
+      const id = req.sessionuser.id
+      const { email, code } = req.body
+      const sessionCode = await getAsync(email)
+      if (code !== sessionCode) {
+        return JsonResult.fail({ req, response, message: '验证码不正确' })
+      }
+      await UserModel.update({ email, id })
+      delAsync(email)
+      JsonResult.success({
+        req,
+        response,
+        message: '绑定邮箱成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '邮箱绑定失败' })
     }
   }
 
@@ -144,7 +181,7 @@ class UserController {
       if (!captcha || (code.toLowerCase() !== captcha.toLowerCase())) {
         return JsonResult.fail({ req, response, message: '验证码错误' })
       }
-      const user = await UserModel.findOne({ username })
+      const user = await UserModel.findOne({ username }, false)
       if (!user) {
         return JsonResult.fail({ req, response, message: '该用户还未注册' })
       }
@@ -293,7 +330,7 @@ class UserController {
       const userId = req.sessionuser.id
       const focusId = req.query.focusId
       const exist = await UserFocusUserModel.findOne(userId, focusId)
-      const user = await UserModel.findOne({ id: focusId })
+      const user = await UserModel.findOne({ id: focusId }, false)
       if (!user) {
         return JsonResult.fail({ req, response, message: '关注的用户不存在' })
       }
@@ -321,7 +358,7 @@ class UserController {
       const userId = req.sessionuser.id
       const focusId = req.query.focusId
       const exist = await UserFocusUserModel.findOne(userId, focusId)
-      const user = await UserModel.findOne({ id: focusId })
+      const user = await UserModel.findOne({ id: focusId }, false)
       if (!user) {
         return JsonResult.fail({ req, response, message: '用户不存在' })
       }
@@ -362,6 +399,49 @@ class UserController {
         data: false,
         message: '查询成功'
       })
+    }
+  }
+
+  /**
+   * get user focus users
+   * @param {*} req
+   * @param {*} response
+   */
+  async findFocusUsers (req, response) {
+    try {
+      const data = await UserFocusUserModel.find(req.query)
+      JsonResult.success({
+        req,
+        response,
+        data,
+        message: '查询成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询失败' })
+    }
+  }
+
+  /**
+   * get user about counts
+   * @param {*} req
+   * @param {*} response
+   */
+  async getAllcounts (req, response) {
+    try {
+      const { userId } = req.query
+      const focusdata = await UserFocusUserModel.findFocusCount(userId)
+      const collectCounts = await UserCollectArticleModel.total({ userId })
+      JsonResult.success({
+        req,
+        response,
+        data: {
+          ...focusdata,
+          collectCounts
+        },
+        message: '查询成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询失败' })
     }
   }
 }

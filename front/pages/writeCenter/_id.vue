@@ -58,8 +58,7 @@
             </a-form-model>
           </div>
         </template>
-        <a-button
-          type="primary">提 交</a-button>
+        <button class="a-primary">提 交</button>
       </a-popover>
     </div>
     <div class="markdown-body">

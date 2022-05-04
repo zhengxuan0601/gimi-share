@@ -1,4 +1,5 @@
 require('module-alias/register')
+require('@/redis')
 const chalk = require('chalk')
 const config = require('config')
 const express = require('express')
@@ -20,7 +21,6 @@ app.use('/gimishare/api/v1/users', userRouter)
 app.use('/gimishare/api/v1/articles', articleRouter)
 app.use('/gimishare/api/v1/comments', commentRouter)
 app.use('/gimishare/api/v1/unit', unitRouter)
-
 app.listen(config.get('server.port'), () => {
   console.log('app listening on server ' + chalk.green(`http://${config.get('server.host')}:${config.get('server.port')}`))
 })

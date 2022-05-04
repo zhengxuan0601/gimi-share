@@ -27,11 +27,15 @@ exports.multipleColumnSet = (object, joinstr) => {
  */
 exports.newRandomId = () => {
   let randomId = ''
-  for (let i = 1; i <= 16; i++) {
+  for (let i = 1; i <= 15; i++) {
     const n = Math.floor(Math.random() * 16.0).toString(16)
     randomId += n
   }
-  return randomId
+  let total = 0
+  for (let i = 0; i < randomId.length; i++) {
+    total += isNaN(parseInt(randomId[i])) ? 6 : parseInt(randomId[i])
+  }
+  return randomId + String(total % 9)
 }
 
 /**

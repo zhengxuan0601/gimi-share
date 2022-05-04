@@ -7,12 +7,15 @@
             <img src="@/assets/images/logo.png" alt="">
           </nuxt-link>
         </div>
+        <div class="nav-menu">
+          <nuxt-link to="/">首页</nuxt-link>
+        </div>
         <div class="right-operate">
           <div class="search-model">
             <a-icon type="search" />
             <input type="text" placeholder="关键字搜索" class="s-input">
           </div>
-          <button class="a-primary create-button">创作者中心</button>
+          <button class="a-primary create-button" @click="toCreatorCenter">创作者中心</button>
           <button 
             v-if="!userInfo"
             class="a-primary dashed"
@@ -21,12 +24,12 @@
             <div slot="content" class="cover-image-popover">
               <div class="nickname">{{ userInfo.nickname }}</div>
               <p><nuxt-link to="/writecenter"><a-icon type="file-add" />写文章</nuxt-link></p>
-              <p><a-icon type="user" />我的主页</p>
-              <p><a-icon type="form" />修改资料</p>
+              <p><nuxt-link :to="`/user/${userInfo.id}`"><a-icon type="user" />我的主页</nuxt-link></p>
+              <p><nuxt-link to="/setting/profile"><a-icon type="form" />修改资料</nuxt-link></p>
               <p @click="userLogout"><a-icon type="poweroff" />退出登录</p>
             </div>
             <div class="cover-img">
-              <img :src="userInfo.avatar" alt="">
+              <img :src="userInfo.avatar || require('@/assets/images/default.png')" alt="avatar">
             </div>
           </a-popover>
         </div>
@@ -55,12 +58,18 @@ export default {
   methods: {
     userLogout () {
       this.$cookies.remove('ACCESS_TOKEN')
-      localStorage.removeItem('accessToken')
       this.$store.commit('UPDATE_USER_INFO', '')
       this.$router.replace('/')
       setTimeout(() => {
         location.reload()
-      }, 200)
+      }, 300)
+    },
+
+    toCreatorCenter () {
+      if (!this.userInfo) {
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+      }
+      this.$router.push('/writecenter')
     }
   }
 }
@@ -86,13 +95,24 @@ export default {
     .header-t {
       align-items: center;
       display: flex;
-      justify-content: space-between;
       .logo {
         display: flex;
         align-items: center;
         img {
           height: 60px;
           display: block;
+        }
+      }
+      .nav-menu {
+        flex: 1;
+        width: 0;
+        padding: 0 20px;
+        a {
+          color: #86909c;
+          margin-right: 20px;
+          &.nuxt-link-exact-active {
+            color: @primary-color;
+          }
         }
       }
       .right-operate {
@@ -145,8 +165,6 @@ export default {
     padding-top: 80px;
     flex: 1;
     height: 0;
-    width: 1100px;
-    margin: 0 auto;
   }
 }
 

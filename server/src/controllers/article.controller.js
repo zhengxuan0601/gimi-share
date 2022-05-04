@@ -121,6 +121,48 @@ class ArticleController {
       JsonResult.fail({ req, response, error, message: '删除文章失败' })
     }
   }
+
+  /**
+   * get articles by collect
+   * @param {*} req
+   * @param {*} response
+   */
+  async getArticleByCollect (req, response) {
+    try {
+      const { userId } = req.query
+      const sessionId = await getSessionuserId(req)
+      const data = await ArticleModel.findUserCollectArticle(userId, sessionId)
+      JsonResult.success({
+        req,
+        response,
+        data,
+        message: '查询收藏文章成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询收藏文章失败' })
+    }
+  }
+
+  /**
+   * get articles bu agree
+   * @param {*} req
+   * @param {*} response
+   */
+  async getArticleByAgree (req, response) {
+    try {
+      const { userId } = req.query
+      const sessionId = await getSessionuserId(req)
+      const data = await ArticleModel.findUserAgreeArticle(userId, sessionId)
+      JsonResult.success({
+        req,
+        response,
+        data,
+        message: '查询点赞文章成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询点赞文章失败' })
+    }
+  }
 }
 
 module.exports = new ArticleController()

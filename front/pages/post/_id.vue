@@ -1,5 +1,5 @@
 <template>
-  <div class="article-content-block">
+  <div class="article-content-block w-1100">
     <client-only>
       <div slot="placeholder">
         <custom-skeleton />
@@ -28,11 +28,14 @@
         </div>
         <div class="title">{{ articleDetail.articleTitle }}</div>
         <div class="user-model">
-          <div class="img">
-            <img :src="articleDetail.author.avatar" alt="avatar">
-          </div>
+          <nuxt-link :to="`/user/${articleDetail.author.id}`" class="img">
+            <img :src="articleDetail.author.avatar || require('@/assets/images/default.png')" alt="avatar">
+          </nuxt-link>
           <div class="info">
-            <p class="nickname">{{ articleDetail.author.nickname }} <em v-if="userInfo.id === articleDetail.userId">作者</em></p>
+            <p class="nickname">
+              <nuxt-link :to="`/user/${articleDetail.author.id}`">{{ articleDetail.author.nickname }}</nuxt-link>
+              <em v-if="userInfo.id === articleDetail.userId">作者</em>
+            </p>
             <p class="time">{{ articleDetail.createTime.replace('-', '年').replace('-', '月').replace(' ', '日 ') }} <span>· 阅读 {{ articleDetail.viewCounts }}</span></p>
           </div>
           <div v-if="userInfo.id !== articleDetail.userId" class="focus-user">
@@ -79,11 +82,15 @@
 
 <script>
 import { mapState } from 'vuex'
+import { validateUniqId } from '@/util'
 import CustomSkeleton from '@/components/CustomSkeleton'
 export default {
   name: 'PostIndex',
   components: { CustomSkeleton },
   layout: 'BaseLayout',
+  validate ({ params }) {
+    return validateUniqId(params.id)
+  },
   async asyncData ({ $axios, params }) {
     try {
       const articleDetail = (await $axios.get(`/api/v1/articles/articleinfo?id=${params.id}`)).data || {}
@@ -230,10 +237,10 @@ export default {
       }
       &.liker {
         span {
-          color: #19c54a;
+          color: @primary-color;
         }
         em {
-          background: #19c54a;
+          background: @primary-color;
         }
       }
       &.collecter {
@@ -270,7 +277,9 @@ export default {
         color: #999;
       }
       .nickname {
-        color: #4c4c4c;
+        a {
+          color: #4c4c4c;
+        }
         em {
           color: #f06909;
           font-style: normal;
@@ -304,8 +313,8 @@ export default {
       font-size: 12px;
     }
     span {
-      background-color: #f0fff8;
-      color: #00c58e;
+      background-color: #19c54a1a;
+      color: @primary-color;
       font-size: 12px;
       padding: 0 12px;
       margin-right: 10px;

@@ -1,5 +1,5 @@
 <template>
-  <div class="home-index-page">
+  <div class="home-index-page w-1100">
     <client-only>
       <div slot="placeholder">
         <div style="padding:30px;background:#fff">
@@ -7,34 +7,42 @@
         </div>
       </div>
       <div class="articlelist-content">
-        <div
-          v-for="item in pagination.list" 
-          :key="item.id" 
-          class="model" 
-          @click="$router.push('/post/' + item.id)">
-          <div class="l">
-            <div class="user-info">
-              <p>{{ item.author.nickname }}</p>
-              <p>{{ item.createTime }}</p>
-              <p>{{ categoryMap[item.category] }}</p>
+        <div 
+          v-if="!pagination.list.length" 
+          style="padding: 30px 0;">
+          <a-empty 
+            description="空空如也" 
+            :image="require('@/assets/images/nodata.png')" /></div>
+        <div v-else>
+          <div
+            v-for="item in pagination.list" 
+            :key="item.id" 
+            class="model" 
+            @click="$router.push('/post/' + item.id)">
+            <div class="l">
+              <div class="user-info">
+                <p @click.stop><nuxt-link :to="`/user/${item.author.id}`">{{ item.author.nickname }}</nuxt-link></p>
+                <p>{{ item.createTime }}</p>
+                <p>{{ categoryMap[item.category] }}</p>
+              </div>
+              <p class="article-title">{{ item.articleTitle }}</p>
+              <p class="article-desc">{{ item.description }}</p>
+              <div class="a-num">
+                <p><a-icon type="eye" /><span>{{ item.viewCounts }}</span></p>
+                <p 
+                  :class="{ 'is-liker': item.isLiker }"
+                  @click.stop="isLikeArticle(item)">
+                  <a-icon type="like" />
+                  <span>{{ item.likeCounts }}</span>
+                </p>
+                <p><a-icon type="message" /><span>{{ item.commentCounts }}</span></p>
+              </div>
             </div>
-            <p class="article-title">{{ item.articleTitle }}</p>
-            <p class="article-desc">{{ item.description }}</p>
-            <div class="a-num">
-              <p><a-icon type="eye" /><span>{{ item.viewCounts }}</span></p>
-              <p 
-                :class="{ 'is-liker': item.isLiker }"
-                @click.stop="isLikeArticle(item)">
-                <a-icon type="like" />
-                <span>{{ item.likeCounts }}</span>
-              </p>
-              <p><a-icon type="message" /><span>{{ item.commentCounts }}</span></p>
+            <div v-if="item.coverImage" class="r">
+              <img :src="item.coverImage" alt="cover-image">
             </div>
-          </div>
-          <div v-if="item.coverImage" class="r">
-            <img :src="item.coverImage" alt="cover-image">
-          </div>
-        </div>  
+          </div> 
+        </div> 
       </div>
     </client-only>
   </div>
@@ -110,99 +118,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.home-index-page {
-  .articlelist-content {
-    background: #fff;
-    .model {
-      display: flex;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #f1f1f190;
-      padding: 20px;
-      cursor: pointer;
-      &:hover {
-        background: #fafafa;
-      }
-      .l {
-        width: 0;
-        flex: 1;
-        .user-info {
-          display: flex;
-          padding: 6px 0;
-          p {
-            font-size: 14px;
-            margin-right: 24px;
-            position: relative;
-            &:not(:last-child) {
-              &:before {  
-                content: "";
-                width: 1px;
-                position: absolute;
-                height: 12px;
-                background: #dedddd;
-                top: 5px;
-                right: -12px;
-              }
-            }
-          }
-        }
-        .article-title {
-          font-size: 16px;
-          color: #1d2129;
-          font-weight: bold;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .article-desc {
-          color: #86909c;
-          font-size: 12px;
-          padding: 6px 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .a-num {
-          display: flex;
-          margin-top: 6px;
-          p {
-            margin-right: 32px;
-            display: flex;
-            align-items: center;
-            position: relative;
-            &:not(:last-child):after {
-              content: "";
-              width: 1px;
-              position: absolute;
-              height: 11px;
-              background: #ede3e3;
-              top: 4px;
-              right: -16px;
-            }
-            &.is-liker {
-              color: #19c54a;
-            }
-            span {
-              font-size: 12px;
-              margin-left: 4px;
-            }
-            &:not(:first-child) {
-              &:hover {
-                color: #19c54a;
-              }
-            }
-          }
-        }
-      }
-      .r {
-        margin-left: 30px;
-        flex-shrink: 0;
-        img {
-          width: 120px;
-          height: 80px;
-        }
-      }
-    }
-  }
-}
 </style>

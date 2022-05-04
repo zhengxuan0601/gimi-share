@@ -9,12 +9,15 @@
  * @typedef UpdateInfo
  * @property {string} nickname -用户昵称
  * @property {enum} gender -用户性别 0 - 男 1 - 女
- * @property {string} email -邮箱
  * @property {string} avatar -头像url
- * @property {string} tel -手机号
  * @property {string} job -职业
- * @property {integer} age -年龄
  * @property {string} description -简介
+ */
+
+/**
+ * @typedef BindEmail
+ * @property {string} email -邮箱
+ * @property {enum} code -验证码
  */
 
 const express = require('express')
@@ -173,5 +176,35 @@ router.get('/unfocususer', auth(), handlerValidate(userController.userUnFocusUse
  * @security JWT
  */
 router.get('/isfocususer', userController.userIsFocus)
+
+/**
+ * 查询用户所有关注的用户列表
+ * @route GET /users/focususers
+ * @group 用户管理
+ * @param {string} userId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/focususers', userController.findFocusUsers)
+
+/**
+ * 查询用户关注、被关注、收藏等数据数量
+ * @route GET /users/getcounts
+ * @group 用户管理
+ * @param {string} userId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/getcounts', userController.getAllcounts)
+
+/**
+ * 邮箱绑定
+ * @route POST /users/bindemail
+ * @group 用户管理
+ * @param {BindEmail.model} BindEmail.body.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.post('/bindemail', auth(), handlerValidate(userController.bindEmail))
 
 module.exports = router

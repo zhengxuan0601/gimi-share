@@ -17,3 +17,21 @@ import cryptoJs from 'crypto-js'
   })
   return encrypted.toString()
 }
+
+/**
+ * 校验所有信息唯一keyid格式
+ * @param { String } unipId
+ */
+export const validateUniqId = uniqId => {
+  if (uniqId.length !== 16) {
+    return false
+  }
+  let total = 0
+  for (let i = 0; i < uniqId.length - 1; i++) {
+    total += isNaN(parseInt(uniqId[i])) ? 6 : parseInt(uniqId[i])
+  }
+  if (String(total % 9) !== uniqId[uniqId.length - 1]) {
+    return false
+  }
+  return true
+}

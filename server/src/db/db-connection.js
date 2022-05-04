@@ -24,6 +24,8 @@ class DBConnection {
         if (err.code === 'ECONNREFUSED') {
           console.log(chalk.red('Database connection was refused.'))
         }
+        console.log(chalk.red('Database connection failed.'))
+        return
       }
       if (connection) {
         connection.release()

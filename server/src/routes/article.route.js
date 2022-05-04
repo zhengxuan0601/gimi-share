@@ -83,4 +83,26 @@ router.post('/updatearticle', auth(), updateArticleShema, handlerValidate(articl
  */
 router.get('/deletearticle', auth(), handlerValidate(articleController.deleteArticle))
 
+/**
+ * 查询被用户收藏的文章列表
+ * @route GET /articles/collected
+ * @group 文章管理
+ * @param {string} userId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/collected', articleController.getArticleByCollect)
+
+/**
+ * 查询被用户点赞过的文章列表
+ * @route GET /articles/agreed
+ * @group 文章管理
+ * @param {string} userId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/agreed', articleController.getArticleByAgree)
+
 module.exports = router

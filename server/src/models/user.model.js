@@ -1,6 +1,4 @@
-const trash = require('@/utils/ini.unit')
 const db = require('@/db/db-connection')
-const { encrypt } = require('@/utils/common.util')
 const { multipleColumnSet, newRandomId, dateFormat } = require('@/utils/common.util')
 
 class UserModel {
@@ -105,11 +103,9 @@ class UserModel {
 
       const createTime = dateFormat(new Date())
 
-      const enpassword = encrypt(password, trash.aesKey, trash.aesIIv)
+      const sql = `INSERT INTO ${this.tableName} (id, username, nickname, password, createTime) VALUES (?, ?, ?, ?, ?)`
 
-      const sql = `INSERT INTO ${this.tableName} (id, username, password, createTime) VALUES (?, ?, ?, ?)`
-
-      await db.query(sql, [id, username, enpassword, createTime])
+      await db.query(sql, [id, username, username, password, createTime])
     } catch (error) {
       throw new Error(error)
     }

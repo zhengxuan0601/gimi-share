@@ -10,7 +10,7 @@ exports.registeruserSchema = [
     .isLength({ max: 16 })
     .withMessage('username must be at longest 16 charts')
     .custom(async username => {
-      const exist = await UserModel.findOne({ username })
+      const exist = await UserModel.findOne({ username }, false)
       if (exist) {
         throw new Error('该用户名已经注册')
       }

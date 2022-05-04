@@ -18,7 +18,7 @@ export const mutations = {
 export const actions = {
   async nuxtServerInit ({ commit }, { app }) {
     try {
-      const { data } = await app.$axios.get('/api/v1/users/sessionuserinfo')
+      const { data } = await app.$axios.get('/api/v1/users/sessionuserinfo?noredirect')
       commit('UPDATE_USER_INFO', data)
     } catch (error) {
       console.log(error)

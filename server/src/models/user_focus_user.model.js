@@ -1,5 +1,6 @@
 const db = require('@/db/db-connection')
 const { multipleColumnSet } = require('@/utils/common.util')
+const UserModel = require('@/models/user.model')
 
 class UserFocusUserModel {
   constructor () {
@@ -19,7 +20,9 @@ class UserFocusUserModel {
 
       const data = await db.query(sql, values)
 
-      return data
+      const users = await Promise.all(data.map(o => UserModel.findOne({ id: o.focusId }, true)))
+
+      return users
     } catch (error) {
       throw new Error(error)
     }
@@ -70,6 +73,28 @@ class UserFocusUserModel {
       const sql = `DELETE FROM ${this.tableName} WHERE ${columnSet}`
 
       await db.query(sql, values)
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * find foucus count and focused count
+   * @param {*} userId
+   */
+  async findFocusCount (userId) {
+    try {
+      const focusSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE userId = ?`
+
+      const focusedSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE FOCUSiD = ?`
+
+      const focusCount = await db.query(focusSql, [userId])
+
+      const focusedCount = await db.query(focusedSql, [userId])
+      return {
+        focusCount: focusCount[0].total,
+        focusedCount: focusedCount[0].total
+      }
     } catch (error) {
       throw new Error(error)
     }

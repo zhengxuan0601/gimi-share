@@ -24,6 +24,10 @@ const options = {
       }
     }
   },
+  route: {
+    url: '/swagger',
+    docs: '/swagger.json'
+  },
   basedir: __dirname,
   files: ['../routes/*.js']
 }

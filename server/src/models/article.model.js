@@ -157,10 +157,11 @@ class ArticleModel {
   async delete (id) {
     try {
       const sql = `DELETE ${this.tableName}, comment, user_collect_article, user_agree_article 
-        FROM ${this.tableName}, comment, user_collect_article, user_agree_article  
-        WHERE ${this.tableName}.id = ? AND comment.articleId = ? AND user_collect_article.articleId = ? AND user_agree_article.articleId = ?`
-
-      await db.query(sql, [id, id, id, id])
+        FROM ${this.tableName} LEFT JOIN comment ON comment.articleId = ${this.tableName}.id
+        LEFT JOIN user_collect_article ON user_collect_article.articleId = ${this.tableName}.id
+        LEFT JOIN user_agree_article ON user_agree_article.articleId = ${this.tableName}.id
+        WHERE ${this.tableName}.id = ?`
+      await db.query(sql, [id])
     } catch (error) {
       throw new Error(error)
     }
@@ -191,6 +192,64 @@ class ArticleModel {
       const sql = `UPDATE ${this.tableName} SET ${fields} = ${fields} - 1 WHERE id = ?`
 
       await db.query(sql, [id])
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * get user collect articles
+   * @param {*} userId
+   * @returns
+   */
+  async findUserCollectArticle (userId, sessionId) {
+    try {
+      const sql = `SELECT ${this.tableName}.* FROM ${this.tableName}, user_collect_article WHERE user_collect_article.userId = ? AND ${this.tableName}.id = user_collect_article.articleId`
+
+      const list = await db.query(sql, [userId])
+
+      const users = await Promise.all(list.map(arc => UserModel.findOne({ id: arc.userId }, true)))
+
+      const isLikers = await Promise.all(list.map(arc => UserAgreeArticleModel.findOne(sessionId, arc.id)))
+
+      list.forEach((arc, idx) => {
+        arc.author = users[idx]
+
+        arc.content = undefined
+
+        arc.isLiker = Boolean(isLikers[idx])
+      })
+
+      return list
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * get user agree articles
+   * @param {*} userId
+   * @returns
+   */
+  async findUserAgreeArticle (userId, sessionId) {
+    try {
+      const sql = `SELECT ${this.tableName}.* FROM ${this.tableName}, user_agree_article WHERE user_agree_article.userId = ? AND ${this.tableName}.id = user_agree_article.articleId`
+
+      const list = await db.query(sql, [userId])
+
+      const users = await Promise.all(list.map(arc => UserModel.findOne({ id: arc.userId }, true)))
+
+      const isLikers = await Promise.all(list.map(arc => UserAgreeArticleModel.findOne(sessionId, arc.id)))
+
+      list.forEach((arc, idx) => {
+        arc.author = users[idx]
+
+        arc.content = undefined
+
+        arc.isLiker = Boolean(isLikers[idx])
+      })
+
+      return list
     } catch (error) {
       throw new Error(error)
     }
