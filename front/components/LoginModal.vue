@@ -9,7 +9,7 @@
         :model="loginForm"
         :rules="loginRules"
       >
-        <h3>账号密码登录</h3>
+        <h3>用户{{ isRegister ? '注册' : '登录' }}</h3>
         <a-form-model-item placeholder="" prop="username">
           <a-input 
             v-model="loginForm.username" 

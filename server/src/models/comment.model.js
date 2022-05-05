@@ -16,7 +16,7 @@ class CommentModel {
       const { columnSet, values } = multipleColumnSet(param)
 
       if (!columnSet) {
-        const sql = `SELECT * FROM ${this.tableName} WHERE IFNULL(articleId, '') = ''`
+        const sql = `SELECT * FROM ${this.tableName} WHERE IFNULL(articleId, '') = '' ORDER BY createTime DESC`
 
         const result = await db.query(sql)
 
@@ -29,7 +29,7 @@ class CommentModel {
         return result
       }
 
-      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet} ORDER BY createTime DESC`
 
       const result = await db.query(sql, values)
 
@@ -68,15 +68,19 @@ class CommentModel {
    * create comment
    * @param {*} param0
    */
-  async create ({ articleId, replyId, userId, content }) {
+  async create ({ articleId, topId, replyId, replyComment, userId, content, replyNickname }) {
     try {
       const id = newRandomId()
 
       const createTime = dateFormat(new Date())
 
-      const sql = `INSERT INTO ${this.tableName} (id, articleId, replyId, userId, content, createTime) VALUES (?, ?, ?, ?, ?, ?)`
+      const sql = `INSERT INTO ${this.tableName} 
 
-      await db.query(sql, [id, articleId, replyId, userId, content, createTime])
+        (id, articleId, topId, replyId, replyComment, userId, content, replyNickname, createTime) 
+
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+      await db.query(sql, [id, articleId, topId, replyId, replyComment, userId, content, replyNickname, createTime])
     } catch (error) {
       throw new Error(error)
     }

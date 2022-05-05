@@ -31,6 +31,16 @@ export default {
     }
   },
 
+  head() {
+    return {
+      title: this.userInfo.nickname + '账号修改',
+      meta: [
+        { charset: 'utf-8' },
+        { hid: 'description', name: 'description', content: this.userInfo.nickname + '账号修改' }
+      ]
+    }
+  },
+
   computed: {
     ...mapState({
       userInfo: state => state.userInfo

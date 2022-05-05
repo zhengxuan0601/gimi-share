@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer')
-
+const trash = require('@/utils/ini.unit')
 async function sendEmail (to, code) {
   const transporter = nodemailer.createTransport({
     host: 'smtp.qq.com',
@@ -7,7 +7,7 @@ async function sendEmail (to, code) {
     secure: false,
     auth: {
       user: '1071401902@qq.com',
-      pass: 'wnfsvajodvccbaif'
+      pass: trash.emailauth
     }
   })
 

@@ -138,6 +138,16 @@ export default {
     }
   },
 
+   head() {
+    return {
+      title: this.userInfo.nickname + '的个人主页',
+      meta: [
+        { charset: 'utf-8' },
+        { hid: 'description', name: 'description', content: this.userInfo.nickname + '的个人主页' }
+      ]
+    }
+  },
+
   computed: {
     ...mapState({
       sessionInfo: state => state.userInfo
@@ -147,22 +157,7 @@ export default {
   watch: {
     currentCategory: {
       handler (cateItem) {
-        switch (cateItem.value) {
-          case '1':
-            this.findArticleByUser()
-            break;
-          case '2':
-              this.findCollectArticles()
-              break;
-          case '3':
-              this.findFocusUsers()
-              break;
-          case '4':
-              this.findAgreeArticles()
-              break;
-          default:
-            break;
-        }
+        this.refreshArticles(cateItem.value)
       },
       deep: true
     }
@@ -321,6 +316,7 @@ export default {
         img {
           display: block;
           width: 100%;
+          height: 100%;
         }
       }
       .info-desc {

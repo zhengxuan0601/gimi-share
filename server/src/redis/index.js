@@ -2,8 +2,9 @@ const chalk = require('chalk')
 const redis = require('redis')
 const { promisify } = require('util')
 const redisLink = 'redis://127.0.0.1:602'
+const trash = require('@/utils/ini.unit')
 const opts = {
-  auth_pass: 'tgbyhnmju'
+  auth_pass: trash.redispassword
 }
 const client = redis.createClient(redisLink, opts)
 client.on('connect', function () {

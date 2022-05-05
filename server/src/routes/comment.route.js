@@ -2,6 +2,7 @@
  * @typedef SubmitComment
  * @property {string} articleId -文章id
  * @property {string} replyId -回复评论所属id
+ * @property {string} replyComment -回复评论内容
  * @property {string} content.required -评论内容
  */
 

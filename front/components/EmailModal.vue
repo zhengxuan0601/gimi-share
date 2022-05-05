@@ -17,7 +17,7 @@
             size="large">
             <div slot="suffix" class="send-email-code">
               <p v-if="!countdown && !sendLoading" @click="sendEmail">发送验证码</p>
-              <span v-if="countdown && !sendLoading">{{ countdown }}s 后重新发送</span>
+              <span v-if="countdown && !sendLoading">{{ countdown }} s</span>
               <a-icon v-if="sendLoading" type="loading" />
             </div>
           </a-input>
@@ -199,7 +199,6 @@ export default {
         }
         span {
           color: #999;
-          font-size: 12px;
         }
       }
     }

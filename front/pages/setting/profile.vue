@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'ProfilePage',
   asyncData ({ store }) {
@@ -66,7 +67,8 @@ export default {
           avatar,
           description,
           gender
-        }
+        },
+        loading: false
       }
     } catch (error) {
       return {
@@ -77,13 +79,25 @@ export default {
           description: '',
           gender: ''
         },
+        loading: false
       }
     }
   },
-  data () {
+
+  head() {
     return {
-      loading: false
+      title: this.userInfo.nickname + '个人资料修改',
+      meta: [
+        { charset: 'utf-8' },
+        { hid: 'description', name: 'description', content: this.userInfo.nickname + '个人资料修改' }
+      ]
     }
+  },
+
+  computed: {
+    ...mapState({
+      userInfo: state => state.userInfo
+    })
   },
   
   methods: {

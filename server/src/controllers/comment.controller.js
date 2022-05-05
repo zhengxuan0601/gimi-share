@@ -16,7 +16,7 @@ class CommentController {
   async getCommentList (req, response) {
     try {
       const data = await CommentModel.find(req.query)
-      const transdata = transformTree(data, 'id', 'replyId')
+      const transdata = transformTree(data, 'id', 'topId')
       JsonResult.success({
         req,
         response,
@@ -36,7 +36,7 @@ class CommentController {
   async createComment (req, response) {
     try {
       const userId = req.sessionuser.id
-      const { articleId, replyId, content } = req.body
+      const { articleId, replyId, content, replyComment, topId, replyNickname } = req.body
       if (articleId) {
         const existArticle = await ArticleModel.findOne({ id: articleId })
         if (!existArticle) {
@@ -49,7 +49,7 @@ class CommentController {
           return JsonResult.fail({ req, response, message: '所回复评论不存在' })
         }
       }
-      await CommentModel.create({ articleId, replyId, content, userId })
+      await CommentModel.create({ articleId, replyId, content, userId, replyComment, topId, replyNickname })
       if (articleId) {
         ArticleModel.autoIncre(articleId, 'commentCounts')
       }
