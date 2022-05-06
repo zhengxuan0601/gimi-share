@@ -45,4 +45,26 @@ router.post('/submit', auth(), submitCommentShema, handlerValidate(commentContro
  */
 router.get('/delete', auth(), deleteCommentShema, handlerValidate(commentController.deleteComment))
 
+/**
+ * 用户点赞评论
+ * @route GET /comments/agreecomment
+ * @group 评论管理
+ * @param {string} commentId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/agreecomment', auth(), handlerValidate(commentController.agreeComment))
+
+/**
+ * 用户取消点赞评论
+ * @route GET /comments/unagreecomment
+ * @group 评论管理
+ * @param {string} commentId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/unagreecomment', auth(), handlerValidate(commentController.unagreeComment))
+
 module.exports = router

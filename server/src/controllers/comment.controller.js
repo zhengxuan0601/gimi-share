@@ -1,7 +1,8 @@
 const CommentModel = require('@/models/comment.model')
 const JsonResult = require('@/utils/httpResponse.unit')
 const ArticleModel = require('@/models/article.model')
-const { transformTree } = require('@/utils/common.util')
+const { transformTree, getSessionuserId } = require('@/utils/common.util')
+const UserAgreeCommentModel = require('@/models/user_agree_comment.model')
 
 class CommentController {
   constructor () {
@@ -15,7 +16,8 @@ class CommentController {
    */
   async getCommentList (req, response) {
     try {
-      const data = await CommentModel.find(req.query)
+      const sessionId = await getSessionuserId(req)
+      const data = await CommentModel.find(req.query, sessionId)
       const transdata = transformTree(data, 'id', 'topId')
       JsonResult.success({
         req,
@@ -36,7 +38,7 @@ class CommentController {
   async createComment (req, response) {
     try {
       const userId = req.sessionuser.id
-      const { articleId, replyId, content, replyComment, topId, replyNickname } = req.body
+      const { articleId, replyId, content, replyComment, topId, replyNickname, replyUserId } = req.body
       if (articleId) {
         const existArticle = await ArticleModel.findOne({ id: articleId })
         if (!existArticle) {
@@ -49,10 +51,7 @@ class CommentController {
           return JsonResult.fail({ req, response, message: '所回复评论不存在' })
         }
       }
-      await CommentModel.create({ articleId, replyId, content, userId, replyComment, topId, replyNickname })
-      if (articleId) {
-        ArticleModel.autoIncre(articleId, 'commentCounts')
-      }
+      await CommentModel.create({ articleId, replyId, content, userId, replyComment, topId, replyNickname, replyUserId })
       JsonResult.success({
         req,
         response,
@@ -80,9 +79,6 @@ class CommentController {
         })
       }
       await CommentModel.delete(id)
-      if (comment.articleId) {
-        ArticleModel.autoDec(comment.articleId, 'commentCounts')
-      }
       JsonResult.success({
         req,
         response,
@@ -90,6 +86,64 @@ class CommentController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '删除失败' })
+    }
+  }
+
+  /**
+   * user agree comment
+   * @param {*} req
+   * @param {*} response
+   */
+  async agreeComment (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const { commentId } = req.query
+      const comment = CommentModel.findOne({ id: commentId })
+      if (!comment) {
+        return JsonResult.fail({ req, response, message: '评论不存在' })
+      }
+      const exist = await UserAgreeCommentModel.findOne(userId, commentId)
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '重复点赞' })
+      }
+      await UserAgreeCommentModel.add(userId, commentId)
+      CommentModel.autoIncre(commentId, 'likeCounts')
+      JsonResult.success({
+        req,
+        response,
+        message: '点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '点赞失败' })
+    }
+  }
+
+  /**
+   * user agree comment
+   * @param {*} req
+   * @param {*} response
+   */
+  async unagreeComment (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const { commentId } = req.query
+      const comment = CommentModel.findOne({ id: commentId })
+      if (!comment) {
+        return JsonResult.fail({ req, response, message: '评论不存在' })
+      }
+      const exist = await UserAgreeCommentModel.findOne(userId, commentId)
+      if (!exist) {
+        return JsonResult.fail({ req, response, message: '还未点赞' })
+      }
+      await UserAgreeCommentModel.delete({ userId, commentId })
+      CommentModel.autoDec(commentId, 'likeCounts')
+      JsonResult.success({
+        req,
+        response,
+        message: '取消点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '取消点赞失败' })
     }
   }
 }

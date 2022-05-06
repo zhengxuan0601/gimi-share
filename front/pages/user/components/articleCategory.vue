@@ -18,8 +18,8 @@
           @click="$router.push('/post/' + item.id)">
           <div class="l">
             <div class="user-info">
-              <p @click.stop><nuxt-link :to="`/user/${item.author.id}`">{{ item.author.nickname }}12</nuxt-link></p>
-              <p>{{ item.createTime }}</p>
+              <p @click.stop><nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
+              <p>{{ cycleDate(item.createTime) }}</p>
               <p>{{ categoryMap[item.category] }}</p>
             </div>
             <p class="article-title">{{ item.articleTitle }}</p>
@@ -30,16 +30,16 @@
                 :class="{ 'is-liker': item.isLiker }"
                 @click.stop="isLikeArticle(item)">
                 <a-icon type="like" />
-                <span>{{ item.likeCounts }}</span>
+                <span v-if="item.likeCounts">{{ item.likeCounts }}</span>
               </p>
-              <p><a-icon type="message" /><span>{{ item.commentCounts }}</span></p>
+              <p><a-icon type="message" /><span v-if="item.commentCounts">{{ item.commentCounts }}</span></p>
             </div>
           </div>
           <div v-if="item.coverImage" class="r">
             <img :src="item.coverImage" alt="cover-image">
           </div>
           <a-popover 
-            v-if="userInfo.id === item.author.id && category === '1'" 
+            v-if="userInfo.id === item.userId && category === '1'" 
             placement="bottom">
             <template slot="content">
               <div class="artile-list-operate">
@@ -59,6 +59,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { cycleDate } from '@/util'
 import { categoryMap } from '@/util/options'
 export default {
   props: {
@@ -74,6 +75,7 @@ export default {
   },
   data () {
     return {
+      cycleDate,
       categoryMap
     }
   },

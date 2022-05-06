@@ -6,7 +6,10 @@
           <img :src="userInfo.avatar || require('@/assets/images/default.png')" alt="avatar">
         </div>
         <div class="info-desc">
-          <h3>{{ userInfo.nickname }}</h3>
+          <h3>{{ userInfo.nickname }} 
+            <span
+              :class="{ 'icon-nan': userInfo.gender === '0', 'icon-nv' : userInfo.gender === '1' }" 
+              class="iconfont"></span></h3>
           <div v-if="userInfo.id !== sessionInfo.id" class="desc">
             <p><span class="iconfont icon-ai-briefcase"></span>{{ userInfo.job || '该用户还未更新职业' }}</p>
             <p><span style="font-size: 18px" class="iconfont icon-mingpian"></span>{{ userInfo.description || '该用户什么都没留下' }}</p>
@@ -328,6 +331,17 @@ export default {
           color: #000;
           font-weight: bold;
           margin-bottom: 6px;
+          span {
+            position: relative;
+            top: -10px;
+            font-size: 12px;
+            &.icon-nan {
+              color: #2080f7;
+            }
+            &.icon-nv {
+              color: rgb(255,77,148);
+            }
+          }
         }
         .desc {
           p {

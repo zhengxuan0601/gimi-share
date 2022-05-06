@@ -15,6 +15,5 @@ CREATE TABLE article (
   `viewCounts` int NULL DEFAULT 0 COMMENT '文章浏览器次数',
   `collectCounts` int NULL DEFAULT 0 COMMENT '文章被收藏次数',
   `likeCounts` int NULL DEFAULT 0 COMMENT '文章被点赞次数',
-  `commentCounts` int NULL DEFAULT 0 COMMENT '文章被评论次数',
   PRIMARY KEY (`id`)
 )

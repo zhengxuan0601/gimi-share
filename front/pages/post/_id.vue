@@ -1,7 +1,7 @@
 <template>
   <div class="article-content-block w-1100">
     <client-only>
-      <div slot="placeholder">
+      <div slot="placeholder" style="background: #fff; padding: 50px;">
         <custom-skeleton />
         <a-skeleton active />
       </div>
@@ -16,8 +16,10 @@
             <em v-if="articleDetail.likeCounts">{{ articleDetail.likeCounts }}</em>
           </div>
           <div class="modal">
-            <span class="iconfont icon-pinglun"></span>
-            <em v-if="articleDetail.commentCounts">{{ articleDetail.commentCounts }}</em>
+            <a href="#article-comments">
+              <span class="iconfont icon-pinglun"></span>
+              <em v-if="articleDetail.commentCounts">{{ articleDetail.commentCounts }}</em>
+            </a>
           </div>
           <div
             class="modal" 
@@ -76,7 +78,7 @@
           SAY：以 「早起」、「运动」、「冥想」、「写作」、「阅读」这五件能够快速改变人生的事情为切入点，帮助大家建立良好的生活习惯，技术的成长绝不是一朝一夕，良好的习惯将会帮助我们更快的进步，但在技术之外，我更希望大家能在这些事情的坚持中，收获一份自信，多一份底气，对人生多一份积极。
         </div>
       </div>
-      <div class="article-comments">
+      <div id="article-comments" class="article-comments">
         <div class="user-submit">
           <h3>评论</h3>
           <div class="content">
@@ -96,28 +98,36 @@
             </div>
           </div>
         </div>
-        <div class="comment-list">
+        <div v-if="commentList.length" class="comment-list">
           <h3>全部评论</h3>
           <div class="modal-list">
             <div v-for="item in commentList" :key="item.id" class="list">
               <div class="left">
-                <img 
-                  :src="item.author.avatar || require('@/assets/images/default.png')" 
-                  alt="avatar">
+                <nuxt-link :to="`/user/${item.userId}`">
+                  <img 
+                    :src="item.avatar || require('@/assets/images/default.png')" 
+                    alt="avatar">
+                </nuxt-link>
               </div>
               <div class="right">
                 <div class="user">
-                  <p class="nickname">{{ item.author.nickname }}</p>
-                  <p class="job">{{ item.author.job || '' }}</p>
+                  <nuxt-link 
+                    :to="`/user/${item.userId}`"
+                    class="nickname">{{ item.nickname }}</nuxt-link>
+                  <p class="job">{{ item.job || '' }}</p>
                 </div>
                 <div class="comment">
                   <p>{{ item.content }}</p>
+                  <span v-if="item.isAuthor" @click="deleteComment(item.id)">删除</span>
                 </div>
                 <div class="dz-pl">
-                  <p><a-icon type="like" /><span>10</span></p>
+                  <p 
+                    :class="{ like: item.isLiker }"
+                    @click="isLikeComment(item)"><a-icon type="like" /><span v-if="item.likeCounts">{{ item.likeCounts }}</span>
+                  </p>
                   <p 
                     v-ClickOutside="() => item.replyState = false"
-                    @click="item.replyState = true"><a-icon type="message" /><span>12</span></p>
+                    @click="item.replyState = true"><a-icon type="message" /><span v-if="item.replyCount">{{ item.replyCount }}</span></p>
                 </div>
                 <div
                   v-show="item.replyState" 
@@ -135,28 +145,39 @@
                   class="reply-comment">
                   <div v-for="itemName in item.children" :key="itemName.id" class="list">
                     <div class="left">
-                      <img 
-                        :src="itemName.author.avatar || require('@/assets/images/default.png')" 
-                        alt="avatar">
+                      <nuxt-link :to="`/user/${itemName.userId}`">
+                        <img 
+                          :src="itemName.avatar || require('@/assets/images/default.png')" 
+                          alt="avatar">
+                      </nuxt-link>
                     </div>
                     <div class="right">
                       <div class="user">
-                        <p class="nickname">{{ itemName.author.nickname }}</p>
-                        <p class="job">{{ itemName.author.job || '' }}</p>
+                        <nuxt-link
+                          :to="`/user/${itemName.userId}`" 
+                          class="nickname">{{ itemName.nickname }}</nuxt-link>
+                        <p class="job">{{ itemName.job || '' }}</p>
                         <span v-if="itemName.replyNickname">@</span>
-                        <p class="nickname">{{ itemName.replyNickname }}</p>
+                        <nuxt-link
+                          :to="`/user/${itemName.replyUserId}`"  
+                          class="nickname">{{ itemName.replyNickname }}</nuxt-link>
                       </div>
                       <div class="comment">
                         <p>{{ itemName.content }}</p>
+                        <span v-if="itemName.isAuthor" @click="deleteComment(itemName.id)">删除</span>
                       </div>
                       <div v-if="itemName.replyComment" class="parent-comment">
                         <p>“{{ itemName.replyComment }}”</p>
                       </div>
                       <div class="dz-pl">
-                        <p><a-icon type="like" /><span>10</span></p>
+                        <p 
+                          :class="{ like: itemName.isLiker }"
+                          @click="isLikeComment(itemName)">
+                          <a-icon type="like" /><span v-if="itemName.likeCounts">{{ itemName.likeCounts }}</span>
+                        </p>
                         <p 
                           v-ClickOutside="() => itemName.replyState = false"
-                          @click="itemName.replyState = true"><a-icon type="message" /><span>12</span></p>
+                          @click="itemName.replyState = true"><a-icon type="message" /><span v-if="itemName.replyCount">{{ itemName.replyCount }}</span></p>
                       </div>
                       <div
                         v-show="itemName.replyState" 
@@ -170,15 +191,15 @@
                           <button
                             :disabled="!itemName.replyNewComment"
                             class="a-primary" 
-                            @click="submitComment(itemName.replyNewComment, item.id, itemName.id, itemName.content, itemName.author.nickname)">评论</button>
+                            @click="submitComment(itemName.replyNewComment, item.id, itemName.id, itemName.content, itemName.nickname, itemName.userId)">评论</button>
                         </div>
                       </div>
                     </div>
-                    <div class="time">2个月前</div>
+                    <div class="time">{{ cycleDate(itemName.createTime) }}</div>
                   </div>
                 </div>
               </div>
-              <div class="time">2个月前</div>
+              <div class="time">{{ cycleDate(item.createTime) }}</div>
             </div>
           </div>
         </div>
@@ -190,9 +211,8 @@
 <script>
 import { mapState } from 'vuex'
 import ClickOutside from 'vue-click-outside'
-import { validateUniqId } from '@/util'
+import { validateUniqId, cycleDate } from '@/util'
 import CustomSkeleton from '@/components/CustomSkeleton'
-console.log(ClickOutside)
 export default {
   name: 'PostIndex',
   components: { CustomSkeleton },
@@ -219,6 +239,7 @@ export default {
   },
   data () {
     return {
+      cycleDate,
       comment: '',
       commentList: []
     }
@@ -257,8 +278,9 @@ export default {
      * @param { String } replyId
      * @param { String } replyComment
      * @param { String } replyNickname
+     * @param { String } replyUserId
      */
-    async submitComment (comment, topId, replyId, replyComment, replyNickname) {
+    async submitComment (comment, topId, replyId, replyComment, replyNickname, replyUserId) {
       if (!this.userInfo) {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
@@ -269,7 +291,8 @@ export default {
           replyId,
           replyComment,
           content: comment,
-          replyNickname
+          replyNickname,
+          replyUserId
         }
         await this.$axios.post('/api/v1/comments/submit', commentInfo)
         this.comment = ''
@@ -288,6 +311,41 @@ export default {
         const { data } = await this.$axios.get(`/api/v1/comments?articleId=${this.articleDetail.id}`)
         this.treeStructure(data)
         this.commentList = data
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    /**
+     * like comment
+     * @params { String } commentItem
+     */
+    async isLikeComment (commentItem) {
+      if (!this.userInfo) {
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+      }
+      try {
+        const API = commentItem.isLiker ? '/comments/unagreecomment' : '/comments/agreecomment'
+        await this.$axios.get(`/api/v1${API}?commentId=${commentItem.id}`)
+        if (commentItem.isLiker) {
+          commentItem.likeCounts -= 1
+        } else {
+          commentItem.likeCounts += 1
+        }
+        commentItem.isLiker = !commentItem.isLiker
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    /**
+     * delete comment
+     * @params { String } commentId
+     */
+    async deleteComment (commentId) {
+      try {
+        await this.$axios.get(`/api/v1/comments/delete?id=${commentId}`)
+        this.findComments()
       } catch (error) {
         console.log(error)
       }
@@ -393,6 +451,11 @@ export default {
       cursor: pointer;
       text-align: center;
       line-height: 48px;
+      a {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
       span {
         color: #8a919f;
         font-size: 20px;
@@ -570,16 +633,21 @@ export default {
       .list {
         display: flex;
         padding: 16px 0;
+        position: relative;
         .left {
           width: 40px;
           height: 40px;
           border-radius: 50%;
           overflow: hidden;
           margin-right: 20px;
-          img {
+          a {
             display: block;
-            width: 100%;
             height: 100%;
+            img {
+              display: block;
+              width: 100%;
+              height: 100%;
+            }
           }
         }
         .right {
@@ -588,11 +656,14 @@ export default {
           .user {
             display: flex;
             .nickname {
-              counter-reset: #4c4c4c;
+              color: #4c4c4c;
             }
             .job {
-              color: #999;
-              margin-left: 8px;
+              color: #d1b7b7;
+              margin-left: 4px;
+              font-size: 12px;
+              position: relative;
+              top: 2px;
             }
             span {
               padding: 0 12px;
@@ -601,8 +672,17 @@ export default {
           }
           .comment {
             padding: 10px 0;
+            display: flex;
             p {
               color: #000;
+              flex: 1;
+              width: 0;
+              padding-right: 20px;
+            }
+            span {
+              color: #c95858;
+              font-size: 12px;
+              cursor: pointer;
             }
           }
           .dz-pl {
@@ -611,7 +691,10 @@ export default {
               margin-right: 20px;
               cursor: pointer;
               i {
-                margin-right: 2px;
+                margin-right: 4px;
+              }
+              &.like, &:hover {
+                color: @primary-color;
               }
             }
           }
@@ -651,6 +734,10 @@ export default {
         }
         .time {
           color: #999;
+          font-size: 12px;
+          position: absolute;
+          right: 0;
+          top: 20px;
         }
       }
     }

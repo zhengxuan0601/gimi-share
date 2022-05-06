@@ -73,9 +73,9 @@ class UnitController {
       if (exist) {
         return JsonResult.fail({ req, response, message: '邮箱已经被注册' })
       }
-      await sendEmail(email, code)
       await setexAsync(email, 60 * 30, code)
       await setexAsync(`${email}-expires`, 60, code)
+      await sendEmail(email, code)
       JsonResult.success({
         req,
         response,
