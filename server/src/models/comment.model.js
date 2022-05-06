@@ -1,5 +1,4 @@
 const db = require('@/db/db-connection')
-const UserAgreeCommentModel = require('@/models/user_agree_comment.model')
 const { newRandomId, dateFormat, multipleColumnSet } = require('@/utils/common.util')
 
 class CommentModel {
@@ -19,16 +18,17 @@ class CommentModel {
       if (!columnSet) {
         const sql = `SELECT ${this.tableName}.*, user.id AS userId, user.avatar, user.nickname, user.job,
 
-          (SELECT COUNT(*) FROM ${this.tableName} AS c WHERE c.replyId = ${this.tableName}.id OR c.topId = ${this.tableName}.id) AS replyCount
+          (SELECT COUNT(*) FROM ${this.tableName} AS c WHERE c.replyId = ${this.tableName}.id OR c.topId = ${this.tableName}.id) AS replyCount,
+
+          (SELECT uac.userId FROM user_agree_comment AS uac WHERE uac.commentId = ${this.tableName}.id AND uac.userId = ?) AS isLiker
 
           FROM ${this.tableName}, user WHERE IFNULL(articleId, '') = '' AND ${this.tableName}.userId = user.id ORDER BY createTime DESC`
 
-        const result = await db.query(sql)
+        const result = await db.query(sql, [sessionId])
 
-        const isLikers = await Promise.all(result.map(c => UserAgreeCommentModel.findOne(sessionId, c.id)))
+        result.forEach(list => {
+          list.isLiker = Boolean(list.isLiker)
 
-        result.forEach((list, idx) => {
-          list.isLiker = Boolean(isLikers[idx])
           list.isAuthor = list.userId === sessionId
         })
 
@@ -37,16 +37,17 @@ class CommentModel {
 
       const sql = `SELECT ${this.tableName}.*, user.id AS userId, user.avatar, user.nickname, user.job,
 
-        (SELECT COUNT(*) FROM ${this.tableName} AS c WHERE c.replyId = ${this.tableName}.id OR c.topId = ${this.tableName}.id) AS replyCount
+        (SELECT COUNT(*) FROM ${this.tableName} AS c WHERE c.replyId = ${this.tableName}.id OR c.topId = ${this.tableName}.id) AS replyCount,
+
+        (SELECT uac.userId FROM user_agree_comment AS uac WHERE uac.commentId = ${this.tableName}.id AND uac.userId = ?) AS isLiker
 
         FROM ${this.tableName}, user WHERE ${columnSet} AND ${this.tableName}.userId = user.id ORDER BY createTime DESC`
 
-      const result = await db.query(sql, values)
+      const result = await db.query(sql, [sessionId, ...values])
 
-      const isLikers = await Promise.all(result.map(c => UserAgreeCommentModel.findOne(sessionId, c.id)))
+      result.forEach(list => {
+        list.isLiker = Boolean(list.isLiker)
 
-      result.forEach((list, idx) => {
-        list.isLiker = Boolean(isLikers[idx])
         list.isAuthor = list.userId === sessionId
       })
 

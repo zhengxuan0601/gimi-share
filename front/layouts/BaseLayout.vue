@@ -110,6 +110,7 @@ export default {
         a {
           color: #86909c;
           margin-right: 20px;
+          font-weight: bold;
           &.nuxt-link-exact-active {
             color: @primary-color;
           }

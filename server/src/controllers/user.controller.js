@@ -214,7 +214,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserCollectArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne({ id: articleId })
+      const article = await ArticleModel.findOne(articleId)
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -243,7 +243,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserCollectArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne({ id: articleId })
+      const article = await ArticleModel.findOne(articleId)
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -272,7 +272,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserAgreeArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne({ id: articleId })
+      const article = await ArticleModel.findOne(articleId)
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -301,7 +301,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserAgreeArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne({ id: articleId })
+      const article = await ArticleModel.findOne(articleId)
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }

@@ -40,7 +40,7 @@ class CommentController {
       const userId = req.sessionuser.id
       const { articleId, replyId, content, replyComment, topId, replyNickname, replyUserId } = req.body
       if (articleId) {
-        const existArticle = await ArticleModel.findOne({ id: articleId })
+        const existArticle = await ArticleModel.findOne(articleId)
         if (!existArticle) {
           return JsonResult.fail({ req, response, message: '文章不存在' })
         }

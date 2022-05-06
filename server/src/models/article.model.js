@@ -1,7 +1,4 @@
 const db = require('@/db/db-connection')
-const UserModel = require('@/models/user.model')
-const UserAgreeArticleModel = require('@/models/user_agree_article.model')
-const UserCollectArticleModel = require('@/models/user_collect_article.model')
 const { multipleColumnSet, newRandomId, dateFormat } = require('@/utils/common.util')
 
 class ArticleModel {
@@ -21,7 +18,7 @@ class ArticleModel {
 
       let sql = `SELECT ${this.tableName}.*, user.nickname, user.avatar,
 
-        (SELECT uac.userId FROM user_agree_article AS uac WHERE uac.articleId = ${this.tableName}.id AND uac.userId = ?) AS isLiker,
+        (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker,
 
         (SELECT COUNT(*) FROM comment AS c WHERE c.articleId = ${this.tableName}.id) AS commentCounts
 
@@ -44,7 +41,9 @@ class ArticleModel {
 
         return {
           list,
+
           total: total[0].total,
+
           pageNo
         }
       }
@@ -78,32 +77,32 @@ class ArticleModel {
    * @param {*} param
    * @param {*} sessionId
    */
-  async findOne (param, sessionId) {
+  async findOne (articleId, sessionId) {
     try {
-      const { columnSet, values } = multipleColumnSet(param)
+      const sql = `SELECT ${this.tableName}.*, user.avatar, user.nickname, 
+        
+        (SELECT COUNT(*) FROM comment AS c WHERE c.articleId = ${this.tableName}.id) AS commentCounts,
+        
+        (SELECT uca.userId FROM user_collect_article AS uca WHERE uca.articleId = ${this.tableName}.id AND uca.userId = ? ) AS isFlower,
 
-      const sql = `SELECT *, (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts FROM ${this.tableName} WHERE ${columnSet}`
+        (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ? ) AS isLiker
+        
+        FROM ${this.tableName} LEFT JOIN user ON ${this.tableName}.userId = user.id
+        
+        WHERE ${this.tableName}.id = ?`
 
-      const result = (await db.query(sql, values))[0]
+      const result = (await db.query(sql, [sessionId, sessionId, articleId]))[0]
 
       if (!result) {
         return null
       }
 
-      const author = await UserModel.findOne({ id: result.userId }, true)
-
-      const isFlower = await UserCollectArticleModel.findOne(sessionId, result.id)
-
-      const isLiker = await UserAgreeArticleModel.findOne(sessionId, result.id)
-
       return {
         ...result,
 
-        isFlower: Boolean(isFlower),
+        isFlower: Boolean(result.isFlower),
 
-        isLiker: Boolean(isLiker),
-
-        author
+        isLiker: Boolean(result.isLiker)
       }
     } catch (error) {
       throw new Error(error)
@@ -215,7 +214,9 @@ class ArticleModel {
     try {
       const sql = `SELECT ${this.tableName}.*, user.nickname, user.avatar,
 
-        (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts
+        (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts,
+
+        (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker
 
         FROM ${this.tableName} LEFT JOIN user_collect_article ON user_collect_article.userId = ?
 
@@ -223,14 +224,12 @@ class ArticleModel {
         
         WHERE ${this.tableName}.id = user_collect_article.articleId`
 
-      const list = await db.query(sql, [userId])
+      const list = await db.query(sql, [sessionId, userId])
 
-      const isLikers = await Promise.all(list.map(arc => UserAgreeArticleModel.findOne(sessionId, arc.id)))
-
-      list.forEach((arc, idx) => {
+      list.forEach(arc => {
         arc.content = undefined
 
-        arc.isLiker = Boolean(isLikers[idx])
+        arc.isLiker = Boolean(arc.isLiker)
       })
 
       return list
@@ -248,7 +247,9 @@ class ArticleModel {
     try {
       const sql = `SELECT ${this.tableName}.*, user.nickname, user.avatar,
 
-        (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts
+        (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts,
+
+        (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker
         
         FROM ${this.tableName} LEFT JOIN user_agree_article ON user_agree_article.userId = ?
 
@@ -256,14 +257,12 @@ class ArticleModel {
 
         WHERE ${this.tableName}.id = user_agree_article.articleId`
 
-      const list = await db.query(sql, [userId])
+      const list = await db.query(sql, [sessionId, userId])
 
-      const isLikers = await Promise.all(list.map(arc => UserAgreeArticleModel.findOne(sessionId, arc.id)))
-
-      list.forEach((arc, idx) => {
+      list.forEach(arc => {
         arc.content = undefined
 
-        arc.isLiker = Boolean(isLikers[idx])
+        arc.isLiker = Boolean(arc.isLiker)
       })
 
       return list

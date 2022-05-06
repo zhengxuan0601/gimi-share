@@ -33,7 +33,7 @@ class ArticleController {
     try {
       const articleId = req.query.id
       const sessionId = await getSessionuserId(req)
-      const data = await ArticleModel.findOne(req.query, sessionId)
+      const data = await ArticleModel.findOne(articleId, sessionId)
       await ArticleModel.autoIncre(articleId, 'viewCounts')
       JsonResult.success({
         req,
@@ -73,7 +73,7 @@ class ArticleController {
   async updateArticle (req, response) {
     try {
       const id = req.body.id
-      const articleInfo = await ArticleModel.findOne({ id })
+      const articleInfo = await ArticleModel.findOne(id)
       if (articleInfo.userId !== req.sessionuser.id) {
         return JsonResult.httpStatus(req, response, 403, {
           message: 'No permission to edit article',
@@ -100,7 +100,7 @@ class ArticleController {
   async deleteArticle (req, response) {
     try {
       const id = req.query.id
-      const articleInfo = await ArticleModel.findOne({ id })
+      const articleInfo = await ArticleModel.findOne(id)
       if (!articleInfo) {
         JsonResult.fail({ req, response, message: '文章不存在' })
       }
