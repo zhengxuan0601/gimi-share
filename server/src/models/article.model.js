@@ -20,7 +20,7 @@ class ArticleModel {
 
         (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker,
 
-        (SELECT COUNT(*) FROM comment AS c WHERE c.articleId = ${this.tableName}.id) AS commentCounts
+        (SELECT COUNT(*) FROM article_comment AS ac WHERE ac.articleId = ${this.tableName}.id) AS commentCounts
 
         FROM ${this.tableName}, user`
 
@@ -81,7 +81,7 @@ class ArticleModel {
     try {
       const sql = `SELECT ${this.tableName}.*, user.avatar, user.nickname, 
         
-        (SELECT COUNT(*) FROM comment AS c WHERE c.articleId = ${this.tableName}.id) AS commentCounts,
+        (SELECT COUNT(*) FROM article_comment AS ac WHERE ac.articleId = ${this.tableName}.id) AS commentCounts,
         
         (SELECT uca.userId FROM user_collect_article AS uca WHERE uca.articleId = ${this.tableName}.id AND uca.userId = ? ) AS isFlower,
 
@@ -159,9 +159,9 @@ class ArticleModel {
    */
   async delete (id) {
     try {
-      const sql = `DELETE ${this.tableName}, comment, user_collect_article, user_agree_article 
+      const sql = `DELETE ${this.tableName}, article_comment, user_collect_article, user_agree_article 
 
-        FROM ${this.tableName} LEFT JOIN comment ON comment.articleId = ${this.tableName}.id
+        FROM ${this.tableName} LEFT JOIN article_comment ON article_comment.articleId = ${this.tableName}.id
 
         LEFT JOIN user_collect_article ON user_collect_article.articleId = ${this.tableName}.id
 
@@ -214,7 +214,7 @@ class ArticleModel {
     try {
       const sql = `SELECT ${this.tableName}.*, user.nickname, user.avatar,
 
-        (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts,
+        (SELECT COUNT(*) FROM article_comment as ac WHERE ac.articleId = ${this.tableName}.id) AS commentCounts,
 
         (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker
 
@@ -247,7 +247,7 @@ class ArticleModel {
     try {
       const sql = `SELECT ${this.tableName}.*, user.nickname, user.avatar,
 
-        (SELECT COUNT(*) FROM comment as c WHERE c.articleId = ${this.tableName}.id) AS commentCounts,
+        (SELECT COUNT(*) FROM article_comment as ac WHERE ac.articleId = ${this.tableName}.id) AS commentCounts,
 
         (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker
         

@@ -1,9 +1,9 @@
 const db = require('@/db/db-connection')
 const { newRandomId, dateFormat, multipleColumnSet } = require('@/utils/common.util')
 
-class CommentModel {
+class ArticleCommentModel {
   constructor () {
-    this.tableName = 'comment'
+    this.tableName = 'article_comment'
   }
 
   /**
@@ -166,4 +166,4 @@ class CommentModel {
   }
 }
 
-module.exports = new CommentModel()
+module.exports = new ArticleCommentModel()

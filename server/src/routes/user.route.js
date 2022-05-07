@@ -207,4 +207,26 @@ router.get('/getcounts', userController.getAllcounts)
  */
 router.post('/bindemail', auth(), handlerValidate(userController.bindEmail))
 
+/**
+ * 用户点赞评论
+ * @route GET /comments/agreecomment
+ * @group 用户管理
+ * @param {string} commentId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.get('/agreecomment', auth(), handlerValidate(userController.agreeComment))
+
+/**
+  * 用户取消点赞评论
+  * @route GET /comments/unagreecomment
+  * @group 用户管理
+  * @param {string} commentId.query.required
+  * @returns {object} 200
+  * @returns {Error}  default - Unexpected error
+  * @security JWT
+  */
+router.get('/unagreecomment', auth(), handlerValidate(userController.unagreeComment))
+
 module.exports = router

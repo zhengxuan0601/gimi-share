@@ -66,11 +66,11 @@ class UserAgreeCommentModel {
    * @param {*} userId
    * @param {*} commentId
    */
-  async add (userId, commentId) {
+  async add (userId, commentId, itemType) {
     try {
-      const sql = `INSERT INTO ${this.tableName} (userId, commentId) VALUES (?, ?)`
+      const sql = `INSERT INTO ${this.tableName} (userId, commentId, itemType) VALUES (?, ?, ?)`
 
-      await db.query(sql, [userId, commentId])
+      await db.query(sql, [userId, commentId, itemType])
     } catch (error) {
       throw new Error(error)
     }

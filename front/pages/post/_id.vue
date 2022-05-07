@@ -90,6 +90,12 @@
             <div class="right">
               <textarea v-model="comment" rows="3" placeholder="请输入您的评论吧~"></textarea>
               <div class="bottom-operate">
+                <div class="left-emoji-pic">
+                  <div>
+                    表情
+                    <VEmojiPicker  />
+                  </div>
+                </div>
                 <button
                   :disabled="!comment"
                   class="a-primary" 
@@ -113,12 +119,18 @@
                 <div class="user">
                   <nuxt-link 
                     :to="`/user/${item.userId}`"
-                    class="nickname">{{ item.nickname }}</nuxt-link>
+                    class="nickname">{{ item.nickname }}
+                    <span 
+                      v-if="item.userId === articleDetail.userId" 
+                      class="is-author">(作者)</span>
+                  </nuxt-link>
                   <p class="job">{{ item.job || '' }}</p>
                 </div>
                 <div class="comment">
                   <p>{{ item.content }}</p>
-                  <span v-if="item.isAuthor" @click="deleteComment(item.id)">删除</span>
+                  <span 
+                    v-if="item.isAuthor || userInfo.id === articleDetail.userId" 
+                    @click="deleteComment(item.id)">删除</span>
                 </div>
                 <div class="dz-pl">
                   <p 
@@ -155,7 +167,11 @@
                       <div class="user">
                         <nuxt-link
                           :to="`/user/${itemName.userId}`" 
-                          class="nickname">{{ itemName.nickname }}</nuxt-link>
+                          class="nickname">{{ itemName.nickname }}
+                          <span 
+                            v-if="itemName.userId === articleDetail.userId" 
+                            class="is-author">(作者)</span>
+                        </nuxt-link>
                         <p class="job">{{ itemName.job || '' }}</p>
                         <span v-if="itemName.replyNickname">@</span>
                         <nuxt-link
@@ -164,7 +180,9 @@
                       </div>
                       <div class="comment">
                         <p>{{ itemName.content }}</p>
-                        <span v-if="itemName.isAuthor" @click="deleteComment(itemName.id)">删除</span>
+                        <span 
+                          v-if="itemName.isAuthor || userInfo.id === articleDetail.userId" 
+                          @click="deleteComment(itemName.id)">删除</span>
                       </div>
                       <div v-if="itemName.replyComment" class="parent-comment">
                         <p>“{{ itemName.replyComment }}”</p>
@@ -177,7 +195,9 @@
                         </p>
                         <p 
                           v-ClickOutside="() => itemName.replyState = false"
-                          @click="itemName.replyState = true"><a-icon type="message" /><span v-if="itemName.replyCount">{{ itemName.replyCount }}</span></p>
+                          @click="itemName.replyState = true">
+                          <a-icon type="message" /><span v-if="itemName.replyCount">{{ itemName.replyCount }}</span>
+                        </p>
                       </div>
                       <div
                         v-show="itemName.replyState" 
@@ -211,11 +231,12 @@
 <script>
 import { mapState } from 'vuex'
 import ClickOutside from 'vue-click-outside'
+import { VEmojiPicker } from 'v-emoji-picker'
 import { validateUniqId, cycleDate } from '@/util'
 import CustomSkeleton from '@/components/CustomSkeleton'
 export default {
   name: 'PostIndex',
-  components: { CustomSkeleton },
+  components: { CustomSkeleton, VEmojiPicker },
   directives: { ClickOutside },
   layout: 'BaseLayout',
   validate ({ params }) {
@@ -241,7 +262,8 @@ export default {
     return {
       cycleDate,
       comment: '',
-      commentList: []
+      commentList: [],
+      emoVisible: false
     }
   },
 
@@ -294,7 +316,7 @@ export default {
           replyNickname,
           replyUserId
         }
-        await this.$axios.post('/api/v1/comments/submit', commentInfo)
+        await this.$axios.post('/api/v1/article/comments/submit', commentInfo)
         this.comment = ''
         this.findComments()
         this.$message.success('评论成功')
@@ -308,7 +330,7 @@ export default {
      */
     async findComments () {
       try {
-        const { data } = await this.$axios.get(`/api/v1/comments?articleId=${this.articleDetail.id}`)
+        const { data } = await this.$axios.get(`/api/v1/article/comments?articleId=${this.articleDetail.id}`)
         this.treeStructure(data)
         this.commentList = data
       } catch (error) {
@@ -325,8 +347,8 @@ export default {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
       try {
-        const API = commentItem.isLiker ? '/comments/unagreecomment' : '/comments/agreecomment'
-        await this.$axios.get(`/api/v1${API}?commentId=${commentItem.id}`)
+        const API = commentItem.isLiker ? '/users/unagreecomment' : '/users/agreecomment'
+        await this.$axios.get(`/api/v1${API}?commentId=${commentItem.id}&itemType=1`)
         if (commentItem.isLiker) {
           commentItem.likeCounts -= 1
         } else {
@@ -344,7 +366,7 @@ export default {
      */
     async deleteComment (commentId) {
       try {
-        await this.$axios.get(`/api/v1/comments/delete?id=${commentId}`)
+        await this.$axios.get(`/api/v1/article/comments/delete?id=${commentId}`)
         this.findComments()
       } catch (error) {
         console.log(error)
@@ -616,7 +638,7 @@ export default {
         }
         .bottom-operate {
           display: flex;
-          justify-content: flex-end;
+          justify-content: space-between;
           margin-top: 5px;
         }
       }
@@ -657,6 +679,9 @@ export default {
             display: flex;
             .nickname {
               color: #4c4c4c;
+              .is-author {
+                padding: 0 4px 0 6px;
+              }
             }
             .job {
               color: #d1b7b7;
@@ -683,6 +708,12 @@ export default {
               color: #c95858;
               font-size: 12px;
               cursor: pointer;
+              display: none;
+            }
+            &:hover {
+              span {
+                display: block;
+              }
             }
           }
           .dz-pl {

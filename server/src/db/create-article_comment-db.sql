@@ -1,8 +1,8 @@
--- CREATE COMMENT TABLE
+-- CREATE ARTICLE_COMMENT TABLE
 
-CREATE TABLE comment (
+CREATE TABLE article_comment (
   `id` varchar(64) NOT NULL COMMENT '评论标识',
-  `articleId` varchar(64) NULL COMMENT '评论所属文章',
+  `articleId` varchar(64) NOT NULL COMMENT '评论所属文章',
   `replyId` varchar(64) NULL COMMENT '所在回复的评论标识',
   `replyComment` varchar(255) NULL COMMENT '所在回复的评论内容',
   `topId` varchar(64) NULL COMMENT '当前评论属于最顶级评论标识',

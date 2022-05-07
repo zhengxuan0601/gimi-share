@@ -5,9 +5,11 @@ const { getAsync, delAsync } = require('@/redis')
 const ArticleModel = require('@/models/article.model')
 const JsonResult = require('@/utils/httpResponse.unit')
 const UserFocusUserModel = require('@/models/user_focus_user.model')
+const ArticleCommentModel = require('@/models/article_comment.model')
 const UserAgreeArticleModel = require('@/models/user_agree_article.model')
 const UserCollectArticleModel = require('@/models/user_collect_article.model')
 const { decrypt, getSessionuserId, encrypt } = require('@/utils/common.util')
+const UserAgreeCommentModel = require('@/models/user_agree_comment.model')
 
 class UserController {
   /**
@@ -403,17 +405,21 @@ class UserController {
   }
 
   /**
-   * get user focus users
+   * get user focus users and foucused user
    * @param {*} req
    * @param {*} response
    */
   async findFocusUsers (req, response) {
     try {
-      const data = await UserFocusUserModel.find(req.query)
+      const sessionId = await getSessionuserId(req)
+      // 关注的用户列表
+      const focusdata = await UserFocusUserModel.find(req.query.userId, sessionId, 'userId')
+      // 关注者的用户列表
+      const focuseddata = await UserFocusUserModel.find(req.query.userId, sessionId, 'focusId')
       JsonResult.success({
         req,
         response,
-        data,
+        data: { focusdata, focuseddata },
         message: '查询成功'
       })
     } catch (error) {
@@ -442,6 +448,74 @@ class UserController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '查询失败' })
+    }
+  }
+
+  /**
+   * user agree comment
+   * @param {*} req
+   * @param {*} response
+   */
+  async agreeComment (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const { commentId, itemType } = req.query
+      let comment = null
+      if (itemType === '1') {
+        comment = await ArticleCommentModel.findOne({ id: commentId })
+      }
+      if (!comment) {
+        return JsonResult.fail({ req, response, message: '评论不存在' })
+      }
+      const exist = await UserAgreeCommentModel.findOne(userId, commentId)
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '重复点赞' })
+      }
+      await UserAgreeCommentModel.add(userId, commentId, itemType)
+      if (itemType === '1') {
+        ArticleCommentModel.autoIncre(commentId, 'likeCounts')
+      }
+      JsonResult.success({
+        req,
+        response,
+        message: '点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '点赞失败' })
+    }
+  }
+
+  /**
+     * user agree comment
+     * @param {*} req
+     * @param {*} response
+     */
+  async unagreeComment (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const { commentId, itemType } = req.query
+      let comment = null
+      if (itemType === '1') {
+        comment = await ArticleCommentModel.findOne({ id: commentId })
+      }
+      if (!comment) {
+        return JsonResult.fail({ req, response, message: '评论不存在' })
+      }
+      const exist = await UserAgreeCommentModel.findOne(userId, commentId)
+      if (!exist) {
+        return JsonResult.fail({ req, response, message: '还未点赞' })
+      }
+      await UserAgreeCommentModel.delete({ userId, commentId })
+      if (itemType === '1') {
+        ArticleCommentModel.autoDec(commentId, 'likeCounts')
+      }
+      JsonResult.success({
+        req,
+        response,
+        message: '取消点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '取消点赞失败' })
     }
   }
 }

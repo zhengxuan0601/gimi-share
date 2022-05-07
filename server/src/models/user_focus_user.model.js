@@ -1,6 +1,6 @@
 const db = require('@/db/db-connection')
 const { multipleColumnSet } = require('@/utils/common.util')
-const UserModel = require('@/models/user.model')
+// const UserModel = require('@/models/user.model')
 
 class UserFocusUserModel {
   constructor () {
@@ -12,17 +12,23 @@ class UserFocusUserModel {
    * @param {*} param
    * @returns
    */
-  async find (param) {
+  async find (id, sessionId, fileds) {
     try {
-      const { columnSet, values } = multipleColumnSet(param)
+      const sql = `SELECT user.id, user.avatar, user.nickname,
 
-      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+        (SELECT ufu.focusId from ${this.tableName} AS ufu WHERE ufu.focusId = user.id AND ufu.userId = ?) AS isFocus
+      
+        FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.${fileds === 'userId' ? 'focusId' : 'userId'} 
+        
+        WHERE ${this.tableName}.${fileds} = ?`
 
-      const data = await db.query(sql, values)
+      const data = await db.query(sql, [sessionId, id])
 
-      const users = await Promise.all(data.map(o => UserModel.findOne({ id: o.focusId }, true)))
+      data.forEach(u => {
+        u.isFocus = Boolean(u.isFocus)
+      })
 
-      return users
+      return data
     } catch (error) {
       throw new Error(error)
     }

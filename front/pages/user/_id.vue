@@ -64,7 +64,7 @@
         <focusCategory 
           v-if="currentCategory.type === 'user'"
           :loading="loading"
-          :focus-user-list="focusUserList" />
+          :focus-info="focusInfo" />
       </div>
     </div>
     <div class="right-user-modal">
@@ -134,7 +134,7 @@ export default {
         total: 0
       },
       articleList: [],
-      focusUserList: [],
+      focusInfo: undefined,
       countInfo: '',
       loading: false,
       isFocus: false
@@ -229,13 +229,13 @@ export default {
     },
 
     /**
-     * 查询用户关注用户列表
+     * 查询用户关注用户列表和用户被关注者列表集合
      */
-    async findFocusUsers () {
+    async findFocusUserInfo () {
       this.loading = true
       try {
         const { data } = await this.$axios.get(`/api/v1/users/focususers?userId=${this.userInfo.id}`)
-        this.focusUserList = data
+        this.focusInfo = data
         this.loading = false
       } catch (error) {
         this.loading = false
@@ -281,7 +281,7 @@ export default {
             this.findCollectArticles()
             break;
         case '3':
-            this.findFocusUsers()
+            this.findFocusUserInfo()
             break;
         case '4':
             this.findAgreeArticles()
