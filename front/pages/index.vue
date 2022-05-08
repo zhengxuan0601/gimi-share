@@ -28,14 +28,14 @@
               <p class="article-title">{{ item.articleTitle }}</p>
               <p class="article-desc">{{ item.description }}</p>
               <div class="a-num">
-                <p><a-icon type="eye" /><span>{{ item.viewCounts }}</span></p>
+                <p><a-icon type="eye" /><span v-if="item.viewCounts">{{ item.viewCounts }}</span></p>
                 <p 
                   :class="{ 'is-liker': item.isLiker }"
                   @click.stop="isLikeArticle(item)">
                   <a-icon type="like" />
-                  <span>{{ item.likeCounts }}</span>
+                  <span v-if="item.likeCounts">{{ item.likeCounts }}</span>
                 </p>
-                <p><a-icon type="message" /><span>{{ item.commentCounts }}</span></p>
+                <p><a-icon type="message" /><span v-if="item.commentCounts">{{ item.commentCounts }}</span></p>
               </div>
             </div>
             <div v-if="item.coverImage" class="r">

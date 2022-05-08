@@ -189,6 +189,7 @@
           span {
             font-size: 12px;
             margin-left: 4px;
+            font-weight: bold;
           }
           &:not(:first-child) {
             &:hover {
@@ -227,5 +228,11 @@
     &:hover {
       color: @hover-primary-color;
     }
+  }
+}
+
+.emoji-popover {
+  .ant-popover-arrow {
+    display: none;
   }
 }

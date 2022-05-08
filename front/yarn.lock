@@ -9305,7 +9305,7 @@ utils-merge@1.0.1:
 
 v-emoji-picker@^2.3.3:
   version "2.3.3"
-  resolved "https://registry.yarnpkg.com/v-emoji-picker/-/v-emoji-picker-2.3.3.tgz#afff5d9be2d9c949b395616bcffd4d74f753289f"
+  resolved "https://registry.npmmirror.com/v-emoji-picker/-/v-emoji-picker-2.3.3.tgz#afff5d9be2d9c949b395616bcffd4d74f753289f"
   integrity sha512-GLuBowVCwKjGRVQ+DJvP6SVFhLIlyvQTBgwlrBuwPX7wt7xi+fdWxmFtyJDBEp/2/xI1aS6Y2lXvse9Cf2vIzA==
   dependencies:
     vue-class-component "^7.2.6"
