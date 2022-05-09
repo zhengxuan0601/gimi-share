@@ -50,8 +50,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import { cycleDate } from '@/util'
-import { categoryMap } from '@/util/options'
+import { cycleDate } from '~/util'
+import { categoryMap } from '~/config/optionMap'
 export default {
   name: 'IndexPage',
   layout: 'BaseLayout',

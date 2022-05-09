@@ -21,7 +21,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import EmailModal from '@/components/EmailModal.vue'
+import EmailModal from '~/components/EmailModal.vue'
 export default {
   name: 'AccountPage',
   components: { EmailModal },

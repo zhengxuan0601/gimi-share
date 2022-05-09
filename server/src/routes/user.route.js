@@ -195,7 +195,7 @@ router.get('/focususers', userController.findFocusUsers)
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */
-router.get('/getcounts', userController.getAllcounts)
+router.get('/getcounts', userController.statisticsCounts)
 
 /**
  * 邮箱绑定

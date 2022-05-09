@@ -10,6 +10,7 @@ const UserAgreeArticleModel = require('@/models/user_agree_article.model')
 const UserCollectArticleModel = require('@/models/user_collect_article.model')
 const { decrypt, getSessionuserId, encrypt } = require('@/utils/common.util')
 const UserAgreeCommentModel = require('@/models/user_agree_comment.model')
+const ShareCircleModel = require('@/models/share_circle.model')
 
 class UserController {
   /**
@@ -428,21 +429,23 @@ class UserController {
   }
 
   /**
-   * get user about counts
+   * statistics user counts
    * @param {*} req
    * @param {*} response
    */
-  async getAllcounts (req, response) {
+  async statisticsCounts (req, response) {
     try {
       const { userId } = req.query
       const focusdata = await UserFocusUserModel.findFocusCount(userId)
       const collectCounts = await UserCollectArticleModel.total({ userId })
+      const shareCount = await ShareCircleModel.total(userId)
       JsonResult.success({
         req,
         response,
         data: {
           ...focusdata,
-          collectCounts
+          collectCounts,
+          shareCount
         },
         message: '查询成功'
       })

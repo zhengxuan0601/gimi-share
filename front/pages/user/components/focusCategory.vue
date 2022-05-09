@@ -30,16 +30,15 @@
               <nuxt-link :to="`/user/${item.id}`">{{ item.nickname }}</nuxt-link>
             </p>
             <div v-if="userInfo.id !== item.id">
-              <button 
+              <a-button 
                 v-if="!item.isFocus"
-                class="a-primary dashed"
-                @click="updateUserFocus(item)"><a-icon type="plus" />关注</button>
-              <button 
+                type="dashed"
+                @click="updateUserFocus(item)"><a-icon type="plus" />关注</a-button>
+              <a-button 
                 v-else
-                class="a-primary dashed"
+                type="dashed"
                 @click="updateUserFocus(item)">
-                <a-icon type="check" />
-                <em class="has">已</em><em class="dis">取消</em>关注</button>
+                <a-icon type="check" />已关注</a-button>
             </div>
           </div>
         </div>

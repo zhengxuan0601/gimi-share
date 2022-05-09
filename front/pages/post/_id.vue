@@ -43,15 +43,13 @@
           <div v-if="userInfo.id !== articleDetail.userId" class="focus-user">
             <button 
               v-if="!isFocususer"
-              class="a-primary 
-              dashed" 
+              type="dashed" 
               @click="updateUserFocus(true)"><a-icon type="plus" />关注</button>
-            <button 
+            <a-button 
               v-else 
-              class="a-primary dashed"
+              type="dashed"
               @click="updateUserFocus(false)">
-              <a-icon type="check" />
-              <em class="has">已</em><em class="dis">取消</em>关注</button>
+              <a-icon type="check" />已关注</a-button>
           </div>
         </div>
         <img 
@@ -86,9 +84,9 @@
 
 <script>
 import { mapState } from 'vuex'
-import { validateUniqId } from '@/util'
-import ArticleComment from '@/components/ArticleComments.vue'
-import CustomSkeleton from '@/components/CustomSkeleton'
+import ArticleComment from './components/ArticleComments.vue'
+import { validateUniqId } from '~/util'
+import CustomSkeleton from '~/components/CustomSkeleton'
 export default {
   name: 'PostIndex',
   components: { CustomSkeleton, ArticleComment },

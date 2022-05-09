@@ -29,7 +29,7 @@ class ArticleModel {
 
         const total = await db.query(totalSql)
 
-        sql += ` WHERE ${this.tableName}.userId = user.id LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+        sql += ` WHERE ${this.tableName}.userId = user.id ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
         const list = await db.query(sql, [sessionId])
 
@@ -44,11 +44,11 @@ class ArticleModel {
 
           total: total[0].total,
 
-          pageNo
+          pageNo: Number(pageNo)
         }
       }
 
-      sql += ` WHERE ${columnSet} AND ${this.tableName}.userId = user.id LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+      sql += ` WHERE ${columnSet} AND ${this.tableName}.userId = user.id ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
       const totalSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE ${columnSet}`
 
@@ -65,7 +65,7 @@ class ArticleModel {
 
         total: total[0].total,
 
-        pageNo
+        pageNo: Number(pageNo)
       }
     } catch (error) {
       throw new Error(error)

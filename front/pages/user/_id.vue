@@ -27,21 +27,20 @@
         </div>
         <div class="right-operate">
           <div v-if="userInfo.id !== sessionInfo.id">
-            <button 
+            <a-button 
               v-if="!isFocus"
-              class="a-primary dashed"
-              @click="updateUserFocus(true)"><a-icon type="plus" />关注</button>
-            <button 
+              type="dashed"
+              @click="updateUserFocus(true)"><a-icon type="plus" />关注</a-button>
+            <a-button 
               v-else
-              class="a-primary dashed"
+              type="dashed"
               @click="updateUserFocus(false)">
-              <a-icon type="check" />
-              <em class="has">已</em><em class="dis">取消</em>关注</button>
+              <a-icon type="check" />已关注</a-button>
           </div>
-          <button 
+          <a-button 
             v-else 
-            class="a-primary dashed" 
-            @click="$router.push('/setting/profile')"><a-icon type="edit" />编辑个人资料</button>
+            type="dashed"
+            @click="$router.push('/setting/profile')"><a-icon type="edit" />编辑个人资料</a-button>
         </div>
       </div>
       <ul class="tab-tag">
@@ -96,7 +95,7 @@
 import { mapState } from 'vuex'
 import focusCategory from './components/focusCategory'
 import articleCategory from './components/articleCategory'
-import { validateUniqId } from '@/util'
+import { validateUniqId } from '~/util'
 export default {
   name: 'IserIndex',
   components: { articleCategory, focusCategory },

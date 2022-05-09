@@ -9,17 +9,21 @@
         </div>
         <div class="nav-menu">
           <nuxt-link to="/">首页</nuxt-link>
+          <nuxt-link to="/sharecircle">友圈</nuxt-link>
         </div>
         <div class="right-operate">
           <div class="search-model">
             <a-icon type="search" />
             <input type="text" placeholder="关键字搜索" class="s-input">
           </div>
-          <button class="a-primary create-button" @click="toCreatorCenter">创作者中心</button>
-          <button 
+          <a-button 
+            type="primary"
+            class="create-button"
+            @click="toCreatorCenter">创作者中心</a-button>
+          <a-button 
             v-if="!userInfo"
-            class="a-primary dashed"
-            @click="$store.commit('UPDATE_LOGIN_VISIBLE', true)">登录</button>
+            type="dashed"
+            @click="$store.commit('UPDATE_LOGIN_VISIBLE', true)">登录</a-button>
           <a-popover v-else trigger="hover" placement="bottom">
             <div slot="content" class="cover-image-popover">
               <div class="nickname">{{ userInfo.nickname }}</div>
@@ -45,7 +49,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import LoginModal from '@/components/LoginModal'
+import LoginModal from '~/components/LoginModal'
 export default {
   components: { LoginModal },
   computed: {

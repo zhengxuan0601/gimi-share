@@ -58,7 +58,7 @@
             </a-form-model>
           </div>
         </template>
-        <button class="a-primary">提 交</button>
+        <a-button type="primary">提 交</a-button>
       </a-popover>
     </div>
     <div class="markdown-body">
@@ -80,8 +80,8 @@
 
 <script>
 import axios from 'axios'
-import { categoryOption } from '@/util/options'
-import ServerLoading from '@/components/ServerLoading'
+import { categoryOption } from '~/config/optionMap'
+import ServerLoading from '~/components/ServerLoading'
 export default {
   name: 'WriteCenter',
   components: { ServerLoading },

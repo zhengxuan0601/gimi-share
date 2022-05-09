@@ -14,10 +14,10 @@
             <div class="left-emoji-pic">
               <EmojiPicker @select="selectEmoji" />
             </div>
-            <button
+            <a-button
               :disabled="!comment"
-              class="a-primary" 
-              @click="submitComment(comment, {})">评论</button>
+              type="primary" 
+              @click="submitComment(comment, {})">评论</a-button>
           </div>
         </div>
       </div>
@@ -70,13 +70,13 @@
                 <div class="left-emoji-pic">
                   <EmojiPicker @select="selectEmoji($event, item)" />
                 </div>
-                <button
+                <a-button
                   :disabled="!item.replyNewComment"
-                  class="a-primary"
+                  type="primary"
                   @click="submitComment(item.replyNewComment, {
                     topId: item.id, 
                     replyId: item.id
-                  }, item)" >评论</button>
+                  }, item)" >评论</a-button>
               </div>
             </div>
             <div
@@ -138,16 +138,16 @@
                       <div class="left-emoji-pic">
                         <EmojiPicker @select="selectEmoji($event, itemName)" />
                       </div>
-                      <button
+                      <a-button
                         :disabled="!itemName.replyNewComment"
-                        class="a-primary" 
+                        type="primary"
                         @click="submitComment(itemName.replyNewComment, {
                           topId: item.id, 
                           replyId: itemName.id, 
                           replyComment: itemName.content, 
                           replyNickname: itemName.nickname, 
                           replyUserId: itemName.userId
-                        }, itemName)">评论</button>
+                        }, itemName)">评论</a-button>
                     </div>
                   </div>
                 </div>
@@ -164,8 +164,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import { cycleDate } from '@/util'
-import EmojiPicker from '@/components/EmojiPicker'
+import { cycleDate } from '~/util'
+import EmojiPicker from '~/components/EmojiPicker'
 export default {
   name: 'ArticleComment',
   components: { EmojiPicker },

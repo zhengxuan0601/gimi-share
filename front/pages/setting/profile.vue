@@ -46,7 +46,7 @@
         </a-textarea>
       </a-form-model-item>
       <div class="save-btn" @click="handleSubmit">
-        <button class="a-primary dashed">立即保存</button>
+        <a-button type="dashed">立即保存</a-button>
       </div>
     </a-form-model>
   </div>

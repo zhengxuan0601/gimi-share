@@ -21,18 +21,18 @@ export default {
   css: [
     'ant-design-vue/dist/antd.css',
     'mavon-editor/dist/css/index.css',
-    '@/assets/style/common.css',
-    '@/assets/iconfont/iconfont.css'
+    '~/assets/style/common.css',
+    '~/assets/iconfont/iconfont.css'
   ],
 
   styleResources: {
-    less: '@/assets/style/common.less'
+    less: '~/assets/style/common.less'
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '@/plugins/antd-ui',
-    '@/plugins/axios',
+    '~/plugins/antd-ui',
+    '~/plugins/axios',
     {
       src: '@/plugins/mavon-editor',
       ssr: false

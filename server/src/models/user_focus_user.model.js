@@ -90,9 +90,9 @@ class UserFocusUserModel {
    */
   async findFocusCount (userId) {
     try {
-      const focusSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE userId = ?`
+      const focusSql = `SELECT COUNT(*) AS total FROM ${this.tableName} WHERE userId = ?`
 
-      const focusedSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE FOCUSiD = ?`
+      const focusedSql = `SELECT COUNT(*) AS total FROM ${this.tableName} WHERE focusId = ?`
 
       const focusCount = await db.query(focusSql, [userId])
 

@@ -2,7 +2,7 @@
   <div class="custom-emoji-picker">
     <a-popover 
       destroy-tooltip-on-hide
-      placement="topLeft" 
+      placement="bottom" 
       trigger="click" 
       overlay-class-name="emoji-popover">
       <template slot="content">
