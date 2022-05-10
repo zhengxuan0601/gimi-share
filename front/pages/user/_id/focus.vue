@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import UserCategory from '../component/UserCategory'
+import UserCategory from '../components/UserCategory'
 export default {
   name: 'UserFocus',
   components: { UserCategory },

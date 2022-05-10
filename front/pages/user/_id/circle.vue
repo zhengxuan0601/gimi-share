@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ShareCircleCategory from '../component/ShareCircleCategory'
+import ShareCircleCategory from '../components/ShareCircleCategory'
 export default {
   name: 'UserCircle',
   components: { ShareCircleCategory },

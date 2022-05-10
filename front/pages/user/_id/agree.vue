@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import ArticleCategory from '../component/ArticleCategory'
-import ShareCircleCategory from '../component/ShareCircleCategory'
+import ArticleCategory from '../components/ArticleCategory'
+import ShareCircleCategory from '../components/ShareCircleCategory'
 export default {
   name: 'UserAgreeArticle',
   components: { ArticleCategory, ShareCircleCategory },

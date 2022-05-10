@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import ArticleCategory from '../component/ArticleCategory'
+import ArticleCategory from '../components/ArticleCategory'
 export default {
   name: 'UserCollect',
   components: { ArticleCategory },
