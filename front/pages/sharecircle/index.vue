@@ -61,7 +61,6 @@
           <a-empty 
             description="空空如也" 
             :image="require('@/assets/images/nodata.png')" /></div>
-        <!-- 友圈分享列表 -->
         <div v-else class="shart-list-block">
           <div 
             v-for="item in pagination.list" 
@@ -91,7 +90,12 @@
               </div>
             </div>
             <div class="bottom">
-              <div><a-icon type="message" /><span></span></div>
+              <div 
+                :class="{ like: item.replyState }"
+                @click="item.replyState = !item.replyState">
+                <a-icon type="message" />
+                <span v-if="item.commentCount">{{ item.commentCount }}</span>
+              </div>
               <div
                 :class="{ like: item.isLiker }" 
                 @click="isLikeCircle(item)">
@@ -99,6 +103,9 @@
                 <span v-if="item.agreeCount">{{ item.agreeCount }}</span>
               </div>
             </div>
+            <SimpleComment
+              v-if="item.replyState"
+              :circle-id="item.id" />
           </div>
         </div>
       </client-only>
@@ -137,19 +144,27 @@
 
 <script>
 import { mapState } from 'vuex'
+import SimpleComment from './components/SimpleComment'
 import { getBase64, cycleDate } from '~/util'
 import EmojiPicker from '~/components/EmojiPicker'
 export default {
   name: 'ShareCircle',
-  components: { EmojiPicker },
+  components: { EmojiPicker, SimpleComment },
   layout: 'BaseLayout',
   async asyncData ({ $axios }) {
     const [pageNo, pageSize] = [1, 20]
     try {
       const { data } = await $axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
+      const list = data.list.map(o => {
+       return {
+          ...o,
+        replyState: false
+       }
+      })
       return {
         pagination: {
           ...data,
+          list,
           pageSize
         }
       }
@@ -171,7 +186,6 @@ export default {
       fileList: [],
       previewVisible: false,
       previewImage: null,
-      
       publishLoading: false,
       staticsCount: ''
     }
@@ -199,7 +213,7 @@ export default {
      */
     async publishShareCircle () {
       if (!this.userInfo) {
-        this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
       if (this.content || this.publishLoading) {
         this.publishLoading = true
@@ -230,9 +244,16 @@ export default {
       const [pageNo, pageSize] = [1, this.pagination.pageSize]
       try {
         const { data } = await this.$axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
+        const list = data.list.map(o => {
+          return {
+              ...o,
+            replyState: false
+          }
+        })
         this.pagination = {
           ...this.pagination,
           ...data,
+          list
         }
       } catch (error) {
         console.log(error)

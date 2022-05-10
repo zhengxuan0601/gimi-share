@@ -368,7 +368,7 @@ export default {
           padding: 10px 20px;
           resize: none;
           &:focus {
-            border: 1px solid #2080f7;
+            border: 1px solid @primary-color;
           }
         }
         .bottom-operate {
@@ -477,7 +477,7 @@ export default {
               transition: .2s;
               resize: none;
                &:focus {
-                border: 1px solid #2080f7;
+                border: 1px solid @primary-color;
               }
             }
             .bottom-operate {

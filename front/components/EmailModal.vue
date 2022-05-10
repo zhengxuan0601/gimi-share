@@ -188,12 +188,12 @@ export default {
         font-size: 12px;
         color: #999;
         span {
-          color: #2080f7;
+          color: @primary-color;
         }
       }
       .send-email-code {
         p {
-          color: #2080f7;
+          color: @primary-color;
           cursor: pointer;
           font-size: 12px;
         }

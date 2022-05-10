@@ -21,6 +21,8 @@ class ShareCircleModel {
       
         (SELECT COUNT(*) FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id) AS agreeCount,
 
+        (SELECT COUNT(*) FROM sharecircle_comment AS sc WHERE sc.circleId = ${this.tableName}.id) AS commentCount,
+
         (SELECT uas.userId FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id AND uas.userId = ?) AS isLiker
       
         FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId`
@@ -135,9 +137,11 @@ class ShareCircleModel {
    */
   async delete (id) {
     try {
-      const sql = `DELETE ${this.tableName}, user_agree_sharecircle
+      const sql = `DELETE ${this.tableName}, user_agree_sharecircle, sharecircle_comment
       
       FROM ${this.tableName} LEFT JOIN user_agree_sharecircle ON user_agree_sharecircle.circleId = ${this.tableName}.id
+
+      LEFT JOIN sharecircle_comment ON sharecircle_comment.circleId = ${this.tableName}.id
       
       WHERE ${this.tableName}.id = ?`
 
@@ -158,6 +162,8 @@ class ShareCircleModel {
       const sql = `SELECT ${this.tableName}.*, user.avatar, user.job, user.nickname,
 
       (SELECT COUNT(*) FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id) AS agreeCount,
+
+      (SELECT COUNT(*) FROM sharecircle_comment AS sc WHERE sc.circleId = ${this.tableName}.id) AS commentCount,
       
       (SELECT uas.userId FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id AND uas.userId = ?) AS isLiker
       

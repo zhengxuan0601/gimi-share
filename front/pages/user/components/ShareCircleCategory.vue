@@ -57,7 +57,10 @@
             </a-popover>
           </div>
           <div class="bottom">
-            <div><a-icon type="message" /><span></span></div>
+            <div>
+              <a-icon type="message" />
+              <span v-if="item.commentCount">{{ item.commentCount }}</span>
+            </div>
             <div
               :class="{ like: item.isLiker }" 
               @click="isLikeCircle(item)">
