@@ -52,12 +52,12 @@
       <client-only>
         <div
           slot="placeholder" 
-          style="background: #fff; padding: 30px 20px; margin-top: 20px;">
-          <a-skeleton active avatar />
+          style="background: #fff; padding: 30px 20px;">
+          <a-skeleton active :paragraph="{ rows: 3 }" />
         </div>
         <div 
           v-if="!pagination.list.length" 
-          style="padding: 30px 0;background: #fff;margin-top: 20px;">
+          style="padding: 30px 0;background: #fff;">
           <a-empty 
             description="空空如也" 
             :image="require('@/assets/images/nodata.png')" /></div>
@@ -69,7 +69,7 @@
             class="share-block">
             <div class="top">
               <div class="left-avatar">
-                <nuxt-link to="/"><img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar"></nuxt-link>
+                <nuxt-link :to="`/user/${item.userId}`"><img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar"></nuxt-link>
               </div>
               <div class="right-info">
                 <p class="nickname">
@@ -91,8 +91,13 @@
               </div>
             </div>
             <div class="bottom">
-              <div><a-icon type="message" /><span>10</span></div>
-              <div><a-icon type="like" /><span>11</span></div>
+              <div><a-icon type="message" /><span></span></div>
+              <div
+                :class="{ like: item.isLiker }" 
+                @click="isLikeCircle(item)">
+                <a-icon type="like" />
+                <span v-if="item.agreeCount">{{ item.agreeCount }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -121,12 +126,12 @@
         </div>
       </div>
     </div>
-     <a-modal 
-        :visible="previewVisible" 
-        :footer="null" 
-        @cancel="previewVisible = false">
-        <img alt="example" style="width: 100%" :src="previewImage" />
-      </a-modal>
+    <a-modal 
+      :visible="previewVisible" 
+      :footer="null" 
+      @cancel="previewVisible = false">
+      <img alt="example" style="width: 100%" :src="previewImage" />
+    </a-modal>
   </div>
 </template>
 
@@ -138,6 +143,27 @@ export default {
   name: 'ShareCircle',
   components: { EmojiPicker },
   layout: 'BaseLayout',
+  async asyncData ({ $axios }) {
+    const [pageNo, pageSize] = [1, 20]
+    try {
+      const { data } = await $axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
+      return {
+        pagination: {
+          ...data,
+          pageSize
+        }
+      }
+    } catch (error) {
+      return {
+        pagination: {
+          pageNo: 1,
+          pageSize: 20,
+          list: [],
+          total: 0
+        }
+      }
+    }
+  },
   data () {
     return {
       cycleDate,
@@ -145,12 +171,7 @@ export default {
       fileList: [],
       previewVisible: false,
       previewImage: null,
-      pagination: {
-        pageNo: 1,
-        pageSize: 20,
-        list: [],
-        total: 0
-      },
+      
       publishLoading: false,
       staticsCount: ''
     }
@@ -170,10 +191,6 @@ export default {
       deep: true,
       immediate: true
     }
-  },
-
-  created () {
-    this.findShareList()
   },
 
   methods: {
@@ -196,7 +213,7 @@ export default {
           this.pagination.pageNo = 1
           this.content = ''
           this.fileList = []
-          this.findShareList()
+          this.refreshShareList()
           this.$message.success('发布友圈成功')
         } catch (error) {
           console.log(error)
@@ -207,10 +224,10 @@ export default {
     },
 
     /**
-     * find share circle page list
+     * refresh share circle page list
      */
-    async findShareList () {
-      const { pageNo, pageSize } = this.pagination
+    async refreshShareList () {
+      const [pageNo, pageSize] = [1, this.pagination.pageSize]
       try {
         const { data } = await this.$axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
         this.pagination = {
@@ -220,6 +237,23 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+
+    /**
+     * user like or unlike sharecircle
+     * @param { Object } circleItem
+     */
+    async isLikeCircle (circleItem) {
+      try {
+        const API = circleItem.isLiker ? '/shares/unagree' : '/shares/agree'
+        await this.$axios.get(`/api/v1${API}?id=${circleItem.id}`)
+        if (circleItem.isLiker) {
+          circleItem.agreeCount -= 1
+        } else {
+          circleItem.agreeCount += 1
+        }
+        circleItem.isLiker = !circleItem.isLiker
+      } catch (error) {}
     },
 
       /**
@@ -242,7 +276,6 @@ export default {
     async getUserStatistics () {
       try {
         const { data } = await this.$axios.get(`/api/v1/users/getcounts?userId=${this.userInfo.id}`)
-        console.log(data)
         this.staticsCount = data
       } catch (error) {
         console.log(error)
@@ -292,6 +325,7 @@ export default {
       background: #fff;
       border-radius: 4px;
       padding: 20px;
+      margin-bottom: 20px;
       .input-block {
         background: #f2f3f5;
         border: 1px solid #f2f3f5;
@@ -320,107 +354,6 @@ export default {
             cursor: pointer;
             i {
               margin-right: 3px;
-            }
-          }
-        }
-      }
-    }
-    .shart-list-block {
-      margin-top: 20px;
-      .share-block {
-        background: #fff;
-        border-radius: 4px;
-        margin-bottom: 20px;
-        .top {
-          display: flex;
-          padding: 20px 20px 10px 20px;
-          .left-avatar {
-            width: 48px;
-            height: 48px;
-            a {
-              display: block;
-              width: 100%;
-              height: 100%;
-              border-radius: 50%;
-              overflow: hidden;
-              img {
-                width: 100%;
-                height: 100%;
-              }
-            }
-          }
-          .right-info {
-            width: 0;
-            flex: 1;
-            padding-left: 14px;
-            .nickname {      
-              font-size: 15px;
-              a {
-                color: #4c4c4c;
-                &:hover {
-                  color: #2080f7;
-                }
-              }
-            }
-            .desc {
-              padding-bottom: 10px;
-              font-size: 12px;
-            }
-            .share-info {
-              color: #000;
-            }
-            .img-box {
-              padding: 16px 0;
-              display: flex;
-              .share-img {
-                margin-right: 4px;
-                img {
-                  display: block;
-                  flex: 0 1 auto;
-                  max-width: 100%;
-                  min-width: 110px;
-                  cursor: zoom-in;
-                  min-height: 110px;
-                  max-height: 230px;
-                  -o-object-fit: cover;
-                  object-fit: cover;
-                }
-                &:nth-child(1):nth-last-child(1) {
-                   border-radius: 4px;
-                  overflow: hidden;
-                  img {
-                    width: 200px;
-                  }
-                }
-                &:nth-child(1):nth-last-child(2), 
-                &:nth-child(2):nth-last-child(1), 
-                &:nth-child(3):nth-last-child(1), 
-                &:nth-child(2):nth-last-child(2), 
-                &:nth-child(1):nth-last-child(3) {
-                  img {
-                    width: 110px;
-                  }
-                }
-              }
-            }
-          }
-        }
-        .bottom {
-          border-top: 1px solid #f1f1f1;
-          display: flex;
-          div {
-            width: 50%;
-            text-align: center;
-            padding: 10px 0;
-            cursor: pointer;
-            color: #86909c;
-            &:hover {
-              opacity: .8;
-            }
-            i {
-              position: relative;
-              top: 1px;
-              margin-right: 2px;
             }
           }
         }

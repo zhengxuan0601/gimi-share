@@ -1,6 +1,6 @@
 <template>
   <div class="articlelist-content article-category-modal">
-    <div v-if="loading" style="padding: 20px;">
+    <div v-if="loading" style="background: #fff; padding: 20px;">
       <a-skeleton active />
     </div>
     <client-only v-else>

@@ -11,13 +11,17 @@ class ShareCircleModel {
    * @param {*} param
    * @returns
    */
-  async find (param) {
+  async find (param, sessionId) {
     try {
       const { pageNo = 1, pageSize = 20, ...object } = param
 
       const { columnSet, values } = multipleColumnSet(object)
 
-      let sql = `SELECT ${this.tableName}.*, avatar, nickname, job 
+      let sql = `SELECT ${this.tableName}.*, avatar, nickname, job,
+      
+        (SELECT COUNT(*) FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id) AS agreeCount,
+
+        (SELECT uas.userId FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id AND uas.userId = ?) AS isLiker
       
         FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId`
 
@@ -26,13 +30,16 @@ class ShareCircleModel {
 
         sql += ` ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
-        const [list, total] = [await db.query(sql), await db.query(totalSql)]
+        const [list, total] = [await db.query(sql, [sessionId]), await db.query(totalSql)]
 
         return {
           list: list.map(o => {
             return {
               ...o,
-              picList: o.picList.split(';').filter(Boolean)
+
+              picList: o.picList.split(';').filter(Boolean),
+
+              isLiker: Boolean(o.isLiker)
             }
           }),
 
@@ -45,13 +52,16 @@ class ShareCircleModel {
 
         sql += ` WHERE ${columnSet} ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
-        const [list, total] = [await db.query(sql, values), await db.query(totalSql, values)]
+        const [list, total] = [await db.query(sql, [sessionId, ...values]), await db.query(totalSql, values)]
 
         return {
           list: list.map(o => {
             return {
               ...o,
-              picList: o.picList.split(';').filter(Boolean)
+
+              picList: o.picList.split(';').filter(Boolean),
+
+              isLiker: Boolean(o.isLiker)
             }
           }),
 
@@ -60,6 +70,25 @@ class ShareCircleModel {
           pageNo: Number(pageNo)
         }
       }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * findone sharecircle info
+   * @param {*} param
+   * @returns
+   */
+  async findOne (param) {
+    try {
+      const { columnSet, values } = multipleColumnSet(param, ' AND ')
+
+      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+
+      const result = await db.query(sql, values)
+
+      return result[0]
     } catch (error) {
       throw new Error(error)
     }
@@ -95,6 +124,58 @@ class ShareCircleModel {
       const total = await db.query(sql, [userId])
 
       return total[0].total
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * delete user sharecircle
+   * @param {*} id
+   */
+  async delete (id) {
+    try {
+      const sql = `DELETE ${this.tableName}, user_agree_sharecircle
+      
+      FROM ${this.tableName} LEFT JOIN user_agree_sharecircle ON user_agree_sharecircle.circleId = ${this.tableName}.id
+      
+      WHERE ${this.tableName}.id = ?`
+
+      await db.query(sql, [id])
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * find user agree sharecircle list
+   * @param {*} userId
+   * @param {*} sessionId
+   * @returns
+   */
+  async findUserAgreeCircle (userId, sessionId) {
+    try {
+      const sql = `SELECT ${this.tableName}.*, user.avatar, user.job, user.nickname,
+
+      (SELECT COUNT(*) FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id) AS agreeCount,
+      
+      (SELECT uas.userId FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id AND uas.userId = ?) AS isLiker
+      
+      FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId
+
+      WHERE ${this.tableName}.id in (SELECT uas.circleId FROM user_agree_sharecircle AS uas WHERE uas.userId = ?)`
+
+      const list = await db.query(sql, [sessionId, userId])
+
+      return list.map(o => {
+        return {
+          ...o,
+
+          picList: o.picList.split(';').filter(Boolean),
+
+          isLiker: Boolean(o.isLiker)
+        }
+      })
     } catch (error) {
       throw new Error(error)
     }

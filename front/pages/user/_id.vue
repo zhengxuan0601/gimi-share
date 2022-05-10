@@ -30,55 +30,47 @@
             <a-button 
               v-if="!isFocus"
               type="dashed"
-              @click="updateUserFocus(true)"><a-icon type="plus" />关注</a-button>
+              icon="user-add"
+              @click="updateUserFocus(true)">关注</a-button>
             <a-button 
               v-else
               type="dashed"
-              @click="updateUserFocus(false)">
-              <a-icon type="check" />已关注</a-button>
+              icon="check"
+              @click="updateUserFocus(false)">已关注</a-button>
           </div>
           <a-button 
             v-else 
             type="dashed"
-            @click="$router.push('/setting/profile')"><a-icon type="edit" />编辑个人资料</a-button>
+            icon="edit"
+            @click="$router.push('/setting/profile')">编辑个人资料</a-button>
         </div>
       </div>
       <ul class="tab-tag">
         <li 
           v-for="item in categoryTab"
-          :key="item.value"
-          :class="{ active: currentCategory.value === item.value }" 
-          @click="updateInfoCaterory(item)">{{ item.label }}</li>
+          :key="item.url">
+          <nuxt-link :to="`/user/${userInfo.id}${item.url}`">{{ item.label }}</nuxt-link>  
+        </li>
       </ul>
       <div class="category-content">
-        <!-- 文章 -->
-        <articleCategory 
-          v-if="currentCategory.type === 'article'"
-          :category="currentCategory.value"
-          :loading="loading"
-          :article-list="articleList"
-          @refresh="refreshArticles" />
-
-        <!-- 关注用户 -->
-        <focusCategory 
-          v-if="currentCategory.type === 'user'"
-          :loading="loading"
-          :focus-info="focusInfo" />
+        <nuxt-child :user-id="userInfo.id"></nuxt-child>
       </div>
     </div>
     <div class="right-user-modal">
       <div class="focus-account">
         <div>
           <p>关注了</p>
-          <span>{{ countInfo.focusCount || 0 }}</span>
+          <nuxt-link :to="`/user/${userInfo.id}/focus`">{{ countInfo.focusCount || 0 }}</nuxt-link>
         </div>
         <div>
           <p>关注者</p>
-          <span>{{ countInfo.focusedCount || 0 }}</span>
+          <nuxt-link :to="`/user/${userInfo.id}/focus`">{{ countInfo.focusedCount || 0 }}</nuxt-link>
         </div>
       </div>
       <div class="list-block">
-        <div class="block pointer" @click="currentCategory = { value: '2', label: '收藏', type: 'article' }">
+        <div 
+          class="block pointer" 
+          @click="$router.push(`/user/${userInfo.id}/collect`)">
           <p>收藏</p>
           <span>{{ countInfo.collectCounts || 0 }}</span>
         </div>
@@ -93,12 +85,9 @@
 
 <script>
 import { mapState } from 'vuex'
-import focusCategory from './components/focusCategory'
-import articleCategory from './components/articleCategory'
 import { validateUniqId } from '~/util'
 export default {
   name: 'IserIndex',
-  components: { articleCategory, focusCategory },
   layout: 'BaseLayout',
   validate ({ params }) {
     return validateUniqId(params.id)
@@ -118,24 +107,13 @@ export default {
   data () {
     return {
       categoryTab: [
-        { value: '1', label: '文章', type: 'article' },
-        { value: '2', label: '收藏', type: 'article' },
-        { value: '3', label: '关注', type: 'user' },
-        { value: '4', label: '点赞', type: 'article' }
+        { label: '文章', url: '' },
+        { label: '友圈', url: '/circle' },
+        { label: '收藏', url: '/collect' },
+        { label: '关注', url: '/focus' },
+        { label: '赞', url: '/agree' }
       ],
-      currentCategory: {
-        value: '1',
-        type: 'article'
-      },
-      pagination: {
-        pageNo: 1,
-        pageSize: 20,
-        total: 0
-      },
-      articleList: [],
-      focusInfo: undefined,
       countInfo: '',
-      loading: false,
       isFocus: false
     }
   },
@@ -156,17 +134,7 @@ export default {
     })
   },
 
-  watch: {
-    currentCategory: {
-      handler (cateItem) {
-        this.refreshArticles(cateItem.value)
-      },
-      deep: true
-    }
-  },
-
   created () {
-    this.findArticleByUser()
     this.finIsFocus()
     this.findAllCounts()
   },
@@ -181,63 +149,6 @@ export default {
          this.isFocus = data
       } catch (error) {
         console.log(error)
-      }
-    },
-
-    /**
-     * 分页查询该用户下的所有文章
-     */
-    async findArticleByUser () {
-      this.loading = true
-      const { pageNo, pageSize } = this.pagination
-      try {
-        const { data } = await this.$axios.get(`/api/v1/articles?pageNo=${pageNo}&pageSize=${pageSize}&userId=${this.userInfo.id}`)
-        this.articleList = data.list
-        this.loading = false
-      } catch (error) {
-        this.loading = false
-      }
-    },
-
-    /**
-     * 查询该用户下已收藏的所有文章
-     */
-    async findCollectArticles () {
-      this.loading = true
-      try {
-        const { data } = await this.$axios.get(`/api/v1/articles/collected?userId=${this.userInfo.id}`)
-        this.articleList = data
-        this.loading = false
-      } catch (error) {
-        this.loading = false
-      }
-    },
-
-    /**
-     * 查询该用户下已收藏的所有文章
-     */
-    async findAgreeArticles () {
-      this.loading = true
-      try {
-        const { data } = await this.$axios.get(`/api/v1/articles/agreed?userId=${this.userInfo.id}`)
-        this.articleList = data
-        this.loading = false
-      } catch (error) {
-        this.loading = false
-      }
-    },
-
-    /**
-     * 查询用户关注用户列表和用户被关注者列表集合
-     */
-    async findFocusUserInfo () {
-      this.loading = true
-      try {
-        const { data } = await this.$axios.get(`/api/v1/users/focususers?userId=${this.userInfo.id}`)
-        this.focusInfo = data
-        this.loading = false
-      } catch (error) {
-        this.loading = false
       }
     },
 
@@ -269,33 +180,6 @@ export default {
       } catch (error) {
         console.log(error)
       }
-    },
-
-    refreshArticles (category) {
-      switch (category) {
-        case '1':
-          this.findArticleByUser()
-          break;
-        case '2':
-            this.findCollectArticles()
-            break;
-        case '3':
-            this.findFocusUserInfo()
-            break;
-        case '4':
-            this.findAgreeArticles()
-            break;
-        default:
-          break;
-      }
-    },
-
-    updateInfoCaterory (cateItem) {
-      if (cateItem.value === this.currentCategory.value) {
-        return
-      }
-      this.articleList = []
-      this.currentCategory = cateItem
     }
   }
 }
@@ -378,18 +262,22 @@ export default {
         margin-right: 30px;
         cursor: pointer;
         position: relative;
-        &.active {
-          color: #000;
-          &:after {
-            content: "";
-            width: 10px;
-            height: 4px;
-            position: absolute;
-            background: @primary-color;
-            bottom: -12px;
-            left: 50%;
-            margin-left: -5px;
-            border-radius: 2px;
+        a {
+          color: #4c4c4c;
+          position: relative;
+          &.nuxt-link-exact-active {
+            color: #000;
+            &:after {
+              content: "";
+              width: 10px;
+              height: 4px;
+              position: absolute;
+              background: @primary-color;
+              bottom: -12px;
+              left: 50%;
+              margin-left: -5px;
+              border-radius: 2px;
+            }
           }
         }
       }
@@ -413,7 +301,7 @@ export default {
           color: #000;
           font-size: 16px;
         }
-        span {
+        a {
           color: #999;
           font-size: 16px;
         }

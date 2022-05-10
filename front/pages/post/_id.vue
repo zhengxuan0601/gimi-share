@@ -41,15 +41,16 @@
             <p class="time">{{ articleDetail.createTime.replace('-', '年').replace('-', '月').replace(' ', '日 ') }} <span>· 阅读 {{ articleDetail.viewCounts }}</span></p>
           </div>
           <div v-if="userInfo.id !== articleDetail.userId" class="focus-user">
-            <button 
+            <a-button 
               v-if="!isFocususer"
               type="dashed" 
-              @click="updateUserFocus(true)"><a-icon type="plus" />关注</button>
+              icon="user-add"
+              @click="updateUserFocus(true)">关注</a-button>
             <a-button 
               v-else 
               type="dashed"
-              @click="updateUserFocus(false)">
-              <a-icon type="check" />已关注</a-button>
+              icon="check"
+              @click="updateUserFocus(false)">已关注</a-button>
           </div>
         </div>
         <img 

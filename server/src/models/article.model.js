@@ -218,11 +218,9 @@ class ArticleModel {
 
         (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker
 
-        FROM ${this.tableName} LEFT JOIN user_collect_article ON user_collect_article.userId = ?
-
-        LEFT JOIN user ON user.id = ${this.tableName}.userId
+        FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId
         
-        WHERE ${this.tableName}.id = user_collect_article.articleId`
+        WHERE ${this.tableName}.id in (SELECT uaa.articleId FROM user_collect_article AS uaa WHERE uaa.userId = ?)`
 
       const list = await db.query(sql, [sessionId, userId])
 
@@ -251,11 +249,9 @@ class ArticleModel {
 
         (SELECT uaa.userId FROM user_agree_article AS uaa WHERE uaa.articleId = ${this.tableName}.id AND uaa.userId = ?) AS isLiker
         
-        FROM ${this.tableName} LEFT JOIN user_agree_article ON user_agree_article.userId = ?
+        FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId
 
-        LEFT JOIN user ON user.id = ${this.tableName}.userId
-
-        WHERE ${this.tableName}.id = user_agree_article.articleId`
+        WHERE ${this.tableName}.id in (SELECT uaa.articleId FROM user_agree_article AS uaa WHERE uaa.userId = ?)`
 
       const list = await db.query(sql, [sessionId, userId])
 

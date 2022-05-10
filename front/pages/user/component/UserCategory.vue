@@ -33,12 +33,13 @@
               <a-button 
                 v-if="!item.isFocus"
                 type="dashed"
-                @click="updateUserFocus(item)"><a-icon type="plus" />关注</a-button>
+                icon="user-add"
+                @click="updateUserFocus(item)">关注</a-button>
               <a-button 
                 v-else
                 type="dashed"
-                @click="updateUserFocus(item)">
-                <a-icon type="check" />已关注</a-button>
+                icon="check"
+                @click="updateUserFocus(item)">已关注</a-button>
             </div>
           </div>
         </div>

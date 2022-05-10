@@ -1,6 +1,8 @@
 const JsonResult = require('@/utils/httpResponse.unit')
 const httpRequest = require('@/utils/httpRequest.unit')
+const { getSessionuserId } = require('@/utils/common.util')
 const ShareCircleModel = require('@/models/share_circle.model')
+const UserAgreeSharecircleModel = require('@/models/user_agree_sharecircle.model')
 
 class ShareCircleController {
   /**
@@ -10,7 +12,8 @@ class ShareCircleController {
    */
   async findShareList (req, response) {
     try {
-      const data = await ShareCircleModel.find(req.query)
+      const sessionId = await getSessionuserId(req)
+      const data = await ShareCircleModel.find(req.query, sessionId)
       JsonResult.success({
         req,
         data,
@@ -51,6 +54,112 @@ class ShareCircleController {
       })
     } catch (error) {
       JsonResult.fail({ req, response, error, message: '发布友圈失败' })
+    }
+  }
+
+  /**
+   * delete user sharecircle
+   * @param {*} req
+   * @param {*} response
+   * @returns
+   */
+  async deleteShareCircle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const id = req.query.id
+      const circle = await ShareCircleModel.findOne({ userId, id })
+      if (!circle) {
+        return JsonResult.httpStatus(req, response, 401, {
+          message: 'Authentication failed!',
+          code: '9999'
+        })
+      }
+      await ShareCircleModel.delete(id)
+      JsonResult.success({
+        req,
+        response,
+        message: '删除成功'
+      })
+    } catch (error) {
+      console.log(error)
+      JsonResult.fail({ req, response, error, message: '删除失败' })
+    }
+  }
+
+  /**
+   * user agree sharecircle
+   * @param {*} req
+   * @param {*} response
+   */
+  async agreeSharecircle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const circleId = req.query.id
+      const shareCircle = await ShareCircleModel.findOne({ id: circleId })
+      if (!shareCircle) {
+        return JsonResult.fail({ req, response, message: '友圈不存在' })
+      }
+      const exist = await UserAgreeSharecircleModel.findOne({ userId, circleId })
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '重复点赞' })
+      }
+      await UserAgreeSharecircleModel.add(userId, circleId)
+      JsonResult.success({
+        req,
+        response,
+        message: '点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '点赞失败' })
+    }
+  }
+
+  /**
+   * user agree sharecircle
+   * @param {*} req
+   * @param {*} response
+   */
+  async unagreeSharecircle (req, response) {
+    try {
+      const userId = req.sessionuser.id
+      const circleId = req.query.id
+      const shareCircle = await ShareCircleModel.findOne({ id: circleId })
+      if (!shareCircle) {
+        return JsonResult.fail({ req, response, message: '友圈不存在' })
+      }
+      const exist = await UserAgreeSharecircleModel.findOne({ userId, circleId })
+      if (!exist) {
+        return JsonResult.fail({ req, response, message: '还未点赞' })
+      }
+      await UserAgreeSharecircleModel.delete({ userId, circleId })
+      JsonResult.success({
+        req,
+        response,
+        message: '取消点赞成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '取消点赞失败' })
+    }
+  }
+
+  /**
+   * find user agree circle list
+   * @param {*} req
+   * @param {*} response
+   */
+  async userAgreeCircle (req, response) {
+    try {
+      const userId = req.query.userId
+      const sessionId = await getSessionuserId(req)
+      const data = await ShareCircleModel.findUserAgreeCircle(userId, sessionId)
+      JsonResult.success({
+        req,
+        response,
+        data,
+        message: '查询成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询失败' })
     }
   }
 }
