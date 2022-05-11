@@ -23,6 +23,16 @@ const { publishShareSchema } = require('@/middleware/validators/shareCircleValid
 router.get('/', shareCircleController.findShareList)
 
 /**
+ * 查询友圈详细信息
+ * @route GET /shares/info
+ * @group 友圈分享管理
+ * @param {string} circleId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/info', shareCircleController.findShareCircleInfo)
+
+/**
  * 查询用点赞的友圈列表
  * @route GET /shares/agreecircles
  * @group 友圈分享管理

@@ -40,7 +40,9 @@
             </p>
             <p class="time">{{ articleDetail.createTime.replace('-', '年').replace('-', '月').replace(' ', '日 ') }} <span>· 阅读 {{ articleDetail.viewCounts }}</span></p>
           </div>
-          <div v-if="userInfo.id !== articleDetail.userId" class="focus-user">
+          <div 
+            v-if="userInfo.id !== articleDetail.userId" 
+            class="focus-user">
             <a-button 
               v-if="!isFocususer"
               type="dashed" 

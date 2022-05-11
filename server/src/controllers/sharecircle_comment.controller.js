@@ -1,11 +1,28 @@
 const JsonResult = require('@/utils/httpResponse.unit')
-const { getSessionuserId } = require('@/utils/common.util')
 const ShareCircleModel = require('@/models/share_circle.model')
+const { transformTree, getSessionuserId } = require('@/utils/common.util')
 const ShareCircleCommentModel = require('@/models/sharecircle_comment.model')
 
 class ShareCircleCommentController {
-  constructor () {
-    this.tableName = 'sharecircle_comment'
+  /**
+   * find comments
+   * @param {*} req
+   * @param {*} response
+   */
+  async getCommentList (req, response) {
+    try {
+      const sessionId = await getSessionuserId(req)
+      const data = await ShareCircleCommentModel.find(req.query, sessionId)
+      const transdata = transformTree(data, 'id', 'topId')
+      JsonResult.success({
+        req,
+        response,
+        data: transdata,
+        message: '查询评论列表成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询评论列表失败' })
+    }
   }
 
   /**
@@ -17,7 +34,7 @@ class ShareCircleCommentController {
     try {
       const userId = req.sessionuser.id
       const { circleId, content, replyId, replyComment, topId, replyNickname, replyUserId } = req.body
-      const shareCircle = await ShareCircleModel.findOne({ id: circleId })
+      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }
@@ -66,7 +83,7 @@ class ShareCircleCommentController {
       if (!comment) {
         return JsonResult.fail({ req, response, message: '评论不存在' })
       }
-      const shareCircle = await ShareCircleModel.findOne({ id: comment.circleId })
+      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': comment.circleId })
       if (comment.userId !== userId && shareCircle.userId !== userId) {
         return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',

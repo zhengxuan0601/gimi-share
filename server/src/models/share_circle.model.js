@@ -82,15 +82,31 @@ class ShareCircleModel {
    * @param {*} param
    * @returns
    */
-  async findOne (param) {
+  async findOne (param, sessionId) {
     try {
       const { columnSet, values } = multipleColumnSet(param, ' AND ')
 
-      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+      const sql = `SELECT ${this.tableName}.*, user.avatar, user.nickname, user.job,
 
-      const result = await db.query(sql, values)
+        (SELECT COUNT(*) FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id) AS agreeCount,
 
-      return result[0]
+        (SELECT COUNT(*) FROM sharecircle_comment AS sc WHERE sc.circleId = ${this.tableName}.id) AS commentCount,
+
+        (SELECT uas.userId FROM user_agree_sharecircle AS uas WHERE uas.circleId = ${this.tableName}.id AND uas.userId = ?) AS isLiker
+      
+        FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId WHERE ${columnSet}`
+
+      const result = await db.query(sql, [sessionId, ...values])
+
+      if (!result[0]) {
+        return null
+      } else {
+        return {
+          ...result[0],
+
+          isLiker: Boolean(result[0].isLiker)
+        }
+      }
     } catch (error) {
       throw new Error(error)
     }
@@ -137,11 +153,13 @@ class ShareCircleModel {
    */
   async delete (id) {
     try {
-      const sql = `DELETE ${this.tableName}, user_agree_sharecircle, sharecircle_comment
+      const sql = `DELETE ${this.tableName}, user_agree_sharecircle, sharecircle_comment, user_agree_comment
       
       FROM ${this.tableName} LEFT JOIN user_agree_sharecircle ON user_agree_sharecircle.circleId = ${this.tableName}.id
 
       LEFT JOIN sharecircle_comment ON sharecircle_comment.circleId = ${this.tableName}.id
+
+      LEFT JOIN user_agree_comment ON user_agree_comment.commentId = sharecircle_comment.id
       
       WHERE ${this.tableName}.id = ?`
 

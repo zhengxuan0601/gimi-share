@@ -45,9 +45,9 @@
               <a-icon type="like" />
               <span v-if="item.likeCount">{{ item.likeCount }}</span>
             </p>
-            <p>
+            <p @click="$router.push(`/sharecircle/${circleId}`)">
               <a-icon type="message" />
-              <!-- <span>10</span> -->
+              <span v-if="item.replyCount">{{ item.replyCount }}</span>
             </p>
           </div>
           <span
@@ -59,7 +59,7 @@
       </div>
       <nuxt-link 
         v-if="simpleInfo.total > 5" 
-        to="/"
+        :to="`/sharecircle/${circleId}`"
         class="show-comment-more">查看全部{{ simpleInfo.total }}条回复
         <a-icon type="double-right" />
       </nuxt-link>
@@ -132,6 +132,9 @@ export default {
     },
 
     async isLikeComment (commentItem) {
+      if (!this.userInfo) {
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+      }
       const API = commentItem.isLiker ? '/api/v1/users/unagreecomment' : '/api/v1/users/agreecomment'
       try {
         await this.$axios.get(`${API}?commentId=${commentItem.id}&itemType=2`)

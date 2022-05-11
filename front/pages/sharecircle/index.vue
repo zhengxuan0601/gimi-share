@@ -266,6 +266,9 @@ export default {
      * @param { Object } circleItem
      */
     async isLikeCircle (circleItem) {
+      if (!this.userInfo) {
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+      }
       try {
         const API = circleItem.isLiker ? '/shares/unagree' : '/shares/agree'
         await this.$axios.get(`/api/v1${API}?id=${circleItem.id}`)

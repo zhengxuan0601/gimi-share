@@ -26,6 +26,27 @@ class ShareCircleController {
   }
 
   /**
+   * find sharecircle info
+   * @param {*} req
+   * @param {*} response
+   */
+  async findShareCircleInfo (req, response) {
+    try {
+      const circleId = req.query.circleId
+      const sessionId = await getSessionuserId(req)
+      const data = await ShareCircleModel.findOne({ 'share_circle.id': circleId }, sessionId)
+      JsonResult.success({
+        req,
+        data,
+        response,
+        message: '查询友圈列表成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询失败' })
+    }
+  }
+
+  /**
    * publish share_cricle
    * @param {*} req
    * @param {*} response
@@ -67,7 +88,7 @@ class ShareCircleController {
     try {
       const userId = req.sessionuser.id
       const id = req.query.id
-      const circle = await ShareCircleModel.findOne({ userId, id })
+      const circle = await ShareCircleModel.findOne({ 'share_circle.userId': userId, 'share_circle.id': id })
       if (!circle) {
         return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',
@@ -95,7 +116,7 @@ class ShareCircleController {
     try {
       const userId = req.sessionuser.id
       const circleId = req.query.id
-      const shareCircle = await ShareCircleModel.findOne({ id: circleId })
+      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }
@@ -123,7 +144,7 @@ class ShareCircleController {
     try {
       const userId = req.sessionuser.id
       const circleId = req.query.id
-      const shareCircle = await ShareCircleModel.findOne({ id: circleId })
+      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }

@@ -159,13 +159,15 @@ class ArticleModel {
    */
   async delete (id) {
     try {
-      const sql = `DELETE ${this.tableName}, article_comment, user_collect_article, user_agree_article 
+      const sql = `DELETE ${this.tableName}, article_comment, user_collect_article, user_agree_article, user_agree_comment 
 
         FROM ${this.tableName} LEFT JOIN article_comment ON article_comment.articleId = ${this.tableName}.id
 
         LEFT JOIN user_collect_article ON user_collect_article.articleId = ${this.tableName}.id
 
         LEFT JOIN user_agree_article ON user_agree_article.articleId = ${this.tableName}.id
+
+        LEFT JOIN user_agree_comment ON user_agree_comment.commentId = article_comment.id
 
         WHERE ${this.tableName}.id = ?`
 

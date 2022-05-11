@@ -14,6 +14,16 @@ const shareCircleCommentController = require('@/controllers/sharecircle_comment.
 const { submitCommentShema } = require('@/middleware/validators/commentValidator.middleware')
 
 /**
+ * 查询友圈所有的评论列表
+ * @route GET /sharecircle/comments
+ * @group 友圈评论管理
+ * @param {string} circleId.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/', shareCircleCommentController.getCommentList)
+
+/**
  * 查询近5条评论列表
  * @route GET /sharecircle/comments/simplecomments
  * @group 友圈评论管理
@@ -27,7 +37,7 @@ router.get('/simplecomments', shareCircleCommentController.findSimpleComments)
  * 删除评论
  * @route GET /sharecircle/comments/delete
  * @group 友圈评论管理
- * @param {string} circleId.query.required
+ * @param {string} id.query.required
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */
