@@ -2,7 +2,9 @@
   <div class="circle-simple-comment">
     <div class="submit-modal">
       <div class="left-avatar">
-        <img src="https://p26-passport.byteacctimg.com/img/user-avatar/5ba0ae3b112a83b512e2ad3a0813aac4~300x300.image" alt="avatar">
+        <img 
+          :src="!userInfo ? require('~/assets/images/default.svg') : userInfo.avatar || require('~/assets/images/default.png')" 
+          alt="avatar">
       </div>
       <div class="right-input">
         <a-textarea
@@ -39,21 +41,28 @@
           </div>
           <p class="comment">{{ item.content }}</p>
           <div class="dz-pl">
-            <p>
+            <p :class="{ like: item.isLiker }" @click="isLikeComment(item)">
               <a-icon type="like" />
-              <span>5</span>
+              <span v-if="item.likeCount">{{ item.likeCount }}</span>
             </p>
             <p>
               <a-icon type="message" />
-              <span>10</span>
+              <!-- <span>10</span> -->
             </p>
           </div>
+          <span
+            v-if="userInfo.id === item.userId 
+              || userInfo.id === circieUserId" 
+            class="delete" 
+            @click="deleteComment(item.id)">删除</span>
         </div>
       </div>
       <nuxt-link 
         v-if="simpleInfo.total > 5" 
         to="/"
-        class="show-comment-more">查看全部{{ simpleInfo.total }}条回复<a-icon type="double-right" /></nuxt-link>
+        class="show-comment-more">查看全部{{ simpleInfo.total }}条回复
+        <a-icon type="double-right" />
+      </nuxt-link>
     </div>
   </div>
 </template>
@@ -67,6 +76,11 @@ export default {
   components: { EmojiPicker },
   props: {
     circleId: {
+      type: String,
+      require: true,
+      default: ''
+    },
+    circieUserId: {
       type: String,
       require: true,
       default: ''
@@ -114,6 +128,26 @@ export default {
       try {
         const { data } = await this.$axios.get(`/api/v1/sharecircle/comments/simplecomments?circleId=${this.circleId}`)
         this.simpleInfo = data
+      } catch (error) {}
+    },
+
+    async isLikeComment (commentItem) {
+      const API = commentItem.isLiker ? '/api/v1/users/unagreecomment' : '/api/v1/users/agreecomment'
+      try {
+        await this.$axios.get(`${API}?commentId=${commentItem.id}&itemType=2`)
+        if (commentItem.isLiker) {
+          commentItem.likeCount -= 1
+        } else {
+          commentItem.likeCount += 1
+        }
+        commentItem.isLiker = !commentItem.isLiker
+      } catch (error) {}
+    },
+
+    async deleteComment (circleId) {
+      try {
+        await this.$axios.get(`/api/v1/sharecircle/comments/delete?id=${circleId}`)
+        this.finSimpleComments()
       } catch (error) {}
     },
 
@@ -179,6 +213,9 @@ export default {
         border-bottom: 1px solid #f1f1f170;
       }
       .right-info {
+        width: 0;
+        flex: 1;
+        position: relative;
         .info {
           display: flex;
           p {
@@ -201,6 +238,20 @@ export default {
             &.like, &:hover {
               color: @primary-color;
             }
+          }
+        }
+        .delete {
+          position: absolute;
+          color: #c95858;
+          font-size: 12px;
+          cursor: pointer;
+          right: 0;
+          top: 0;
+          display: none;
+        }
+        &:hover {
+          .delete {
+            display: block;
           }
         }
       }

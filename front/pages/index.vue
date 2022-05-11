@@ -81,12 +81,6 @@ export default {
     }
   },
 
-  head () {
-    return {
-      title: 'GimiShare-分享新鲜事'
-    }
-  },
-
   computed: {
     ...mapState({
       userInfo: state => state.userInfo

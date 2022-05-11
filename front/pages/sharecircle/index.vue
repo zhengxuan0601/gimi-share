@@ -93,7 +93,7 @@
               <div 
                 :class="{ like: item.replyState }"
                 @click="item.replyState = !item.replyState">
-                <a-icon type="message" />
+                <a-icon :type="!item.replyState ? 'message' : 'sound'" />
                 <span v-if="item.commentCount">{{ item.commentCount }}</span>
               </div>
               <div
@@ -105,6 +105,7 @@
             </div>
             <SimpleComment
               v-if="item.replyState"
+              :circie-user-id="item.userId"
               :circle-id="item.id" />
           </div>
         </div>

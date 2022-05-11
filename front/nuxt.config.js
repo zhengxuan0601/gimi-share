@@ -1,7 +1,7 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'GimShare 记录美好生活',
+    title: 'GimiShare-分享新鲜事',
     htmlAttrs: {
       lang: 'en'
     },
@@ -9,7 +9,7 @@ export default {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '记录身边趣事，与您共同分享' },
-      { hid: 'keywords', name: 'keywords', content: 'GimShare,生活分享,旅行攻略,指南' },
+      { hid: 'keywords', name: 'keywords', content: 'GimShare,生活分享,学习,指南' },
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [

@@ -4,13 +4,14 @@ const UserModel = require('@/models/user.model')
 const { getAsync, delAsync } = require('@/redis')
 const ArticleModel = require('@/models/article.model')
 const JsonResult = require('@/utils/httpResponse.unit')
+const ShareCircleModel = require('@/models/share_circle.model')
 const UserFocusUserModel = require('@/models/user_focus_user.model')
 const ArticleCommentModel = require('@/models/article_comment.model')
 const UserAgreeArticleModel = require('@/models/user_agree_article.model')
-const UserCollectArticleModel = require('@/models/user_collect_article.model')
-const { decrypt, getSessionuserId, encrypt } = require('@/utils/common.util')
 const UserAgreeCommentModel = require('@/models/user_agree_comment.model')
-const ShareCircleModel = require('@/models/share_circle.model')
+const { decrypt, getSessionuserId, encrypt } = require('@/utils/common.util')
+const ShareCircleCommentModel = require('@/models/sharecircle_comment.model')
+const UserCollectArticleModel = require('@/models/user_collect_article.model')
 
 class UserController {
   /**
@@ -466,6 +467,8 @@ class UserController {
       let comment = null
       if (itemType === '1') {
         comment = await ArticleCommentModel.findOne({ id: commentId })
+      } else if (itemType === '2') {
+        comment = await ShareCircleCommentModel.findOne({ id: commentId })
       }
       if (!comment) {
         return JsonResult.fail({ req, response, message: '评论不存在' })
@@ -500,6 +503,8 @@ class UserController {
       let comment = null
       if (itemType === '1') {
         comment = await ArticleCommentModel.findOne({ id: commentId })
+      } else if (itemType === '2') {
+        comment = await ShareCircleCommentModel.findOne({ id: commentId })
       }
       if (!comment) {
         return JsonResult.fail({ req, response, message: '评论不存在' })

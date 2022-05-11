@@ -209,9 +209,10 @@ router.post('/bindemail', auth(), handlerValidate(userController.bindEmail))
 
 /**
  * 用户点赞评论
- * @route GET /comments/agreecomment
+ * @route GET /users/agreecomment
  * @group 用户管理
  * @param {string} commentId.query.required
+ * @param {string} itemType.query.required
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  * @security JWT
@@ -220,9 +221,10 @@ router.get('/agreecomment', auth(), handlerValidate(userController.agreeComment)
 
 /**
   * 用户取消点赞评论
-  * @route GET /comments/unagreecomment
+  * @route GET /users/unagreecomment
   * @group 用户管理
   * @param {string} commentId.query.required
+  * @param {string} itemType.query.required
   * @returns {object} 200
   * @returns {Error}  default - Unexpected error
   * @security JWT

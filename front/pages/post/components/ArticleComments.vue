@@ -364,7 +364,7 @@ export default {
           border: none;
           outline: none;
           width: 100%;
-          border-radius: 4px;
+          border-radius: 2px;
           padding: 10px 20px;
           resize: none;
           &:focus {
@@ -472,7 +472,7 @@ export default {
               border: none;
               outline: none;
               width: 100%;
-              border-radius: 4px;
+              border-radius: 2px;
               padding: 10px 20px;
               transition: .2s;
               resize: none;
