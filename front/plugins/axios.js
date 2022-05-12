@@ -5,6 +5,7 @@ export default function ({ store, redirect, app: { $axios, $cookies } }) {
   $axios.onRequest((config) => {
     const accessToken = $cookies.get('ACCESS_TOKEN') || ''
     config.headers.accessToken = accessToken
+    config.headers['Cache-Control'] = 'no-cache'
     return config
   })
   

@@ -164,7 +164,7 @@ export default {
            try {
             const API = this.id ? '/api/v1/articles/updatearticle' : '/api/v1/articles/createarticle'
             await this.$axios.post(API, this.articleInfo)
-            this.$message.success(this.id ? '编辑文章成功' : '添加文章成功')
+            this.$message.success(this.id ? '编辑文章成功' : '发布文章成功')
             this.$router.replace('/')
           } catch (error) {
             console.log(error)

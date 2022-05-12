@@ -1,5 +1,6 @@
 const ArticleModel = require('@/models/article.model')
 const JsonResult = require('@/utils/httpResponse.unit')
+const DynamicsModel = require('@/models/dynamics.model')
 const { getSessionuserId } = require('@/utils/common.util')
 const UserCollectArticleModel = require('@/models/user_collect_article.model')
 
@@ -54,7 +55,8 @@ class ArticleController {
   async createArticle (req, response) {
     try {
       const userId = req.sessionuser.id
-      await ArticleModel.create(req.body, userId)
+      const articleId = await ArticleModel.create(req.body, userId)
+      DynamicsModel.add({ userId, type: '1', articleId })
       JsonResult.success({
         req,
         response,
@@ -73,7 +75,7 @@ class ArticleController {
   async updateArticle (req, response) {
     try {
       const id = req.body.id
-      const articleInfo = await ArticleModel.findOne(id)
+      const articleInfo = await ArticleModel.exists({ id })
       if (articleInfo.userId !== req.sessionuser.id) {
         return JsonResult.httpStatus(req, response, 403, {
           message: 'No permission to edit article',
@@ -100,7 +102,7 @@ class ArticleController {
   async deleteArticle (req, response) {
     try {
       const id = req.query.id
-      const articleInfo = await ArticleModel.findOne(id)
+      const articleInfo = await ArticleModel.exists({ id })
       if (!articleInfo) {
         JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -112,6 +114,7 @@ class ArticleController {
       }
       await ArticleModel.delete(id)
       await UserCollectArticleModel.delete({ articleId: id })
+      DynamicsModel.delete({ articleId: id })
       JsonResult.success({
         req,
         response,

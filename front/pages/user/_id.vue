@@ -47,13 +47,16 @@
       </div>
       <ul class="tab-tag">
         <li 
-          v-for="item in categoryTab"
+          v-for="item in userCategoryTabs"
           :key="item.url">
           <nuxt-link :to="`/user/${userInfo.id}${item.url}`">{{ item.label }}</nuxt-link>  
         </li>
       </ul>
       <div class="category-content">
-        <nuxt-child :user-id="userInfo.id"></nuxt-child>
+        <nuxt-child 
+          :user-avatar="userInfo.avatar"
+          :user-nickname="userInfo.nickname"
+          :user-id="userInfo.id"></nuxt-child>
       </div>
     </div>
     <div class="right-user-modal">
@@ -86,6 +89,7 @@
 <script>
 import { mapState } from 'vuex'
 import { validateUniqId } from '~/util'
+import { userCategoryTabs } from '@/config/optionMap'
 export default {
   name: 'IserIndex',
   layout: 'BaseLayout',
@@ -106,19 +110,13 @@ export default {
   },
   data () {
     return {
-      categoryTab: [
-        { label: '文章', url: '' },
-        { label: '友圈', url: '/circle' },
-        { label: '收藏', url: '/collect' },
-        { label: '关注', url: '/focus' },
-        { label: '赞', url: '/agree' }
-      ],
+      userCategoryTabs,
       countInfo: '',
       isFocus: false
     }
   },
 
-   head() {
+  head() {
     return {
       title: this.userInfo.nickname + '的个人主页',
       meta: [

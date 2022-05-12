@@ -21,7 +21,7 @@
             @click="$router.push('/post/' + item.id)">
             <div class="l">
               <div class="user-info">
-                <p @click.stop><nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
+                <p @click.stop><nuxt-link target="_blank" :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
                 <p>{{ cycleDate(item.createTime) }}</p>
                 <p>{{ categoryMap[item.category] }}</p>
               </div>

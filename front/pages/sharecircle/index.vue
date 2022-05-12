@@ -68,11 +68,15 @@
             class="share-block">
             <div class="top">
               <div class="left-avatar">
-                <nuxt-link :to="`/user/${item.userId}`"><img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar"></nuxt-link>
+                <nuxt-link 
+                  target="_blank"
+                  :to="`/user/${item.userId}`">
+                  <img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar">
+                </nuxt-link>
               </div>
               <div class="right-info">
                 <p class="nickname">
-                  <nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link>
+                  <nuxt-link target="_blank" :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link>
                 </p>
                 <p class="desc"><span v-if="item.job">{{ item.job }} · </span>{{ cycleDate(item.createTime) }}</p>
                 <p class="share-info">{{ item.content }}</p>
@@ -128,9 +132,18 @@
           </div>
         </div>
         <div class="statistics">
-          <div><p>友圈</p><span>{{ staticsCount.shareCount === undefined ? '-' : staticsCount.shareCount }}</span></div>
-          <div><p>关注</p><span>{{ staticsCount.focusCount === undefined ? '-' : staticsCount.focusCount }}</span></div>
-          <div><p>关注者</p><span>{{ staticsCount.focusedCount === undefined ? '-' : staticsCount.focusedCount }}</span></div>
+          <div @click="userRouteLink('/circle')">
+            <p>友圈</p>
+            <span>{{ staticsCount.shareCount === undefined ? '-' : staticsCount.shareCount }}</span>
+          </div>
+          <div @click="userRouteLink('/focus')">
+            <p>关注</p>
+            <span>{{ staticsCount.focusCount === undefined ? '-' : staticsCount.focusCount }}</span>
+          </div>
+          <div @click="userRouteLink('/focus')">
+            <p>关注者</p>
+            <span>{{ staticsCount.focusedCount === undefined ? '-' : staticsCount.focusedCount }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -189,6 +202,16 @@ export default {
       previewImage: null,
       publishLoading: false,
       staticsCount: ''
+    }
+  },
+
+  head() {
+    return {
+      title: 'GimiShare - 友圈分享',
+      meta: [
+        { charset: 'utf-8' },
+        { hid: 'description', name: 'description', content: 'GimiShare，友圈分享' }
+      ]
     }
   },
 
@@ -296,6 +319,13 @@ export default {
       input.selectionStart = startPos + emoji.data.length
       input.selectionEnd = startPos + emoji.data.length
       this.content = resultText
+    },
+
+    userRouteLink (path) {
+      if (!this.userInfo) {
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+      }
+      this.$router.push(`/user/${this.userInfo.id}${path}`)
     },
 
     async getUserStatistics () {
@@ -429,6 +459,7 @@ export default {
         display: flex;
         & > div {
           width: 100%;
+          cursor: pointer;
           p {
             color: #000;
             margin-bottom: 4px;

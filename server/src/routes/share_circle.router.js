@@ -40,7 +40,7 @@ router.get('/info', shareCircleController.findShareCircleInfo)
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */
-router.get('/agreecircles', shareCircleController.userAgreeCircle)
+router.get('/agreecircles', shareCircleController.userAgreeCircleList)
 
 /**
  * 发布友圈

@@ -26,11 +26,19 @@
             @click="$store.commit('UPDATE_LOGIN_VISIBLE', true)">登录</a-button>
           <a-popover v-else trigger="hover" placement="bottom">
             <div slot="content" class="cover-image-popover">
-              <div class="nickname">{{ userInfo.nickname }}</div>
-              <p><nuxt-link to="/writecenter"><a-icon type="file-add" />写文章</nuxt-link></p>
-              <p><nuxt-link :to="`/user/${userInfo.id}`"><a-icon type="user" />我的主页</nuxt-link></p>
-              <p><nuxt-link to="/setting/profile"><a-icon type="form" />修改资料</nuxt-link></p>
-              <p @click="userLogout"><a-icon type="poweroff" />退出登录</p>
+              <div>
+                <p><nuxt-link to="/writecenter" target="_blank"><i class="iconfont icon-article"></i>写文章</nuxt-link></p>
+              </div>
+              <div>
+                <p><nuxt-link to="/setting/profile"><i class="iconfont icon-set_item1"></i>修改资料</nuxt-link></p>
+                <p><nuxt-link :to="`/user/${userInfo.id}`"><i class="iconfont icon-40one"></i>我的主页</nuxt-link></p>
+                <p><nuxt-link :to="`/user/${userInfo.id}/collect`"><i class="iconfont icon-shoucang"></i>我的收藏</nuxt-link></p>
+                <p><nuxt-link :to="`/user/${userInfo.id}/focus`"><i class="iconfont icon-wodeguanzhu"></i>我的关注</nuxt-link></p>
+                <p><nuxt-link :to="`/user/${userInfo.id}/agree`"><i class="iconfont icon-zan"></i>我的点赞</nuxt-link></p>
+              </div>
+              <div>
+                <p @click="userLogout"><i class="iconfont icon-tuichudenglu"></i>退出登录</p>
+              </div>
             </div>
             <div class="cover-img">
               <img :src="userInfo.avatar || require('@/assets/images/default.png')" alt="avatar">

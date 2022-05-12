@@ -77,7 +77,7 @@ class ArticleModel {
    * @param {*} param
    * @param {*} sessionId
    */
-  async findOne (articleId, sessionId) {
+  async findOne (articleId, sessionId, hideContent) {
     try {
       const sql = `SELECT ${this.tableName}.*, user.avatar, user.nickname, 
         
@@ -100,10 +100,30 @@ class ArticleModel {
       return {
         ...result,
 
+        content: hideContent ? undefined : result.content,
+
         isFlower: Boolean(result.isFlower),
 
         isLiker: Boolean(result.isLiker)
       }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * @param {*} param
+   * @returns
+   */
+  async exists (param) {
+    try {
+      const { columnSet, values } = multipleColumnSet(param, ' AND ')
+
+      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+
+      const result = await db.query(sql, values)
+
+      return result[0]
     } catch (error) {
       throw new Error(error)
     }
@@ -125,6 +145,8 @@ class ArticleModel {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
       await db.query(sql, [userId, id, articleTitle, content, category, tag, coverImage, description, linkUrl, createTime])
+
+      return id
     } catch (error) {
       throw new Error(error)
     }

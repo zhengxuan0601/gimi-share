@@ -38,7 +38,7 @@ class CommentController {
     try {
       const userId = req.sessionuser.id
       const { articleId, replyId, content, replyComment, topId, replyNickname, replyUserId } = req.body
-      const existArticle = await ArticleModel.findOne(articleId)
+      const existArticle = await ArticleModel.exists({ id: articleId })
       if (!existArticle) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -72,7 +72,7 @@ class CommentController {
       if (!comment) {
         return JsonResult.fail({ req, response, message: '文章评论不存在' })
       }
-      const article = await ArticleModel.findOne(comment.articleId)
+      const article = await ArticleModel.exists({ id: comment.articleId })
       // 不属于自己的评论，并且不属于自己文章下的评论无权限删除
       if (comment.userId !== userId && article.userId !== userId) {
         return JsonResult.httpStatus(req, response, 401, {

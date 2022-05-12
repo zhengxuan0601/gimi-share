@@ -1,5 +1,6 @@
 const JsonResult = require('@/utils/httpResponse.unit')
 const httpRequest = require('@/utils/httpRequest.unit')
+const DynamicsModel = require('@/models/dynamics.model')
 const { getSessionuserId } = require('@/utils/common.util')
 const ShareCircleModel = require('@/models/share_circle.model')
 const UserAgreeSharecircleModel = require('@/models/user_agree_sharecircle.model')
@@ -65,9 +66,9 @@ class ShareCircleController {
         .filter(r => r.code === '0')
         .map(r => r.data)
         .join(';')
-      console.log(picList)
       const userId = req.sessionuser.id
-      await ShareCircleModel.add({ content, picList, userId })
+      const circleId = await ShareCircleModel.add({ content, picList, userId })
+      DynamicsModel.add({ userId, type: '1', circleId })
       JsonResult.success({
         req,
         response,
@@ -88,7 +89,7 @@ class ShareCircleController {
     try {
       const userId = req.sessionuser.id
       const id = req.query.id
-      const circle = await ShareCircleModel.findOne({ 'share_circle.userId': userId, 'share_circle.id': id })
+      const circle = await ShareCircleModel.exists({ userId, id })
       if (!circle) {
         return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',
@@ -96,6 +97,7 @@ class ShareCircleController {
         })
       }
       await ShareCircleModel.delete(id)
+      DynamicsModel.delete({ circleId: id })
       JsonResult.success({
         req,
         response,
@@ -116,7 +118,7 @@ class ShareCircleController {
     try {
       const userId = req.sessionuser.id
       const circleId = req.query.id
-      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': circleId })
+      const shareCircle = await ShareCircleModel.exists({ id: circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }
@@ -125,6 +127,7 @@ class ShareCircleController {
         return JsonResult.fail({ req, response, message: '重复点赞' })
       }
       await UserAgreeSharecircleModel.add(userId, circleId)
+      DynamicsModel.add({ userId, type: '2', circleId })
       JsonResult.success({
         req,
         response,
@@ -144,7 +147,7 @@ class ShareCircleController {
     try {
       const userId = req.sessionuser.id
       const circleId = req.query.id
-      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': circleId })
+      const shareCircle = await ShareCircleModel.exists({ id: circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }
@@ -153,6 +156,7 @@ class ShareCircleController {
         return JsonResult.fail({ req, response, message: '还未点赞' })
       }
       await UserAgreeSharecircleModel.delete({ userId, circleId })
+      DynamicsModel.delete({ userId, type: '2', circleId })
       JsonResult.success({
         req,
         response,
@@ -168,7 +172,7 @@ class ShareCircleController {
    * @param {*} req
    * @param {*} response
    */
-  async userAgreeCircle (req, response) {
+  async userAgreeCircleList (req, response) {
     try {
       const userId = req.query.userId
       const sessionId = await getSessionuserId(req)

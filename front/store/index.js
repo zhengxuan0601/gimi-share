@@ -19,6 +19,7 @@ export const actions = {
   async nuxtServerInit ({ commit }, { app }) {
     try {
       const { data } = await app.$axios.get('/api/v1/users/sessionuserinfo?noredirect')
+      console.log(data)
       commit('UPDATE_USER_INFO', data)
     } catch (error) {
       console.log(error)

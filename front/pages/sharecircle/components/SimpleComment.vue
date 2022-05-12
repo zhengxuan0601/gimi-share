@@ -28,7 +28,7 @@
       <h5>全部评论（{{ simpleInfo.total }}）</h5>
       <div v-for="item in simpleInfo.list" :key="item.id" class="comment-block">
         <div class="left-avatar">
-          <nuxt-link :to="`/user/${item.userId}`">
+          <nuxt-link target="_blank" :to="`/user/${item.userId}`">
             <img 
               :src="item.avatar || require('~/assets/images/default.png')" alt="avatar">
           </nuxt-link>
@@ -45,9 +45,11 @@
               <a-icon type="like" />
               <span v-if="item.likeCount">{{ item.likeCount }}</span>
             </p>
-            <p @click="$router.push(`/sharecircle/${circleId}`)">
-              <a-icon type="message" />
-              <span v-if="item.replyCount">{{ item.replyCount }}</span>
+            <p>
+              <nuxt-link target="_blank" :to="`/sharecircle/${circleId}`">
+                <a-icon type="message" />
+                <span v-if="item.replyCount">{{ item.replyCount }}</span>
+              </nuxt-link>
             </p>
           </div>
           <span
@@ -58,7 +60,8 @@
         </div>
       </div>
       <nuxt-link 
-        v-if="simpleInfo.total > 5" 
+        v-if="simpleInfo.total > 5"
+        target="_blank" 
         :to="`/sharecircle/${circleId}`"
         class="show-comment-more">查看全部{{ simpleInfo.total }}条回复
         <a-icon type="double-right" />
@@ -240,6 +243,9 @@ export default {
             cursor: pointer;
             &.like, &:hover {
               color: @primary-color;
+            }
+            a {
+              color: #4c4c4c;
             }
           }
         }

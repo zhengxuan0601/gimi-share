@@ -30,12 +30,12 @@
         </div>
         <div class="title">{{ articleDetail.articleTitle }}</div>
         <div class="user-model">
-          <nuxt-link :to="`/user/${articleDetail.userId}`" class="img">
+          <nuxt-link target="_blank" :to="`/user/${articleDetail.userId}`" class="img">
             <img :src="articleDetail.avatar || require('@/assets/images/default.png')" alt="avatar">
           </nuxt-link>
           <div class="info">
             <p class="nickname">
-              <nuxt-link :to="`/user/${articleDetail.userId}`">{{ articleDetail.nickname }}</nuxt-link>
+              <nuxt-link target="_blank" :to="`/user/${articleDetail.userId}`">{{ articleDetail.nickname }}</nuxt-link>
               <em v-if="userInfo.id === articleDetail.userId">作者</em>
             </p>
             <p class="time">{{ articleDetail.createTime.replace('-', '年').replace('-', '月').replace(' ', '日 ') }} <span>· 阅读 {{ articleDetail.viewCounts }}</span></p>

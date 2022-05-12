@@ -6,6 +6,55 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "7100054",
+      "name": "我的关注",
+      "font_class": "wodeguanzhu",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "954953",
+      "name": "article",
+      "font_class": "article",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
+      "icon_id": "322957",
+      "name": "user",
+      "font_class": "40one",
+      "unicode": "e66a",
+      "unicode_decimal": 58986
+    },
+    {
+      "icon_id": "3858848",
+      "name": "赞",
+      "font_class": "zan",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "8332518",
+      "name": "修改资料",
+      "font_class": "set_item1",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "21835199",
+      "name": "收藏",
+      "font_class": "shoucang",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
+      "icon_id": "26757008",
+      "name": "退出登录",
+      "font_class": "tuichudenglu",
+      "unicode": "e653",
+      "unicode_decimal": 58963
+    },
+    {
       "icon_id": "8326657",
       "name": "实景酷-男",
       "font_class": "nan",

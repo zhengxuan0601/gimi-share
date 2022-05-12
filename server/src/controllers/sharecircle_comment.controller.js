@@ -34,7 +34,7 @@ class ShareCircleCommentController {
     try {
       const userId = req.sessionuser.id
       const { circleId, content, replyId, replyComment, topId, replyNickname, replyUserId } = req.body
-      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': circleId })
+      const shareCircle = await ShareCircleModel.exists({ id: circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }
@@ -83,7 +83,7 @@ class ShareCircleCommentController {
       if (!comment) {
         return JsonResult.fail({ req, response, message: '评论不存在' })
       }
-      const shareCircle = await ShareCircleModel.findOne({ 'share_circle.id': comment.circleId })
+      const shareCircle = await ShareCircleModel.exists({ id: comment.circleId })
       if (comment.userId !== userId && shareCircle.userId !== userId) {
         return JsonResult.httpStatus(req, response, 401, {
           message: 'Authentication failed!',

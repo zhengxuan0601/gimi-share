@@ -80,6 +80,7 @@ class ShareCircleModel {
   /**
    * findone sharecircle info
    * @param {*} param
+   * @param {*} sessionId
    * @returns
    */
   async findOne (param, sessionId) {
@@ -113,6 +114,24 @@ class ShareCircleModel {
   }
 
   /**
+   * @param {*} param
+   * @returns
+   */
+  async exists (param) {
+    try {
+      const { columnSet, values } = multipleColumnSet(param, ' AND ')
+
+      const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
+
+      const result = await db.query(sql, values)
+
+      return result[0]
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
    * add share circle
    * @param {*} param0
    */
@@ -125,6 +144,8 @@ class ShareCircleModel {
         VALUES (?, ?, ?, ?, ?)`
 
       await db.query(sql, [id, content, picList, userId, createTime])
+
+      return id
     } catch (error) {
       throw new Error(error)
     }

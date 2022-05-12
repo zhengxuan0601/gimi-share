@@ -27,7 +27,7 @@
       <div class="modal-list">
         <div v-for="item in commentList" :key="item.id" class="list">
           <div class="left">
-            <nuxt-link :to="`/user/${item.userId}`">
+            <nuxt-link target="_blank" :to="`/user/${item.userId}`">
               <img 
                 :src="item.avatar || require('@/assets/images/default.png')" 
                 alt="avatar">
@@ -35,7 +35,8 @@
           </div>
           <div class="right">
             <div class="user">
-              <nuxt-link 
+              <nuxt-link
+                target="_blank" 
                 :to="`/user/${item.userId}`"
                 class="nickname">{{ item.nickname }}
                 <span 
@@ -84,7 +85,7 @@
               class="reply-comment">
               <div v-for="itemName in item.children" :key="itemName.id" class="list">
                 <div class="left">
-                  <nuxt-link :to="`/user/${itemName.userId}`">
+                  <nuxt-link target="_blank" :to="`/user/${itemName.userId}`">
                     <img 
                       :src="itemName.avatar || require('@/assets/images/default.png')" 
                       alt="avatar">
@@ -93,6 +94,7 @@
                 <div class="right">
                   <div class="user">
                     <nuxt-link
+                      target="_blank"
                       :to="`/user/${itemName.userId}`" 
                       class="nickname">{{ itemName.nickname }}
                       <span 
@@ -102,6 +104,7 @@
                     <p class="job">{{ itemName.job || '' }}</p>
                     <span v-if="itemName.replyNickname">@</span>
                     <nuxt-link
+                      target="_blank"
                       :to="`/user/${itemName.replyUserId}`"  
                       class="nickname">{{ itemName.replyNickname }}</nuxt-link>
                   </div>

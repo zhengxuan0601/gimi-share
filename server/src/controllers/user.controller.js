@@ -4,6 +4,7 @@ const UserModel = require('@/models/user.model')
 const { getAsync, delAsync } = require('@/redis')
 const ArticleModel = require('@/models/article.model')
 const JsonResult = require('@/utils/httpResponse.unit')
+const DynamicsModel = require('@/models/dynamics.model')
 const ShareCircleModel = require('@/models/share_circle.model')
 const UserFocusUserModel = require('@/models/user_focus_user.model')
 const ArticleCommentModel = require('@/models/article_comment.model')
@@ -218,7 +219,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserCollectArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne(articleId)
+      const article = await ArticleModel.exists({ id: articleId })
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -227,6 +228,7 @@ class UserController {
       }
       await UserCollectArticleModel.add(userId, articleId)
       await ArticleModel.autoIncre(articleId, 'collectCounts')
+      DynamicsModel.add({ userId, type: '4', articleId })
       JsonResult.success({
         req,
         response,
@@ -247,7 +249,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserCollectArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne(articleId)
+      const article = await ArticleModel.exists({ id: articleId })
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -256,6 +258,7 @@ class UserController {
       }
       await UserCollectArticleModel.delete({ userId, articleId })
       await ArticleModel.autoDec(articleId, 'collectCounts')
+      DynamicsModel.delete({ userId, type: '4', articleId })
       JsonResult.success({
         req,
         response,
@@ -276,7 +279,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserAgreeArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne(articleId)
+      const article = await ArticleModel.exists({ id: articleId })
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -284,7 +287,8 @@ class UserController {
         return JsonResult.fail({ req, response, message: '重复点赞' })
       }
       await UserAgreeArticleModel.add(userId, articleId)
-      await ArticleModel.autoIncre(articleId, 'likeCounts')
+      ArticleModel.autoIncre(articleId, 'likeCounts')
+      DynamicsModel.add({ userId, type: '2', articleId })
       JsonResult.success({
         req,
         response,
@@ -305,7 +309,7 @@ class UserController {
       const userId = req.sessionuser.id
       const articleId = req.query.articleId
       const exist = await UserAgreeArticleModel.findOne(userId, articleId)
-      const article = await ArticleModel.findOne(articleId)
+      const article = await ArticleModel.exists({ id: articleId })
       if (!article) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
       }
@@ -313,7 +317,8 @@ class UserController {
         return JsonResult.fail({ req, response, message: '还未点赞' })
       }
       await UserAgreeArticleModel.delete({ userId, articleId })
-      await ArticleModel.autoDec(articleId, 'likeCounts')
+      ArticleModel.autoDec(articleId, 'likeCounts')
+      DynamicsModel.delete({ userId, type: '2', articleId })
       JsonResult.success({
         req,
         response,
@@ -342,6 +347,7 @@ class UserController {
         return JsonResult.fail({ req, response, message: '已关注' })
       }
       await UserFocusUserModel.add(userId, focusId)
+      DynamicsModel.add({ userId, type: '3', focusUserId: focusId })
       JsonResult.success({
         req,
         response,
@@ -370,6 +376,7 @@ class UserController {
         return JsonResult.fail({ req, response, message: '还未关注' })
       }
       await UserFocusUserModel.delete({ userId, focusId })
+      DynamicsModel.delete({ userId, type: '3', focusUserId: focusId })
       JsonResult.success({
         req,
         response,

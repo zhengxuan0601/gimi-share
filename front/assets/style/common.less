@@ -77,31 +77,37 @@
   padding: 0;
   .cover-image-popover {
     padding: 12px 0;
-    .nickname {
-      color: @primary-color;
-      font-size: 12px;
-      margin-bottom: 6px;
-      padding: 0 16px;
-      font-weight: bold;
-    }
-    p {
-      line-height: 28px;
-      font-size: 12px;
-      cursor: pointer;
-      padding: 0 16px;
-      transition: .2s;
-      a {
-        color: #4c4c4c;
+    & > div {
+      &:not(:last-child) {
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f1f1f1;
       }
-      &:hover {
-        background: rgb(248, 248, 248);
+      &:not(:first-child) {
+        padding-top: 10px;
       }
-      &:active {
-        opacity: .6;
-      }
-      i {
-        margin-right: 6px;
-        font-size: 14px;
+      p {
+        line-height: 30px;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 0 50px 0 16px;
+        transition: .2s;
+        a {
+          color: #4c4c4c;
+          display: block;
+        }
+        &:hover {
+          background: rgb(248, 248, 248);
+        }
+        &:active {
+          opacity: .6;
+        }
+        i {
+          margin-right: 8px;
+          font-size: 20px;
+          color: #999;
+          position: relative;
+          top: 2px;
+        }
       }
     }
   }

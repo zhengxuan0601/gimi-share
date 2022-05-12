@@ -8,7 +8,7 @@
         <div class="share-block">
           <div class="top">
             <div class="left-avatar">
-              <nuxt-link :to="`/user/${circleDetail.userId}`">
+              <nuxt-link target="_blank" :to="`/user/${circleDetail.userId}`">
                 <img 
                   :src="circleDetail.avatar || require('~/assets/images/default.png')" 
                   alt="avatar">
@@ -16,7 +16,7 @@
             </div>
             <div class="right-info">
               <p class="nickname">
-                <nuxt-link :to="`/user/${circleDetail.userId}`">{{ circleDetail.nickname }}</nuxt-link>
+                <nuxt-link target="_blank" :to="`/user/${circleDetail.userId}`">{{ circleDetail.nickname }}</nuxt-link>
               </p>
               <p class="desc"><span v-if="circleDetail.job">{{ circleDetail.job }} · </span>{{ cycleDate(circleDetail.createTime) }}</p>
               <p class="share-info">{{ circleDetail.content }}</p>
