@@ -64,6 +64,12 @@
       </client-only>
     </div>
     <div class="circle-content-block-right"></div>
+    <a-modal 
+      :visible="previewVisible" 
+      :footer="null" 
+      @cancel="previewVisible = false">
+      <img alt="example" style="width: 100%" :src="previewImage" />
+    </a-modal>
   </div>
 </template>
 
@@ -97,7 +103,9 @@ export default {
 
   data () {
     return {
-      cycleDate
+      cycleDate,
+      previewVisible: false,
+      previewImage: null
     }
   },
 
@@ -136,7 +144,8 @@ export default {
       }
       try {
         const API = this.circleDetail.isLiker ? '/shares/unagree' : '/shares/agree'
-        await this.$axios.get(`/api/v1${API}?id=${this.circleDetail.id}`)
+        const { id, userId } = this.circleDetail
+        await this.$axios.get(`/api/v1${API}?id=${id}&uid=${userId}`)
         if (this.circleDetail.isLiker) {
           this.circleDetail.agreeCount -= 1
         } else {
@@ -145,6 +154,11 @@ export default {
         this.circleDetail.isLiker = !this.circleDetail.isLiker
       } catch (error) {}
     },
+
+    handlePreview (file) {
+      this.previewImage = file.url
+      this.previewVisible = true
+    }
   }
 }
 </script>

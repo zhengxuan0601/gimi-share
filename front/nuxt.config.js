@@ -10,10 +10,12 @@ export default {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '记录身边趣事，与您共同分享' },
       { hid: 'keywords', name: 'keywords', content: 'GimShare,生活分享,学习,指南' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { name: 'format-detection', content: 'telephone=no' },
+      { name: 'referrer', content: 'no-referrer' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: '//at.alicdn.com/t/font_3367936_by3kr73satr.css' }
     ]
   },
 
@@ -21,8 +23,7 @@ export default {
   css: [
     'ant-design-vue/dist/antd.css',
     'mavon-editor/dist/css/index.css',
-    '~/assets/style/common.css',
-    '~/assets/iconfont/iconfont.css'
+    '~/assets/style/common.css'
   ],
 
   styleResources: {

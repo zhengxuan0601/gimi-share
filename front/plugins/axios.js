@@ -2,10 +2,11 @@ import { message } from 'ant-design-vue'
 
 export default function ({ store, redirect, app: { $axios, $cookies } }) {
   // $axios.defaults.baseURL = '/gimishare/api/v1'
+  $axios.defaults.timeout = 30000
+  $axios.defaults.headers['Cache-Control'] = 'no-cache'
   $axios.onRequest((config) => {
     const accessToken = $cookies.get('ACCESS_TOKEN') || ''
     config.headers.accessToken = accessToken
-    config.headers['Cache-Control'] = 'no-cache'
     return config
   })
   
@@ -17,7 +18,7 @@ export default function ({ store, redirect, app: { $axios, $cookies } }) {
     if (error.response.data.code === '9999') {
       $cookies.remove('ACCESS_TOKEN')
       store.commit('UPDATE_USER_INFO', '')
-      if (url !== '/api/v1/users/sessionuserinfo?noredirect') {
+      if (!url.includes('noredirect')) {
         redirect('/')
       }
       return Promise.reject(new Error(mes))

@@ -294,7 +294,7 @@ export default {
       }
       try {
         const API = circleItem.isLiker ? '/shares/unagree' : '/shares/agree'
-        await this.$axios.get(`/api/v1${API}?id=${circleItem.id}`)
+        await this.$axios.get(`/api/v1${API}?id=${circleItem.id}&uid=${circleItem.userId}`)
         if (circleItem.isLiker) {
           circleItem.agreeCount -= 1
         } else {
@@ -302,6 +302,15 @@ export default {
         }
         circleItem.isLiker = !circleItem.isLiker
       } catch (error) {}
+    },
+
+    async getUserStatistics () {
+      try {
+        const { data } = await this.$axios.get(`/api/v1/users/getcounts?userId=${this.userInfo.id}`)
+        this.staticsCount = data
+      } catch (error) {
+        console.log(error)
+      }
     },
 
       /**
@@ -326,15 +335,6 @@ export default {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
       this.$router.push(`/user/${this.userInfo.id}${path}`)
-    },
-
-    async getUserStatistics () {
-      try {
-        const { data } = await this.$axios.get(`/api/v1/users/getcounts?userId=${this.userInfo.id}`)
-        this.staticsCount = data
-      } catch (error) {
-        console.log(error)
-      }
     },
 
     async customHttpRequest ({ file }) {

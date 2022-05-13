@@ -1,3 +1,4 @@
+const MessageModel = require('@/models/message.model')
 const JsonResult = require('@/utils/httpResponse.unit')
 const ShareCircleModel = require('@/models/share_circle.model')
 const { transformTree, getSessionuserId } = require('@/utils/common.util')
@@ -33,12 +34,15 @@ class ShareCircleCommentController {
   async createCircleComment (req, response) {
     try {
       const userId = req.sessionuser.id
-      const { circleId, content, replyId, replyComment, topId, replyNickname, replyUserId } = req.body
+      const { uid, circleId, content, replyId, replyComment, topId, replyNickname, replyUserId } = req.body
       const shareCircle = await ShareCircleModel.exists({ id: circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
       }
       await ShareCircleCommentModel.add({ circleId, content, replyId, replyComment, topId, replyNickname, replyUserId, userId })
+      // 评论友圈生成消息
+      const [sourceUserId, targetUserId, itemType, comment, isReplyComment] = [userId, uid, '4', content, replyComment ? '1' : '0']
+      MessageModel.add({ sourceUserId, targetUserId, circleId, itemType, comment, isReplyComment })
       JsonResult.success({
         req,
         response,

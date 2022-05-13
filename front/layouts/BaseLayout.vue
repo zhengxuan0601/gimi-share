@@ -20,6 +20,9 @@
             type="primary"
             class="create-button"
             @click="toCreatorCenter">创作者中心</a-button>
+          <a-badge dot style="margin-right: 16px;">
+            <nuxt-link class="iconfont icon-notify" to="/notification"></nuxt-link>
+          </a-badge>
           <a-button 
             v-if="!userInfo"
             type="dashed"
@@ -160,6 +163,10 @@ export default {
         }
         .create-button {
           margin: 0 16px;
+        }
+        .icon-notify {
+          font-size: 22px;
+          color: #999;
         }
         .cover-img {
           width: 36px;

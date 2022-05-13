@@ -43,7 +43,10 @@
                     <a-icon type="like" />
                     <span v-if="item.pointInfo.likeCounts">{{ item.pointInfo.likeCounts }}</span>
                   </p>
-                  <p><a-icon type="message" /><span v-if="item.pointInfo.commentCounts">{{ item.pointInfo.commentCounts }}</span></p>
+                  <p>
+                    <a-icon type="message" />
+                    <span v-if="item.pointInfo.commentCounts">{{ item.pointInfo.commentCounts }}</span>
+                  </p>
                 </div>
               </div>
               <div v-if="item.pointInfo.coverImage" class="r">
@@ -88,8 +91,10 @@
               </div>
               <div class="bottom">
                 <div>
-                  <a-icon type="message" />
-                  <span v-if="item.pointInfo.commentCount">{{ item.pointInfo.commentCount }}</span>
+                  <nuxt-link target="_blank" :to="`/sharecircle/${item.pointInfo.id}`">
+                    <a-icon type="message" />
+                    <span v-if="item.pointInfo.commentCount">{{ item.pointInfo.commentCount }}</span>
+                  </nuxt-link>
                 </div>
                 <div
                   :class="{ like: item.pointInfo.isLiker }" 
@@ -111,7 +116,9 @@
                 <p class="nickname">
                   {{ userNickname }}
                   <span>关注了</span>
-                  <nuxt-link :to="`/user/${item.pointInfo.id}`">{{ item.pointInfo.nickname }}</nuxt-link>
+                  <nuxt-link 
+                    target="_blank"
+                    :to="`/user/${item.pointInfo.id}`">{{ item.pointInfo.nickname }}</nuxt-link>
                 </p>
               </div>
             </div>

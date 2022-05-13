@@ -2,6 +2,7 @@ const ArticleModel = require('@/models/article.model')
 const JsonResult = require('@/utils/httpResponse.unit')
 const ArticleCommentModel = require('@/models/article_comment.model')
 const { transformTree, getSessionuserId } = require('@/utils/common.util')
+const MessageModel = require('@/models/message.model')
 
 class CommentController {
   constructor () {
@@ -37,7 +38,8 @@ class CommentController {
   async createComment (req, response) {
     try {
       const userId = req.sessionuser.id
-      const { articleId, replyId, content, replyComment, topId, replyNickname, replyUserId } = req.body
+      const { articleId, uid, replyId, content, replyComment, topId, replyNickname, replyUserId } = req.body
+      console.log(uid)
       const existArticle = await ArticleModel.exists({ id: articleId })
       if (!existArticle) {
         return JsonResult.fail({ req, response, message: '文章不存在' })
@@ -49,6 +51,9 @@ class CommentController {
         }
       }
       await ArticleCommentModel.create({ articleId, replyId, content, userId, replyComment, topId, replyNickname, replyUserId })
+      // 评论文章生成消息
+      const [sourceUserId, targetUserId, itemType, comment, isReplyComment] = [userId, uid, '4', content, replyComment ? '1' : '0']
+      MessageModel.add({ sourceUserId, targetUserId, articleId, itemType, comment, isReplyComment })
       JsonResult.success({
         req,
         response,

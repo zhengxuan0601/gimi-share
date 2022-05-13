@@ -17,7 +17,7 @@
             <a-button
               :disabled="!comment"
               type="primary" 
-              @click="submitComment(comment, {})">评论</a-button>
+              @click="submitComment(comment, articleDetail.userId, {})">评论</a-button>
           </div>
         </div>
       </div>
@@ -74,9 +74,10 @@
                 <a-button
                   :disabled="!item.replyNewComment"
                   type="primary"
-                  @click="submitComment(item.replyNewComment, {
+                  @click="submitComment(item.replyNewComment, item.userId, {
                     topId: item.id, 
-                    replyId: item.id
+                    replyId: item.id,
+                    replyComment: item.content
                   }, item)" >评论</a-button>
               </div>
             </div>
@@ -114,7 +115,7 @@
                       v-if="itemName.isAuthor || userInfo.id === articleDetail.userId" 
                       @click="deleteComment(itemName.id)">删除</span>
                   </div>
-                  <div v-if="itemName.replyComment" class="parent-comment">
+                  <div v-if="itemName.replyUserId" class="parent-comment">
                     <p>“{{ itemName.replyComment }}”</p>
                   </div>
                   <div class="dz-pl">
@@ -144,7 +145,7 @@
                       <a-button
                         :disabled="!itemName.replyNewComment"
                         type="primary"
-                        @click="submitComment(itemName.replyNewComment, {
+                        @click="submitComment(itemName.replyNewComment, itemName.userId, {
                           topId: item.id, 
                           replyId: itemName.id, 
                           replyComment: itemName.content, 
@@ -201,13 +202,14 @@ export default {
     /**
      * submit comment
      * @param { String } comment
+     * @param { String } uid
      * @param { String } topId
      * @param { String } replyId
      * @param { String } replyComment
      * @param { String } replyNickname
      * @param { String } replyUserId
      */
-    async submitComment (comment, { 
+    async submitComment (comment, uid, { 
       topId, 
       replyId, 
       replyComment, 
@@ -220,6 +222,7 @@ export default {
       try {
         const commentInfo = {
           articleId: this.articleDetail.id,
+          uid,
           topId,
           replyId,
           replyComment,

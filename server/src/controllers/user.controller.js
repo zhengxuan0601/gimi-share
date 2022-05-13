@@ -3,6 +3,7 @@ const trash = require('@/utils/ini.unit')
 const UserModel = require('@/models/user.model')
 const { getAsync, delAsync } = require('@/redis')
 const ArticleModel = require('@/models/article.model')
+const MessageModel = require('@/models/message.model')
 const JsonResult = require('@/utils/httpResponse.unit')
 const DynamicsModel = require('@/models/dynamics.model')
 const ShareCircleModel = require('@/models/share_circle.model')
@@ -217,7 +218,7 @@ class UserController {
   async userCollectArticle (req, response) {
     try {
       const userId = req.sessionuser.id
-      const articleId = req.query.articleId
+      const { articleId, uid } = req.query
       const exist = await UserCollectArticleModel.findOne(userId, articleId)
       const article = await ArticleModel.exists({ id: articleId })
       if (!article) {
@@ -228,7 +229,11 @@ class UserController {
       }
       await UserCollectArticleModel.add(userId, articleId)
       await ArticleModel.autoIncre(articleId, 'collectCounts')
-      DynamicsModel.add({ userId, type: '4', articleId })
+      if (article.userId !== userId) {
+        DynamicsModel.add({ userId, type: '4', articleId })
+        const [sourceUserId, targetUserId, itemType] = [userId, uid, '2']
+        MessageModel.add({ sourceUserId, targetUserId, articleId, itemType })
+      }
       JsonResult.success({
         req,
         response,
@@ -277,7 +282,7 @@ class UserController {
   async userAgreeArticle (req, response) {
     try {
       const userId = req.sessionuser.id
-      const articleId = req.query.articleId
+      const { articleId, uid } = req.query
       const exist = await UserAgreeArticleModel.findOne(userId, articleId)
       const article = await ArticleModel.exists({ id: articleId })
       if (!article) {
@@ -288,7 +293,11 @@ class UserController {
       }
       await UserAgreeArticleModel.add(userId, articleId)
       ArticleModel.autoIncre(articleId, 'likeCounts')
-      DynamicsModel.add({ userId, type: '2', articleId })
+      if (article.userId !== userId) {
+        DynamicsModel.add({ userId, type: '2', articleId })
+        const [sourceUserId, targetUserId, itemType] = [userId, uid, '1']
+        MessageModel.add({ sourceUserId, targetUserId, articleId, itemType })
+      }
       JsonResult.success({
         req,
         response,
@@ -343,11 +352,16 @@ class UserController {
       if (!user) {
         return JsonResult.fail({ req, response, message: '关注的用户不存在' })
       }
+      if (userId === focusId) {
+        return JsonResult.fail({ req, response, message: '不能关注自己' })
+      }
       if (exist) {
         return JsonResult.fail({ req, response, message: '已关注' })
       }
       await UserFocusUserModel.add(userId, focusId)
       DynamicsModel.add({ userId, type: '3', focusUserId: focusId })
+      const [sourceUserId, targetUserId, itemType] = [userId, focusId, '3']
+      MessageModel.add({ sourceUserId, targetUserId, itemType })
       JsonResult.success({
         req,
         response,

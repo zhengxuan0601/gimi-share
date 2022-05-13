@@ -118,7 +118,8 @@ export default {
       try {
         const requestParams = {
           circleId: this.circleId,
-          content: this.comment
+          content: this.comment,
+          uid: this.circieUserId
         }
         await this.$axios.post('/api/v1/sharecircle/comments/create', requestParams)
         this.comment = ''

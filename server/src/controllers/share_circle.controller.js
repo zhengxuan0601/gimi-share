@@ -1,3 +1,4 @@
+const MessageModel = require('@/models/message.model')
 const JsonResult = require('@/utils/httpResponse.unit')
 const httpRequest = require('@/utils/httpRequest.unit')
 const DynamicsModel = require('@/models/dynamics.model')
@@ -117,7 +118,7 @@ class ShareCircleController {
   async agreeSharecircle (req, response) {
     try {
       const userId = req.sessionuser.id
-      const circleId = req.query.id
+      const [circleId, uid] = [req.query.id, req.query.uid]
       const shareCircle = await ShareCircleModel.exists({ id: circleId })
       if (!shareCircle) {
         return JsonResult.fail({ req, response, message: '友圈不存在' })
@@ -127,7 +128,11 @@ class ShareCircleController {
         return JsonResult.fail({ req, response, message: '重复点赞' })
       }
       await UserAgreeSharecircleModel.add(userId, circleId)
-      DynamicsModel.add({ userId, type: '2', circleId })
+      if (shareCircle.userId !== userId) {
+        DynamicsModel.add({ userId, type: '2', circleId })
+        const [sourceUserId, targetUserId, itemType] = [userId, uid, '1']
+        MessageModel.add({ sourceUserId, targetUserId, circleId, itemType })
+      }
       JsonResult.success({
         req,
         response,

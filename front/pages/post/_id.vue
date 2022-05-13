@@ -142,7 +142,7 @@ export default {
       }
       try {
         const API = articleItem.isLiker ? '/users/unagreearticle' : '/users/agreearticle'
-        await this.$axios.get(`/api/v1${API}?articleId=${articleItem.id}`)
+        await this.$axios.get(`/api/v1${API}?articleId=${articleItem.id}&uid=${articleItem.userId}`)
         if (articleItem.isLiker) {
           articleItem.likeCounts -= 1
         } else {
@@ -164,7 +164,7 @@ export default {
       }
       try {
         const API = articleItem.isFlower ? '/users/uncollectarticle' : '/users/collectarticle'
-        await this.$axios.get(`/api/v1${API}?articleId=${articleItem.id}`)
+        await this.$axios.get(`/api/v1${API}?articleId=${articleItem.id}&uid=${articleItem.userId}`)
         articleItem.isFlower = !articleItem.isFlower
       } catch (error) {
         console.log(error)
