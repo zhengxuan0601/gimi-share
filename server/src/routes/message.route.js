@@ -1,9 +1,8 @@
 /**
  * @typedef MessageList
- * @property {string} pageNo.required -文章标题
- * @property {string} pageSize.required -文章内容
+ * @property {number} pageNo.required -文章标题
+ * @property {number} pageSize.required -文章内容
  * @property {string} itemType.required -文章分类
- * @property {string} targetUserId.required -文章标签
  */
 
 const express = require('express')
@@ -21,5 +20,14 @@ const messageController = require('@/controllers/message.controller')
  * @security JWT
  */
 router.post('/', auth(), messageController.findMessageList)
+
+/**
+ * 查询用户未读消息数量
+ * @route GET /messages/count
+ * @group 消息管理
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/count', auth(), messageController.findNoReadTotal)
 
 module.exports = router

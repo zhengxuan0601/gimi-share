@@ -20,7 +20,7 @@ class MessageModel {
 
       const sql = `SELECT ${this.tableName}.*, 
       
-        user.nickname AS sourceNickname, 
+        user.nickname AS sourceNickname, user.avatar AS sourceAvatar,
         
         article.articleTitle, 
         
@@ -38,6 +38,10 @@ class MessageModel {
 
       const [list, total] = [await db.query(sql, values), await db.query(totalSql, values)]
 
+      const noRead = list.filter(o => o.haveRead === '0').map(o => o.id)
+
+      noRead.length && this.updateReadState(noRead)
+
       return {
         list,
 
@@ -45,6 +49,25 @@ class MessageModel {
 
         pageNo
       }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * message is exists
+   * @param {*} param
+   * @returns
+   */
+  async exists (param) {
+    try {
+      const { columnSet, values } = multipleColumnSet(param, ' AND ')
+
+      const sql = `SELECT id FROM ${this.tableName} WHERE ${columnSet}`
+
+      const result = await db.query(sql, values)
+
+      return result[0]
     } catch (error) {
       throw new Error(error)
     }
@@ -72,6 +95,39 @@ class MessageModel {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
       await db.query(sql, [id, sourceUserId, targetUserId, articleId, circleId, commentId, comment, itemType, isReplyComment, createTime])
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * batch update message haveRead state
+   * @param {*} ids
+   */
+  async updateReadState (ids) {
+    try {
+      const sql = `UPDATE ${this.tableName} SET haveRead = '1' WHERE id IN (${ids.map(o => '?').join(',')})`
+
+      await db.query(sql, ids)
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * find message total
+   * @param {*} param
+   * @returns
+   */
+  async total (param) {
+    try {
+      const { columnSet, values } = multipleColumnSet(param, ' AND ')
+
+      const sql = `SELECT COUNT(*) AS total FROM ${this.tableName} WHERE ${columnSet}`
+
+      const data = await db.query(sql, values)
+
+      return data[0].total
     } catch (error) {
       throw new Error(error)
     }

@@ -131,7 +131,12 @@ class ShareCircleController {
       if (shareCircle.userId !== userId) {
         DynamicsModel.add({ userId, type: '2', circleId })
         const [sourceUserId, targetUserId, itemType] = [userId, uid, '1']
-        MessageModel.add({ sourceUserId, targetUserId, circleId, itemType })
+        const params = { sourceUserId, targetUserId, circleId, itemType }
+        MessageModel.exists(params).then(exists => {
+          if (!exists) {
+            MessageModel.add(params)
+          }
+        })
       }
       JsonResult.success({
         req,

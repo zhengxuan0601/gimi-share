@@ -1,17 +1,22 @@
 export const state = () => {
   return {
     loginModalVisible: false,
-    userInfo: ""
+    userInfo: "",
+    notifyCount: 0
   }
 }
 
 export const mutations = {
-  UPDATE_LOGIN_VISIBLE (state, LV) {
-    state.loginModalVisible = LV
+  UPDATE_LOGIN_VISIBLE (state, loginModalVisible) {
+    state.loginModalVisible = loginModalVisible
   },
 
-  UPDATE_USER_INFO (state, UI) {
-    state.userInfo = UI
+  UPDATE_USER_INFO (state, userInfo) {
+    state.userInfo = userInfo
+  },
+
+  UPDATE_NOTIFY_COUNT (state, notifyCount) {
+    state.notifyCount = notifyCount
   }
 }
 

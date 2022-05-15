@@ -36,6 +36,7 @@ export default {
 
 <style scoped lang="less">
 .setting-page {
+  margin-top: 20px;
   .breadcrumb {
     background: #fff;
     padding: 0 20px;

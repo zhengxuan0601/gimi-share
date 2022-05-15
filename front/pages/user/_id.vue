@@ -185,6 +185,7 @@ export default {
 
 <style scoped lang="less">
 .user-content {
+  margin-top: 20px;
   .left-user-modal {
     width: 708px;
     .user-info-block {

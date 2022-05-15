@@ -373,6 +373,7 @@ export default {
 
 <style scoped lang="less">
 .share-circle-content {
+  margin-top: 20px;
   .left-share-modal {
     width: 708px;
     .publish-block {

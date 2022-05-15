@@ -131,6 +131,12 @@ export default {
     })
   },
 
+  created () {
+    if (this.userInfo) {
+      this.generateHistory()
+    }
+  },
+
   methods: {
     /**
      * article liker
@@ -187,6 +193,10 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+
+    generateHistory () {
+      this.$axios.post('/api/v1/history/generate', { uid: this.articleDetail.userId, articleId: this.articleDetail.id })
     }
   }
 }
@@ -195,7 +205,7 @@ export default {
 <style lang="less" scoped>
 .article-content-block {
   width: 860px;
-  margin: 0 auto;
+  margin: 20px auto 0;
 }
 .article-content {
   background: #fff;

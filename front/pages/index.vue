@@ -3,7 +3,7 @@
     <client-only>
       <div slot="placeholder">
         <div style="padding:30px;background:#fff">
-          <a-skeleton active />
+          <a-skeleton :paragraph="{ rows: 6 }" active :title="{ width: 160 }" />
         </div>
       </div>
       <div class="articlelist-content">
@@ -98,7 +98,7 @@ export default {
       }
       try {
         const API = articleItem.isLiker ? '/users/unagreearticle' : '/users/agreearticle'
-        await this.$axios.get(`/api/v1${API}?articleId=${articleItem.id}`)
+        await this.$axios.get(`/api/v1${API}?articleId=${articleItem.id}&uid=${articleItem.userId}`)
         if (articleItem.isLiker) {
           articleItem.likeCounts -= 1
         } else {
@@ -114,4 +114,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.home-index-page {
+  margin-top: 20px;
+}
 </style>

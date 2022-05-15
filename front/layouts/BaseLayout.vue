@@ -20,7 +20,7 @@
             type="primary"
             class="create-button"
             @click="toCreatorCenter">创作者中心</a-button>
-          <a-badge dot style="margin-right: 16px;">
+          <a-badge v-if="userInfo" :count="notifyCount" dot style="margin-right: 16px;">
             <nuxt-link class="iconfont icon-notify" to="/notification"></nuxt-link>
           </a-badge>
           <a-button 
@@ -38,9 +38,10 @@
                 <p><nuxt-link :to="`/user/${userInfo.id}/collect`"><i class="iconfont icon-shoucang"></i>我的收藏</nuxt-link></p>
                 <p><nuxt-link :to="`/user/${userInfo.id}/focus`"><i class="iconfont icon-wodeguanzhu"></i>我的关注</nuxt-link></p>
                 <p><nuxt-link :to="`/user/${userInfo.id}/agree`"><i class="iconfont icon-zan"></i>我的点赞</nuxt-link></p>
+                <p><nuxt-link :to="`/browsehistory`"><i class="iconfont icon-liulan"></i>浏览记录</nuxt-link></p>
               </div>
               <div>
-                <p @click="userLogout"><i class="iconfont icon-tuichudenglu"></i>退出登录</p>
+                <p class="pad-ing" @click="userLogout"><i class="iconfont icon-tuichudenglu"></i>退出登录</p>
               </div>
             </div>
             <div class="cover-img">
@@ -66,8 +67,15 @@ export default {
   computed: {
     ...mapState({
       loginModalVisible: state => state.loginModalVisible,
-      userInfo: state => state.userInfo
+      userInfo: state => state.userInfo,
+      notifyCount: state => state.notifyCount
     })
+  },
+
+  created () {
+    if (this.userInfo && process.client) {
+      this.getNotifyCount()
+    }
   },
 
   methods: {
@@ -85,6 +93,13 @@ export default {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
       this.$router.push('/writecenter')
+    },
+
+    async getNotifyCount () {
+      try {
+        const { data } = await this.$axios.get('/api/v1/messages/count')
+        this.$store.commit('UPDATE_NOTIFY_COUNT', data.allCount)
+      } catch (error) {}
     }
   }
 }
@@ -184,7 +199,7 @@ export default {
     }
   }
   section {
-    padding-top: 80px;
+    padding-top: 60px;
     flex: 1;
     height: 0;
   }

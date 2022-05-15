@@ -202,11 +202,11 @@ class UserController {
       JsonResult.success({
         req,
         response,
-        message: '用户登陆成功',
+        message: '用户登录成功',
         data: { ...sessionuser, accessToken }
       })
     } catch (error) {
-      JsonResult.fail({ req, response, error, message: '用户登陆失败' })
+      JsonResult.fail({ req, response, error, message: '用户登录失败' })
     }
   }
 
@@ -232,7 +232,12 @@ class UserController {
       if (article.userId !== userId) {
         DynamicsModel.add({ userId, type: '4', articleId })
         const [sourceUserId, targetUserId, itemType] = [userId, uid, '2']
-        MessageModel.add({ sourceUserId, targetUserId, articleId, itemType })
+        const params = { sourceUserId, targetUserId, articleId, itemType }
+        MessageModel.exists(params).then(exists => {
+          if (!exists) {
+            MessageModel.add(params)
+          }
+        })
       }
       JsonResult.success({
         req,
@@ -296,7 +301,12 @@ class UserController {
       if (article.userId !== userId) {
         DynamicsModel.add({ userId, type: '2', articleId })
         const [sourceUserId, targetUserId, itemType] = [userId, uid, '1']
-        MessageModel.add({ sourceUserId, targetUserId, articleId, itemType })
+        const params = { sourceUserId, targetUserId, articleId, itemType }
+        MessageModel.exists(params).then(exists => {
+          if (!exists) {
+            MessageModel.add(params)
+          }
+        })
       }
       JsonResult.success({
         req,
@@ -361,7 +371,12 @@ class UserController {
       await UserFocusUserModel.add(userId, focusId)
       DynamicsModel.add({ userId, type: '3', focusUserId: focusId })
       const [sourceUserId, targetUserId, itemType] = [userId, focusId, '3']
-      MessageModel.add({ sourceUserId, targetUserId, itemType })
+      const params = { sourceUserId, targetUserId, itemType }
+      MessageModel.exists(params).then(exists => {
+        if (!exists) {
+          MessageModel.add(params)
+        }
+      })
       JsonResult.success({
         req,
         response,

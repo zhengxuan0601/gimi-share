@@ -165,6 +165,7 @@ export default {
 
 <style scoped lang="less">
   .circle-content-block {
+    margin-top: 20px;
     &-left {
       width: 708px;
       .share-block {
