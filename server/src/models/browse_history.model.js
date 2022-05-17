@@ -7,6 +7,41 @@ class BrowseHistoryModel {
   }
 
   /**
+   * find user browse history list
+   * @param {*} userId
+   * @param {*} pageNo
+   * @param {*} pageSize
+   */
+  async find ({ userId, pageNo, pageSize }) {
+    try {
+      const sql = `SELECT T.*, arc.articleTitle, arc.description, arc.viewCounts, arc.likeCounts, arc.coverImage,
+      
+      (SELECT user.nickname FROM user WHERE T.uid = user.id) AS authorNickname,
+
+      (SELECT COUNT(*) FROM article_comment AS ac WHERE T.articleId = ac.articleId) AS commentCounts
+      
+      FROM ${this.tableName} AS T LEFT JOIN article AS arc ON T.articleId = arc.id
+      
+      WHERE T.userId = ? ORDER BY T.createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+
+      const totalSql = `SELECT COUNT(*) AS total FROM ${this.tableName} WHERE userId = ?`
+
+      const [list, total] = [await db.query(sql, [userId]), await db.query(totalSql, [userId])]
+
+      return {
+        list,
+
+        total: total[0].total,
+
+        pageNo: Number(pageNo)
+      }
+    } catch (error) {
+      console.log(error)
+      throw new Error(error)
+    }
+  }
+
+  /**
    * history is esists
    * @param {*} parmas
    * @returns

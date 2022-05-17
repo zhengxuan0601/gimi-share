@@ -3,6 +3,11 @@ const JsonResult = require('@/utils/httpResponse.unit')
 const { getSessionuserId } = require('@/utils/common.util')
 
 class DynamicsController {
+  /**
+   * find dynamic list
+   * @param {*} req
+   * @param {*} response
+   */
   async findDynamicList (req, response) {
     try {
       const { userId, pageNo = 1, pageSize = 10 } = req.query

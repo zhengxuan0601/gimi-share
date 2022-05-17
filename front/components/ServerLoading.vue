@@ -27,6 +27,7 @@ export default {
     transform: translateX(-50%);
     font-size: 16px;
     top: 350px;
+    font-weight: bold;
   }
 }
 </style>

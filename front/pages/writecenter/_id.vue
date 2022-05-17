@@ -1,69 +1,69 @@
 <template>
   <div class="writecenter-content">
-    <div class="writemodel-title">
-      <input 
-        v-model="articleInfo.articleTitle"
-        class="article-title" 
-        type="text" 
-        placeholder="输入文章标题...">
-      <a-popover placement="bottomRight" trigger="click">
-        <template slot="content">
-          <div class="popover-form">
-            <a-form-model 
-              ref="articleForm"
-              :model="articleInfo" 
-              :rules="rules"
-              :label-col="{ span: 6 }" 
-              :wrapper-col="{ span: 18 }">
-              <a-form-model-item label="文章分类" prop="category">
-                <a-radio-group v-model="articleInfo.category">
-                  <a-radio 
-                    v-for="item in categoryOption" 
-                    :key="item.value" 
-                    :value="item.value">{{ item.label }}</a-radio>
-                </a-radio-group>
-              </a-form-model-item>
-              <a-form-model-item label="关键字" prop="tag">
-                <a-input v-model="articleInfo.tag" placeholder="输入关键字，用;进行分隔" />
-              </a-form-model-item>
-              <a-form-model-item label="文章封面" style="margin-bottom: 0">
-                <a-upload
-                  name="file"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://zdxblog.cn/upload/uploadFile"
-                  @change="handleChange"
-                >
-                  <img v-if="articleInfo.coverImage" :src="articleInfo.coverImage" alt="avatar" />
-                  <div v-else>
-                    <a-icon :type="loading ? 'loading' : 'plus'" />
-                    <div class="ant-upload-text">
-                      Upload
+    <client-only>
+      <server-loading slot="placeholder"></server-loading>
+      <div class="writemodel-title">
+        <input 
+          v-model="articleInfo.articleTitle"
+          class="article-title" 
+          type="text" 
+          placeholder="输入文章标题...">
+        <a-popover placement="bottomRight" trigger="click">
+          <template slot="content">
+            <div class="popover-form">
+              <a-form-model 
+                ref="articleForm"
+                :model="articleInfo" 
+                :rules="rules"
+                :label-col="{ span: 6 }" 
+                :wrapper-col="{ span: 18 }">
+                <a-form-model-item label="文章分类" prop="category">
+                  <a-radio-group v-model="articleInfo.category">
+                    <a-radio 
+                      v-for="item in categoryOption" 
+                      :key="item.value" 
+                      :value="item.value">{{ item.label }}</a-radio>
+                  </a-radio-group>
+                </a-form-model-item>
+                <a-form-model-item label="关键字" prop="tag">
+                  <a-input v-model="articleInfo.tag" placeholder="输入关键字，用;进行分隔" />
+                </a-form-model-item>
+                <a-form-model-item label="文章封面" style="margin-bottom: 0">
+                  <a-upload
+                    name="file"
+                    list-type="picture-card"
+                    class="avatar-uploader"
+                    :show-upload-list="false"
+                    action="https://zdxblog.cn/upload/uploadFile"
+                    @change="handleChange"
+                  >
+                    <img v-if="articleInfo.coverImage" :src="articleInfo.coverImage" alt="avatar" />
+                    <div v-else>
+                      <a-icon :type="loading ? 'loading' : 'plus'" />
+                      <div class="ant-upload-text">
+                        Upload
+                      </div>
                     </div>
-                  </div>
-                </a-upload>
-              </a-form-model-item>
-              <a-form-model-item label="文章描述" prop="description">
-                <a-textarea v-model="articleInfo.description" placeholder="请输入文章描述" :rows="4" />
-              </a-form-model-item>
-              <a-form-model-item 
-                style="margin-bottom: 0"
-                :wrapper-col="{ span: 4, offset: 20 }">
-                <a-button
-                  :disabled="!articleInfo.articleTitle || !articleInfo.content"
-                  type="primary"
-                  @click="saveShareArticle">发布</a-button>
-              </a-form-model-item>
-            </a-form-model>
-          </div>
-        </template>
-        <a-button type="primary">提 交</a-button>
-      </a-popover>
-    </div>
-    <div class="markdown-body">
-      <client-only>
-        <server-loading slot="placeholder"></server-loading>
+                  </a-upload>
+                </a-form-model-item>
+                <a-form-model-item label="文章描述" prop="description">
+                  <a-textarea v-model="articleInfo.description" placeholder="请输入文章描述" :rows="4" />
+                </a-form-model-item>
+                <a-form-model-item 
+                  style="margin-bottom: 0"
+                  :wrapper-col="{ span: 4, offset: 20 }">
+                  <a-button
+                    :disabled="!articleInfo.articleTitle || !articleInfo.content"
+                    type="primary"
+                    @click="saveShareArticle">发布</a-button>
+                </a-form-model-item>
+              </a-form-model>
+            </div>
+          </template>
+          <a-button type="primary">提 交</a-button>
+        </a-popover>
+      </div>
+      <div class="markdown-body">
         <mavon-editor 
           ref='md'
           v-model="articleInfo.content"
@@ -72,9 +72,9 @@
           :box-shadow="false"
           @imgAdd="uploadImageServer">
         </mavon-editor>
-      </client-only>
-    </div>
-    <div class="article-bottom"></div>
+      </div>
+      <div class="article-bottom"></div>
+    </client-only>
   </div>
 </template>
 

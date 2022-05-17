@@ -92,7 +92,8 @@ export default {
       if (!this.userInfo) {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
-      this.$router.push('/writecenter')
+      const routerObject= this.$router.resolve({ path: '/writecenter' })
+      window.open(routerObject.href, '_blank')
     },
 
     async getNotifyCount () {

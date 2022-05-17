@@ -36,6 +36,19 @@ export default {
         }
       }
     }
+  },
+
+  beforeDestroy () {
+    this.getNotifyCount()
+  },
+
+  methods: {
+    async getNotifyCount () {
+      try {
+        const { data } = await this.$axios.get('/api/v1/messages/count')
+        this.$store.commit('UPDATE_NOTIFY_COUNT', data.allCount)
+      } catch (error) {}
+    }
   }
 }
 </script>

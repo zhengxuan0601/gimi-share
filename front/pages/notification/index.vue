@@ -28,7 +28,7 @@
                   下的评论
                 </p>
                 <p v-else>
-                  <nuxt-link class="name" :to="`/user/${item.sourceUserId}`">需要坚持的人</nuxt-link>
+                  <nuxt-link class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
                   评论了你的{{ item.articleId ? '文章' : '' }}
                   <nuxt-link v-if="item.articleId" :to="`/post/${item.articleId}`">{{ item.articleTitle }}</nuxt-link>
                   <nuxt-link v-if="item.circleId" :to="`/sharecircle/${item.circleId}`">友圈分享</nuxt-link>
