@@ -25,7 +25,7 @@ const router = express.Router()
 const auth = require('@/middleware/auth.middleware')
 const userController = require('@/controllers/user.controller')
 const handlerValidate = require('@/middleware/handlerValidate.middleware')
-const { registeruserSchema, loginuserShema } = require('@/middleware/validators/userValidator.middleware')
+const { registeruserSchema } = require('@/middleware/validators/userValidator.middleware')
 
 /**
  * 用户列表分页查询
@@ -98,7 +98,7 @@ router.post('/updateuser', auth(), handlerValidate(userController.updateUser))
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */
-router.post('/login', loginuserShema, handlerValidate(userController.userLogin))
+router.post('/login', handlerValidate(userController.userLogin))
 
 /**
  * 用户收藏文章

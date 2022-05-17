@@ -17,7 +17,6 @@
             size="large">
             <div slot="suffix" class="send-email-code">
               <p v-if="!countdown && !sendLoading" @click="sendEmail">发送验证码</p>
-              <span v-if="countdown && !sendLoading">{{ countdown }} s</span>
               <a-icon v-if="sendLoading" type="loading" />
             </div>
           </a-input>
@@ -26,8 +25,11 @@
           <a-input
             v-model="emailForm.code"
             size="large"
-            class="code-input"
-            placeholder="请输入验证码" />
+            placeholder="请输入验证码">
+            <div slot="suffix" class="send-email-code">
+              <span v-if="countdown && !sendLoading">{{ countdown }} s后重新发送</span>
+            </div>
+          </a-input>
         </a-form-model-item>
         <a-button
           block 
@@ -127,81 +129,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-.login-wrapper {
-  position: fixed;
-  background: rgba(0,0,0,.3);
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  .modal {
-    padding: 30px;
-    background: #fff;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left: -160px;
-    width: 320px;
-    margin-top: -200px;
-    box-shadow: 0 0 6px 3px rgba(0,0,0,.1);
-    .anticon-close {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      font-size: 14px;
-      opacity: .8;
-      cursor: pointer;
-    }
-    h3 {
-      font-weight: bold;
-      color: #252933;
-      font-size: 16px;
-      padding-bottom: 20px;
-    }
-    .ant-form-horizontal {
-      .ant-form-item {
-        margin-bottom: 12px;
-        &:nth-of-type(3) {
-          margin-bottom: 6px;
-          .ant-form-item-control {
-            line-height: normal;
-          }
-        }
-        .ant-form-item-children {
-          display: flex;
-          align-items: center;
-          .code-input {
-            width: 110px;
-            margin-right: 10px;
-          }
-        }
-      }
-      .ant-btn-block {
-        font-size: 14px;
-        margin-top: 10px;
-      }
-      .tip {
-        margin-top: 20px;
-        font-size: 12px;
-        color: #999;
-        span {
-          color: @primary-color;
-        }
-      }
-      .send-email-code {
-        p {
-          color: @primary-color;
-          cursor: pointer;
-          font-size: 12px;
-        }
-        span {
-          color: #999;
-        }
-      }
-    }
-  }
-}
-</style>

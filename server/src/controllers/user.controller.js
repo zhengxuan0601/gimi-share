@@ -158,6 +158,10 @@ class UserController {
     try {
       const id = req.sessionuser.id
       const { email, code } = req.body
+      const exist = await UserModel.findOne({ email })
+      if (exist) {
+        return JsonResult.fail({ req, response, message: '邮箱已经被注册' })
+      }
       const sessionCode = await getAsync(email)
       if (code !== sessionCode) {
         return JsonResult.fail({ req, response, message: '验证码不正确' })
@@ -181,8 +185,27 @@ class UserController {
    * @returns
    */
   async userLogin (req, response) {
-    const { username, password, code } = req.body
+    const { username, password, code, email, emailLogin } = req.body
     try {
+      // 邮箱验证码登录
+      if (emailLogin) {
+        const user = await UserModel.findOne({ email }, false)
+        if (!user) {
+          return JsonResult.fail({ req, response, message: '该邮箱还未绑定' })
+        }
+        const sessionCode = await getAsync(email)
+        if (code !== sessionCode) {
+          return JsonResult.fail({ req, response, message: '验证码不正确' })
+        }
+        const accessToken = jwt.sign(user, trash.jsonSecretkey, { expiresIn: trash.expiresIn })
+        return JsonResult.success({
+          req,
+          response,
+          message: '用户登录成功',
+          data: { ...user, accessToken }
+        })
+      }
+      // 用户名密码登录
       const captcha = req.session.captcha
       if (!captcha || (code.toLowerCase() !== captcha.toLowerCase())) {
         return JsonResult.fail({ req, response, message: '验证码错误' })

@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const auth = require('@/middleware/auth.middleware')
 const unitController = require('@/controllers/unit.controller')
 const handlerValidate = require('@/middleware/handlerValidate.middleware')
 
@@ -30,6 +29,6 @@ router.get('/getpublickey', unitController.getPublicKey)
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */
-router.get('/emailcode', auth(), handlerValidate(unitController.sendEmailCode))
+router.get('/emailcode', handlerValidate(unitController.sendEmailCode))
 
 module.exports = router

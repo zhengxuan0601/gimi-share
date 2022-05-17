@@ -15,7 +15,7 @@ async function sendEmail (to, code) {
     transporter.sendMail({
       from: '需要坚持的人<1071401902@qq.com>',
       to,
-      subject: '邮箱绑定验证申请',
+      subject: '邮箱验证码',
       text: code
     }, (error, info) => {
       if (error) {

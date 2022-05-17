@@ -9,33 +9,70 @@
         :model="loginForm"
         :rules="loginRules"
       >
-        <h3>用户{{ isRegister ? '注册' : '登录' }}</h3>
-        <a-form-model-item placeholder="" prop="username">
-          <a-input 
-            v-model="loginForm.username" 
-            placeholder="请输入账号"
-            size="large" />
-        </a-form-model-item>
-        <a-form-model-item prop="password">
-          <a-input-password
-            v-model="loginForm.password"
-            size="large" 
-            placeholder="请输入密码" />
-        </a-form-model-item>
-        <a-form-model-item prop="code" style="display: flex;">
-          <a-input
-            v-model="loginForm.code"
-            class="code-input"
-            placeholder="请输入验证码" />
-          <!-- eslint-disable vue/no-v-html -->
-          <div
-            style="cursor: pointer" 
-            class="code" 
-            @click="getVerificationcode" 
-            v-html="codeImage"></div>
-        </a-form-model-item>
-        <div>
+        <h3 v-if="!isEmailVisible">用户名{{ isRegister ? '注册' : '登录' }}</h3>
+        <h3 v-else>邮箱登录</h3>
+        <!-- 用户名密码操作 -->
+        <div v-if="!isEmailVisible">
+          <a-form-model-item placeholder="" prop="username">
+            <a-input 
+              v-model="loginForm.username" 
+              placeholder="请输入账号"
+              size="large" />
+          </a-form-model-item>
+          <a-form-model-item prop="password">
+            <a-input-password
+              v-model="loginForm.password"
+              size="large" 
+              placeholder="请输入密码" />
+          </a-form-model-item>
+          <a-form-model-item prop="code" style="display: flex;">
+            <a-input
+              v-model="loginForm.code"
+              size="large"
+              class="code-input"
+              placeholder="请输入验证码" />
+            <!-- eslint-disable vue/no-v-html -->
+            <div
+              style="cursor: pointer" 
+              class="code" 
+              @click="getVerificationcode" 
+              v-html="codeImage"></div>
+          </a-form-model-item>
+        </div>
+        <!-- 邮箱验证码操作 -->
+        <div v-else>
+          <a-form-model-item prop="email">
+            <a-input 
+              v-model="loginForm.email" 
+              placeholder="请输入邮箱"
+              size="large">
+              <div slot="suffix" class="send-email-code">
+                <p v-if="!countdown && !sendLoading" @click="sendEmail">发送验证码</p>
+                <a-icon v-if="sendLoading" type="loading" />
+              </div>
+            </a-input>
+          </a-form-model-item>
+          <a-form-model-item prop="emailCode">
+            <a-input
+              v-model="loginForm.emailCode"
+              size="large"
+              placeholder="请输入验证码">
+              <div slot="suffix" class="send-email-code">
+                <span v-if="countdown && !sendLoading">{{ countdown }} s后重新发送</span>
+              </div>
+            </a-input>
+          </a-form-model-item>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
           <a-button 
+            v-if="!isRegister"
+            style="padding: 0; font-size: 12px;"
+            type="link"
+            size="small" 
+            @click="isEmailVisible = !isEmailVisible">{{ !isEmailVisible ? '邮箱登录' : '用户名登录' }}</a-button>
+          <a-button
+            v-if="!isEmailVisible" 
+            style="padding: 0; font-size: 12px;"
             type="link"
             size="small" 
             @click="isRegister = !isRegister">前往{{ !isRegister ? '注册' : '登录' }}</a-button>
@@ -59,7 +96,9 @@ export default {
       loginForm: {
         username: '',
         password: '',
-        code: ''
+        code: '',
+        email: '',
+        emailCode: ''
       },
       loginRules: {
         username: [
@@ -71,12 +110,23 @@ export default {
           { min: 5, max: 16, message: 'Length should be 5 to 16', trigger: 'blur' }
         ],
         code: [
-          { required: true, message: 'Please input username', trigger: 'blur' },
+          { required: true, message: 'Please input code', trigger: 'blur' },
+          { min: 4, max: 4, message: 'Length should be 4', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: 'Please input email', type: 'email', trigger: 'blur' },
+          { pattern: /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/, message: 'email is not valid' }
+        ],
+        emailCode: [
+          { required: true, message: 'Please input emailCode', trigger: 'blur' },
           { min: 4, max: 4, message: 'Length should be 4', trigger: 'blur' }
         ],
       },
       isRegister: false,
-      codeImage: ""
+      codeImage: "",
+      countdown: null,
+      sendLoading: false,
+      isEmailVisible: false
     }
   },
 
@@ -90,13 +140,20 @@ export default {
       this.codeImage = data
     },
 
+    /**
+     * username or email login
+     */
     submituserInfo () {
       this.$refs.loginForm.validate(async value => {
         if (value) {
           try {
             const API = this.isRegister ? '/users/registeruser' : '/users/login'
             const aesPublicKey = (await this.$axios.get('/api/v1/unit/getpublickey')).data
-            const { data } = await this.$axios.post(`/api/v1${API}`, {
+            const { data } = await this.$axios.post(`/api/v1${API}`, this.isEmailVisible ? {
+              email: this.loginForm.email,
+              code: this.loginForm.emailCode,
+              emailLogin: true
+            } : {
               ...this.loginForm,
               password: encrypt(this.loginForm.password, aesPublicKey.aesKey, aesPublicKey.aesIv)
             })
@@ -117,75 +174,31 @@ export default {
           }
         }
       })
+    },
+
+    /**
+     * send email
+     */
+    async sendEmail () {
+      const REG_EMAIL = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
+      if (!REG_EMAIL.test(this.loginForm.email)) {
+        return this.$message.info('邮箱格式不正确')
+      }
+      this.sendLoading = true
+      try {
+        await this.$axios.get(`/api/v1/unit/emailcode?email=${this.loginForm.email}`)
+        this.countdown = 60
+        this.countdownTimer = setInterval(() => {
+          this.countdown--
+          if (this.countdown === 0) {
+            this.countdown = null
+            clearInterval(this.countdownTimer)
+          }
+        }, 1000)
+      } catch (error) {} finally {
+        this.sendLoading = false
+      }
     }
   }
 }
 </script>
-
-<style lang="less">
-.login-wrapper {
-  position: fixed;
-  background: rgba(0,0,0,.3);
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  .modal {
-    padding: 30px;
-    background: #fff;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left: -160px;
-    width: 320px;
-    margin-top: -200px;
-    box-shadow: 0 0 6px 3px rgba(0,0,0,.1);
-    .anticon-close {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      font-size: 14px;
-      opacity: .8;
-      cursor: pointer;
-    }
-    h3 {
-      font-weight: bold;
-      color: #252933;
-      font-size: 16px;
-      padding-bottom: 20px;
-    }
-    .ant-form-horizontal {
-      .ant-form-item {
-        margin-bottom: 12px;
-        &:nth-of-type(3) {
-          margin-bottom: 6px;
-          .ant-form-item-control {
-            line-height: normal;
-          }
-        }
-        .ant-form-item-children {
-          display: flex;
-          align-items: center;
-          .code-input {
-            width: 110px;
-            margin-right: 10px;
-          }
-        }
-      }
-      .ant-btn-block {
-        font-size: 14px;
-        margin-top: 10px;
-      }
-      .tip {
-        margin-top: 20px;
-        font-size: 12px;
-        color: #999;
-        span {
-          color: #2080f7;
-        }
-      }
-    }
-  }
-}
-</style>

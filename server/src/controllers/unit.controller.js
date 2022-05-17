@@ -1,7 +1,6 @@
 const captcha = require('svg-captcha')
 const { newRandomId } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
-const UserModel = require('@/models/user.model')
 const sendEmail = require('@/utils/email.util')
 const { setexAsync, getAsync } = require('@/redis')
 
@@ -69,10 +68,6 @@ class UnitController {
         return JsonResult.fail({ req, response, message: '频繁操作，请在一分钟后再次发送！' })
       }
       const code = String(Math.floor(Math.random() * 1000) + 4000)
-      const exist = await UserModel.findOne({ email })
-      if (exist) {
-        return JsonResult.fail({ req, response, message: '邮箱已经被注册' })
-      }
       await setexAsync(email, 60 * 30, code)
       await setexAsync(`${email}-expires`, 60, code)
       await sendEmail(email, code)
