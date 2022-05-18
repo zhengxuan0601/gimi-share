@@ -2,7 +2,7 @@ const captcha = require('svg-captcha')
 const { newRandomId } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
 const sendEmail = require('@/utils/email.util')
-const { setexAsync, getAsync } = require('@/redis')
+const { setexAsync } = require('@/redis')
 
 class UnitController {
   /**
@@ -63,13 +63,13 @@ class UnitController {
    */
   async sendEmailCode (req, response) {
     try {
-      const email = req.query.email
-      if (await getAsync(`${email}-expires`)) {
+      if (req.session.sendEmailCD) {
         return JsonResult.fail({ req, response, message: '频繁操作，请在一分钟后再次发送！' })
       }
+      const email = req.query.email
       const code = String(Math.floor(Math.random() * 1000) + 4000)
       await setexAsync(email, 60 * 30, code)
-      await setexAsync(`${email}-expires`, 60, code)
+      req.session.sendEmailCD = true
       await sendEmail(email, code)
       JsonResult.success({
         req,

@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 const unitController = require('@/controllers/unit.controller')
-const handlerValidate = require('@/middleware/handlerValidate.middleware')
 
 /**
  * 获取验证码
@@ -29,6 +28,6 @@ router.get('/getpublickey', unitController.getPublicKey)
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
  */
-router.get('/emailcode', handlerValidate(unitController.sendEmailCode))
+router.get('/emailcode', unitController.sendEmailCode)
 
 module.exports = router
