@@ -63,10 +63,11 @@
         <mavon-editor 
           :value="articleDetail.content"
           class="md"
-          :subfield = "false"
-          :default-open = "'preview'"
-          :toolbars-flag = "false"
+          :subfield="false"
+          default-open="preview"
+          :toolbars-flag="false"
           :editable="false"
+          :image-click="imagePreview"
           style="padding:20px">
         </mavon-editor>
         <div class="article-tag">
@@ -197,6 +198,11 @@ export default {
 
     generateHistory () {
       this.$axios.post('/api/v1/history/generate', { uid: this.articleDetail.userId, articleId: this.articleDetail.id })
+    },
+
+    imagePreview (e) {
+      const img = e.getAttribute('src')
+      this.$store.commit('UPDATE_PREVIEW_IMGSRC', img)
     }
   }
 }
@@ -368,6 +374,9 @@ export default {
   }
   h5 {
     font-size: 15px;
+  }
+  img {
+    max-width: 40%;
   }
 }
 </style>

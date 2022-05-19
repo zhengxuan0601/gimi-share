@@ -124,12 +124,6 @@
             </div>
           </div>
         </div>
-         <a-modal 
-          :visible="previewVisible" 
-          :footer="null" 
-          @cancel="previewVisible = false">
-          <img alt="example" style="width: 100%" :src="previewImage" />
-        </a-modal>
       </div>
     </client-only>
   </div>
@@ -165,9 +159,7 @@ export default {
         pageSize: 10,
         total: 0
       },
-      loading: true,
-      previewVisible: false,
-      previewImage: null
+      loading: true
     }
   },
 
@@ -242,8 +234,7 @@ export default {
     },
 
     handlePreview (file) {
-      this.previewImage = file.url
-      this.previewVisible = true
+      this.$store.commit('UPDATE_PREVIEW_IMGSRC', file.url)
     }
   }
 }

@@ -2,7 +2,8 @@ export const state = () => {
   return {
     loginModalVisible: false,
     userInfo: "",
-    notifyCount: 0
+    notifyCount: 0,
+    previewImgSrc: null
   }
 }
 
@@ -17,6 +18,10 @@ export const mutations = {
 
   UPDATE_NOTIFY_COUNT (state, notifyCount) {
     state.notifyCount = notifyCount
+  },
+
+  UPDATE_PREVIEW_IMGSRC (state, previewImgSrc) {
+    state.previewImgSrc = previewImgSrc
   }
 }
 

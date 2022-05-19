@@ -10,6 +10,7 @@
         <div class="nav-menu">
           <nuxt-link to="/">首页</nuxt-link>
           <nuxt-link to="/sharecircle">友圈</nuxt-link>
+          <nuxt-link to="/feedback">反馈</nuxt-link>
         </div>
         <div class="right-operate">
           <div class="search-model">
@@ -56,6 +57,12 @@
     </section>
     <LoginModal
       v-if="loginModalVisible" />
+    <a-modal 
+      :visible="!!previewImgSrc" 
+      :footer="null" 
+      @cancel="$store.commit('UPDATE_PREVIEW_IMGSRC', null)">
+      <img alt="example" style="width: 100%" :src="previewImgSrc" />
+    </a-modal>
   </div>
 </template>
 
@@ -68,7 +75,8 @@ export default {
     ...mapState({
       loginModalVisible: state => state.loginModalVisible,
       userInfo: state => state.userInfo,
-      notifyCount: state => state.notifyCount
+      notifyCount: state => state.notifyCount,
+      previewImgSrc: state => state.previewImgSrc
     })
   },
 
@@ -194,6 +202,7 @@ export default {
             width: 100%;
             height: 100%;
             display: block;
+            object-fit: cover;
           }
         }
       }
