@@ -116,5 +116,8 @@ export default {
 <style lang="less" scoped>
 .home-index-page {
   margin-top: 20px;
+  .articlelist-content {
+    width: 708px;
+  }
 }
 </style>

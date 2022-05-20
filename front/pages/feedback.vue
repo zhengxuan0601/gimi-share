@@ -6,29 +6,10 @@
           <a-skeleton :paragraph="{ rows: 6 }" active :title="{ width: 160 }" />
         </div>
       </div>
-      <div class="edit-markdown-block">
-        <div class="left-avatar">
-          <img :src="userInfo ? userInfo.avatar || require('~/assets/images/default.png') : require('~/assets/images/default.svg')" alt="avatar">
-        </div>
-        <div class="mavon-edit">
-          <mavon-editor 
-            ref='md'
-            v-model="content"
-            toolbars-background="#f6f8fa"
-            :toolbars="toolbars" 
-            :tab-size="4"
-            :subfield="false"
-            placeholder="留下你宝贵的意见吧^^（最少输入20个字符）"
-            :box-shadow="false"
-            @imgAdd="uploadImageServer">
-          </mavon-editor>
-        </div>
-        <div class="bottom-operate">
-          <a-button 
-            :disabled="content.length < 20"
-            type="primary" 
-            @click="submitFeedback">提交反馈</a-button>
-        </div>
+      <div style="margin-bottom: 30px; padding: 30px 10px 10px; background:#fff;">
+        <FeedbackSubmitModal 
+          :user-info="userInfo"
+          @success="pagination.pageNo = 1; findFeedbackList()" />
       </div>
       <div v-if="pagination.list.length" class="feedback-list-modal">
         <div v-for="item in pagination.list" :key="item.id" class="feedbak-block">
@@ -42,22 +23,21 @@
                 <span>发布于{{ cycleDate(item.createTime) }}</span>
               </div>
               <div>
-                <a-popover trigger="click" placement="top">
+                <a-popover placement="top">
                   <template slot="content">
                     <div class="emoji-popover">
-                      <p>👍</p>
-                      <p>👎</p>
-                      <p>🎉</p>
-                      <p>❤️</p>
-                      <p>🚀</p>
-                      <p>👀</p>
+                      <p :class="{ active: item.isLiker }" @click="submitAttitude(item, '1', 'isLiker', 'likeCount')">👍</p>
+                      <p :class="{ active: item.isDisliker }" @click="submitAttitude(item, '2', 'isDisliker', 'dislikeCount')">👎</p>
+                      <p :class="{ active: item.isGifter }" @click="submitAttitude(item, '3', 'isGifter', 'giftCount')">🎉</p>
+                      <p :class="{ active: item.isHearter }" @click="submitAttitude(item, '4', 'isHearter', 'heartCount')">❤️</p>
+                      <p :class="{ active: item.isRocketer }" @click="submitAttitude(item, '5', 'isRocketer', 'rocketCount')">🚀</p>
+                      <p :class="{ active: item.isViewer }" @click="submitAttitude(item, '6', 'isViewer', 'viewCount')">👀</p>
                     </div>
                   </template>
                   <a-icon type="smile" />
                 </a-popover>
                 <a-popover 
                   v-if="userInfo.id === item.userId" 
-                  trigger="click" 
                   placement="bottom">
                   <template slot="content">
                     <p style="font-size: 12px; padding: 8px 20px; cursor: pointer;" @click="deleteFeedback(item.id)">删除</p>
@@ -78,6 +58,33 @@
                 :image-click="imagePreview"
                 style="padding:20px">
               </mavon-editor>
+              <div 
+                v-show="item.likeCount 
+                  || item.dislikeCount 
+                  || item.giftCount 
+                  || item.heartCount 
+                  || item.rocketCount 
+                  || item.viewCount" class="attitude-count">
+                <a-popover placement="top">
+                  <template slot="content">
+                    <div class="emoji-popover">
+                      <p :class="{ active: item.isLiker }" @click="submitAttitude(item, '1', 'isLiker', 'likeCount')">👍</p>
+                      <p :class="{ active: item.isDisliker }" @click="submitAttitude(item, '2', 'isDisliker', 'dislikeCount')">👎</p>
+                      <p :class="{ active: item.isGifter }" @click="submitAttitude(item, '3', 'isGifter', 'giftCount')">🎉</p>
+                      <p :class="{ active: item.isHearter }" @click="submitAttitude(item, '4', 'isHearter', 'heartCount')">❤️</p>
+                      <p :class="{ active: item.isRocketer }" @click="submitAttitude(item, '5', 'isRocketer', 'rocketCount')">🚀</p>
+                      <p :class="{ active: item.isViewer }" @click="submitAttitude(item, '6', 'isViewer', 'viewCount')">👀</p>
+                    </div>
+                  </template>
+                  <a-icon type="smile" />
+                </a-popover>
+                <p v-if="item.likeCount" :class="{ active: item.isLiker }" @click="submitAttitude(item, '1', 'isLiker', 'likeCount')">👍<span>{{ item.likeCount }}</span></p>
+                <p v-if="item.dislikeCount" :class="{ active: item.isDisliker }" @click="submitAttitude(item, '2', 'isDisliker', 'dislikeCount')">👎<span>{{ item.dislikeCount }}</span></p>
+                <p v-if="item.giftCount" :class="{ active: item.isGifter }" @click="submitAttitude(item, '3', 'isGifter', 'giftCount')">🎉<span>{{ item.giftCount }}</span></p>
+                <p v-if="item.heartCount" :class="{ active: item.isHearter }" @click="submitAttitude(item, '4', 'isHearter', 'heartCount')">❤️<span>{{ item.heartCount }}</span></p>
+                <p v-if="item.rocketCount" :class="{ active: item.isRocketer }" @click="submitAttitude(item, '5', 'isRocketer', 'rocketCount')">🚀<span>{{ item.rocketCount }}</span></p>
+                <p v-if="item.viewCount" :class="{ active: item.isViewer }" @click="submitAttitude(item, '6', 'isViewer', 'viewCount')">👀<span>{{ item.viewCount }}</span></p>
+              </div>
             </div>
           </div>
         </div>
@@ -87,46 +94,23 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapState } from 'vuex'
 import { cycleDate } from '@/util'
+import FeedbackSubmitModal from '@/components/FeedbackSubmitModal'
 export default {
   name: 'FeedBack',
+  components: { FeedbackSubmitModal },
   layout: 'BaseLayout',
   data () {
     return {
       cycleDate,
-      content: '',
-      toolbars: {
-        bold: true,
-        italic: true,
-        header: true,
-        underline: true,
-        mark: true,
-        superscript: true,
-        quote: true, 
-        ol: true, 
-        ul: true,
-        link: true,
-        imagelink: true,
-        help: false,
-        code: true,
-        table: true,
-        htmlcode: false,
-        fullscreen: false,
-        readmodel: false, 
-        undo: true,
-        trash: false, 
-        save: false,
-        navigation: false,
-        preview: true
-      },
       pagination: {
         pageNo: 1,
         pageSize: 20,
         list: [],
         total: 0
-      }
+      },
+      attitudeLoading: false
     }
   },
 
@@ -147,22 +131,6 @@ export default {
   },
 
   methods: {
-    /**
-     * user submit feedback
-     */
-    async submitFeedback () {
-      if (!this.userInfo) {
-        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
-      }
-      try {
-        await this.$axios.post('/api/v1/feedbacks/create', { content: this.content })
-        this.$message.success('提交反馈成功')
-        this.content = ''
-        this.pagination.pageNo = 1
-        this.findFeedbackList()
-      } catch (error) {}
-    },
-
     /**
      * find feedback list bu page
      */
@@ -190,19 +158,31 @@ export default {
       } catch (error) {}
     },
 
-    uploadImageServer (pos, $file) {
-      const formdata = new FormData();
-      formdata.append('file', $file);
-      axios({
-        url: 'https://zdxblog.cn/upload/uploadFile',
-        method: 'post',
-        data: formdata,
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }).then(data => {
-        this.$refs.md.$img2Url(pos, data.data.data)
-      }).catch(() => {
-        this.$message.error('上传图片失败，请重新上传')
-      })
+    /**
+     * user feedback attitude update
+     * @param { Object } feedbackItem
+     * @param { String } itemType
+     * @param { String } attitudeState
+     * @param { String } countfiled
+     */
+    async submitAttitude (feedbackItem, itemType, attitudeState, countfiled) {
+      if (!this.userInfo) {
+        return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
+      }
+      if (this.attitudeLoading) return
+      this.attitudeLoading = true
+      try {
+        const API = feedbackItem[attitudeState] ? '/api/v1/feedbacks/attitude/cancel' : '/api/v1/feedbacks/attitude/increase'
+        await this.$axios.get(`${API}?feedbackId=${feedbackItem.id}&itemType=${itemType}`)
+        if (feedbackItem[attitudeState]) {
+          feedbackItem[countfiled] -= 1
+        } else {
+          feedbackItem[countfiled] += 1
+        }
+        feedbackItem[attitudeState] = !feedbackItem[attitudeState]
+      } catch (error) {} finally {
+        this.attitudeLoading = false
+      }
     },
 
     imagePreview (e) {
@@ -216,81 +196,6 @@ export default {
 .feedback-page {
   padding: 30px 50px;
   border-radius: 4px;
-  .edit-markdown-block {
-    margin-bottom: 30px;
-    display: flex;
-    background: #fff;
-    padding: 50px 30px 30px;
-    border-radius: 6px;
-    flex-wrap: wrap;
-    .left-avatar {
-      width: 40px;
-      height: 40px;
-      overflow: hidden;
-      display: block;
-      border-radius: 50%;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-    }
-    .mavon-edit {
-      width: 0;
-      flex: 1;
-      margin-left: 20px;
-      position: relative;
-      ::v-deep .v-note-wrapper {
-        border: 1px solid #d0d7de;
-        min-height: 200px;
-        z-index: 99;
-        .v-note-op {
-          border-bottom: 1px solid #d0d7de;
-        }
-        .v-note-panel {
-          .v-note-edit.divarea-wrapper.single-edit {
-            max-height: 300px;
-          }
-        }
-      }
-      &:after {
-        content: "";
-        position: absolute;
-        top: 11px;
-        right: 100%;
-        left: -8px;
-        display: block;
-        width: 8px;
-        height: 16px;
-        pointer-events: none;
-        -webkit-clip-path: polygon(0 50%, 100% 0, 100% 100%);
-        clip-path: polygon(0 50%, 100% 0, 100% 100%);
-        background-color: #d0d7de;
-      }
-      &:before {
-        content: '';
-        position: absolute;
-        top: 11px;
-        right: 100%;
-        left: -8px;
-        display: block;
-        width: 8px;
-        height: 16px;
-        pointer-events: none;
-        -webkit-clip-path: polygon(0 50%, 100% 0, 100% 100%);
-        clip-path: polygon(0 50%, 100% 0, 100% 100%);
-        background-color: #f6f8fa;
-        z-index: 100;
-        margin-left: 2px;
-      }
-    }
-    .bottom-operate {
-      width: 100%;
-      margin-top: 30px;
-      text-align: right;
-    }
-  }
   .feedback-list-modal {
     background: #fff;
     padding: 50px 30px 30px;
@@ -409,6 +314,35 @@ export default {
               left: 0;
               width: 100%;
               height: 100vh;
+            }
+          }
+          .attitude-count {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            i {
+              cursor: pointer;
+              font-size: 16px;
+            }
+            p {
+              color: #24292f;
+              font-size: 12px;
+              margin-left: 12px;
+              border: 1px solid #f1f1f1;
+              padding: 2px 10px 3px;
+              border-radius: 12px;
+              cursor: pointer;
+              &.active {
+                background: #ebfbf2;
+                border-color: #a3fec1;
+                span {
+                  color: #3fb867;
+                }
+              }
+              span {
+                margin-left: 4px;
+                color: #999;
+              }
             }
           }
         }

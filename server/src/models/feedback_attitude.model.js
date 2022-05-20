@@ -12,7 +12,7 @@ class FeedbackAttitudeModel {
    * @param {*} feedbackId
    * @param {*} itemType
    */
-  async add (userId, feedbackId, itemType) {
+  async add ({ userId, feedbackId, itemType }) {
     try {
       const sql = `INSERT INTO ${this.tableName} (userId, feedbackId, itemType)
       
@@ -51,7 +51,7 @@ class FeedbackAttitudeModel {
     try {
       const { columnSet, values } = multipleColumnSet(param, ' AND ')
 
-      const sql = `DELETE ${this.tableName} WHERE ${columnSet}`
+      const sql = `DELETE FROM ${this.tableName} WHERE ${columnSet}`
 
       await db.query(sql, values)
     } catch (error) {

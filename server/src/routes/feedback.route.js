@@ -42,4 +42,26 @@ router.post('/create', auth(), createFeedbackSchema, handlerValidate(feedbackCon
  */
 router.get('/delete', auth(), feedbackController.deleteFeedback)
 
+/**
+ * 用户提交反馈信息态度
+ * @route GET /feedbacks/attitude/increase
+ * @group 反馈管理
+ * @param {string} feedbackId.query.required
+ * @param {string} itemType.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/attitude/increase', auth(), feedbackController.increaseAttitude)
+
+/**
+ * 用户取消反馈信息态度
+ * @route GET /feedbacks/attitude/cancel
+ * @group 反馈管理
+ * @param {string} feedbackId.query.required
+ * @param {string} itemType.query.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/attitude/cancel', auth(), feedbackController.cancelAttitude)
+
 module.exports = router

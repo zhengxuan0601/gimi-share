@@ -67,7 +67,7 @@ class UnitController {
         return JsonResult.fail({ req, response, message: '频繁操作，请在一分钟后再次发送！' })
       }
       const email = req.query.email
-      const code = String(Math.floor(Math.random() * 1000) + 4000)
+      const code = String(Math.floor(Math.random() * 3000) + 3000)
       await setexAsync(email, 60 * 30, code)
       req.session.sendEmailCD = true
       await sendEmail(email, code)

@@ -63,6 +63,14 @@
       @cancel="$store.commit('UPDATE_PREVIEW_IMGSRC', null)">
       <img alt="example" style="width: 100%" :src="previewImgSrc" />
     </a-modal>
+    <div class="fixed-operate-block">
+      <a-back-top>
+        <div class="ant-back-top-inner"><span class="iconfont icon-arrow-to-top"></span></div>
+      </a-back-top>
+      <nuxt-link class="feedback-submit-block" to="/feedback" target="_blank">
+        <span class="icon-pinglun iconfont"></span>
+      </nuxt-link>
+    </div>
   </div>
 </template>
 
@@ -213,6 +221,30 @@ export default {
     flex: 1;
     height: 0;
   }
+  .fixed-operate-block {
+    position: fixed;
+    right: 30px;
+    bottom: 20px;
+    .ant-back-top {
+      position: static
+    }
+    .feedback-submit-block, .ant-back-top-inner {
+      height: 40px;
+      width: 40px;
+      line-height: 40px;
+      border-radius: 4px;
+      background-color: @primary-color;
+      color: #fff;
+      text-align: center;
+      font-size: 20px;
+      border-radius: 50%;
+      opacity: .8;
+      margin-top: 20px;
+      display: block;
+      .icon-arrow-to-top {
+        font-weight: bold;
+      }
+    }
+  }
 }
-
 </style>
