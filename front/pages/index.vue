@@ -44,6 +44,12 @@
           </div> 
         </div> 
       </div>
+      <div class="right-message">
+        <div class="tip">
+          <p><i class="iconfont icon-wenhouyin"></i>下午好！我亲爱的朋友。</p>
+          <span>愿你心情愉悦，笑口常开！</span>
+        </div>
+      </div>
     </client-only>
   </div>
 </template>
@@ -118,6 +124,32 @@ export default {
   margin-top: 20px;
   .articlelist-content {
     width: 708px;
+  }
+  .right-message {
+    position: fixed;
+    top: 80px;
+    margin-left: 736px;
+    width: 240px;
+    .tip {
+      background: #fff;
+      padding: 16px;
+      p {
+        color: #4bd5d5;
+        font-weight: bold;
+        i {
+          font-size: 24px;
+          font-weight: normal;
+          vertical-align: middle;
+          margin-right: 10px;
+        }
+      }
+      span {
+        font-size: 12px;
+        color: #4c4c4c;
+        display: inline-block;
+        padding-left: 38px;
+      }
+    }
   }
 }
 </style>
