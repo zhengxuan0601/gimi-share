@@ -40,7 +40,7 @@ class FeedbackController {
   async findList (req, response) {
     try {
       const { pageNo = 1, pageSize = 20 } = req.query
-      const sessionId = await getSessionuserId()
+      const sessionId = await getSessionuserId(req)
       const data = await FeedbackModel.find({ pageNo, pageSize }, sessionId)
       JsonResult.success({
         req,

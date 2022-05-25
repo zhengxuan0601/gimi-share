@@ -11,11 +11,12 @@
           description="空空如也" 
           :image="require('@/assets/images/nodata.png')" /></div>
       <div v-else>
-        <div
+        <nuxt-link
           v-for="item in articleList" 
           :key="item.id" 
           class="model" 
-          @click="$router.push('/post/' + item.id)">
+          target="_blank"
+          :to="`/post/${item.id}`">
           <div class="l">
             <div class="user-info">
               <p @click.stop><nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
@@ -51,7 +52,7 @@
               <a-icon type="more" />
             </div>
           </a-popover>
-        </div>  
+        </nuxt-link>  
       </div>
     </client-only>
   </div>

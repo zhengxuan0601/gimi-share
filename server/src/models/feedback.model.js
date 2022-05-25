@@ -17,17 +17,17 @@ class FeedbackModel {
 
       const sql = `SELECT ${this.tableName}.*, user.avatar, user.nickname,
 
-        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = ${sessionId} AND fa.itemType = '1') AS isLiker,
+        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = '${sessionId}' AND fa.itemType = '1') AS isLiker,
 
-        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = ${sessionId} AND fa.itemType = '2') AS isDisliker,
+        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = '${sessionId}' AND fa.itemType = '2') AS isDisliker,
 
-        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = ${sessionId} AND fa.itemType = '3') AS isGifter,
+        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = '${sessionId}' AND fa.itemType = '3') AS isGifter,
 
-        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = ${sessionId} AND fa.itemType = '4') AS isHearter,
+        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = '${sessionId}' AND fa.itemType = '4') AS isHearter,
 
-        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = ${sessionId} AND fa.itemType = '5') AS isRocketer,
+        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = '${sessionId}' AND fa.itemType = '5') AS isRocketer,
 
-        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = ${sessionId} AND fa.itemType = '6') AS isViewer
+        (SELECT fa.userId FROM feedback_attitude AS fa WHERE fa.feedbackId = ${this.tableName}.id AND fa.userId = '${sessionId}' AND fa.itemType = '6') AS isViewer
       
         FROM ${this.tableName} LEFT JOIN user ON user.id = ${this.tableName}.userId
         

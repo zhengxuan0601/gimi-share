@@ -5,7 +5,7 @@
     </div>
     <div class="mavon-edit">
       <mavon-editor 
-        ref='md'
+        ref='feedback-md'
         v-model="content"
         toolbars-background="#f6f8fa"
         :toolbars="toolbars" 
@@ -91,7 +91,7 @@ export default {
         data: formdata,
         headers: { 'Content-Type': 'multipart/form-data' },
       }).then(data => {
-        this.$refs.md.$img2Url(pos, data.data.data)
+        this.$refs['feedback-md'].$img2Url(pos, data.data.data)
       }).catch(() => {
         this.$message.error('上传图片失败，请重新上传')
       })
@@ -128,7 +128,7 @@ export default {
     ::v-deep .v-note-wrapper {
       border: 1px solid #d0d7de;
       min-height: 200px;
-      z-index: 99;
+      z-index: 99 !important;
       .v-note-op {
         border-bottom: 1px solid #d0d7de;
       }
@@ -166,7 +166,7 @@ export default {
       clip-path: polygon(0 50%, 100% 0, 100% 100%);
       background-color: #f6f8fa;
       z-index: 100;
-      margin-left: 2px;
+      margin-left: 1px;
     }
   }
   .bottom-operate {

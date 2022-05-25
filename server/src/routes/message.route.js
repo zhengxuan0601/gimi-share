@@ -27,6 +27,7 @@ router.post('/', auth(), messageController.findMessageList)
  * @group 消息管理
  * @returns {object} 200
  * @returns {Error}  default - Unexpected error
+ * @security JWT
  */
 router.get('/count', auth(), messageController.findNoReadTotal)
 

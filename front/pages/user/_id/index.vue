@@ -22,9 +22,10 @@
               <span>{{ userNickname }}</span>
               {{ item.type === '1' ? '发布' : item.type === '2' ? '赞' : '收藏' }}了这篇文章
             </div>
-            <div
+            <nuxt-link
               class="model"
-              @click="$router.push(`/post/${item.articleId}`)">
+              target="_blank"
+              :to="`/post/${item.articleId}`">
               <div class="l">
                 <div class="user-info">
                   <p @click.stop><nuxt-link :to="`/user/${item.pointInfo.userId}`">{{ item.pointInfo.nickname }}</nuxt-link></p>
@@ -52,7 +53,7 @@
               <div v-if="item.pointInfo.coverImage" class="r">
                 <img :src="item.pointInfo.coverImage" alt="cover-image">
               </div>
-            </div> 
+            </nuxt-link> 
           </div>
 
           <!-- 友圈模块展示 -->

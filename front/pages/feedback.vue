@@ -276,7 +276,7 @@ export default {
             clip-path: polygon(0 50%, 100% 0, 100% 100%);
             background-color: #f6f8fa;
             z-index: 2;
-            margin-left: 2px;
+            margin-left: 1px;
           }
         }
         .feed-block {

@@ -128,6 +128,30 @@ class UserModel {
       throw new Error(error)
     }
   }
+
+  /**
+   * find user rank by article counts
+   * @param {*} pageNo
+   * @param {*} pageSize
+   * @returns
+   */
+  async findUserArticleRank (pageNo, pageSize) {
+    try {
+      const sql = `SELECT t.id, t.nickname, t.avatar, t.job
+      
+        FROM ${this.tableName} AS t 
+        
+        ORDER BY (SELECT COUNT(*) FROM article AS a WHERE a.userId = t.id) DESC 
+        
+        LIMIT ${pageSize * (pageNo - 1)}, ${pageSize}`
+
+      const list = await db.query(sql)
+
+      return list
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
 }
 
 module.exports = new UserModel()

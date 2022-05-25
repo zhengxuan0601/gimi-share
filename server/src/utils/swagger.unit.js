@@ -20,7 +20,7 @@ const options = {
         type: 'apiKey',
         in: 'header',
         name: 'accessToken',
-        description: ''
+        description: '回话信息'
       }
     }
   },
