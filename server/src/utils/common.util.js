@@ -2,6 +2,16 @@ const jwt = require('jsonwebtoken')
 const cryptoJs = require('crypto-js')
 const trash = require('@/utils/ini.unit')
 
+function removeProperty (obj) {
+  Object.keys(obj).forEach(item => {
+    if (obj[item] === '' ||
+      obj[item] === undefined ||
+      obj[item] === null ||
+      obj[item] === 'null') delete obj[item]
+  })
+  return obj
+}
+
 /**
  * 查询条件sql拼接
  * @param {*} object
@@ -11,8 +21,9 @@ exports.multipleColumnSet = (object, joinstr) => {
   if (typeof object !== 'object') {
     throw new Error('Invalid input')
   }
-  const keys = Object.keys(object)
-  const values = Object.values(object)
+  const o = removeProperty(object)
+  const keys = Object.keys(o)
+  const values = Object.values(o)
   const columnSet = keys.map(key => `${key} = ?`).join(joinstr || ', ')
 
   return {

@@ -28,9 +28,11 @@
               :to="`/post/${item.articleId}`">
               <div class="l">
                 <div class="user-info">
-                  <p @click.stop><nuxt-link :to="`/user/${item.pointInfo.userId}`">{{ item.pointInfo.nickname }}</nuxt-link></p>
+                  <p @click.stop><nuxt-link target="_blank" :to="`/user/${item.pointInfo.userId}`">{{ item.pointInfo.nickname }}</nuxt-link></p>
                   <p>{{ cycleDate(item.pointInfo.createTime) }}</p>
-                  <p>{{ categoryMap[item.pointInfo.category] }}</p>
+                  <p>
+                    <em v-for="itemName in item.pointInfo.tag.split(';')" :key="itemName">{{ tagMap[itemName] }}</em>
+                  </p>
                 </div>
                 <p class="article-title">{{ item.pointInfo.articleTitle }}</p>
                 <p class="article-desc">{{ item.pointInfo.description }}</p>
@@ -67,13 +69,13 @@
               class="share-block">
               <div class="top">
                 <div class="left-avatar">
-                  <nuxt-link :to="`/user/${item.pointInfo.userId}`">
+                  <nuxt-link target="_blank" :to="`/user/${item.pointInfo.userId}`">
                     <img :src="item.pointInfo.avatar || require('~/assets/images/default.png')" alt="avatar">
                   </nuxt-link>
                 </div>
                 <div class="right-info">
                   <p class="nickname">
-                    <nuxt-link :to="`/user/${item.pointInfo.userId}`">{{ item.pointInfo.nickname }}</nuxt-link>
+                    <nuxt-link target="_blank" :to="`/user/${item.pointInfo.userId}`">{{ item.pointInfo.nickname }}</nuxt-link>
                   </p>
                   <p class="desc"><span v-if="item.pointInfo.job">{{ item.pointInfo.job }} · </span>{{ cycleDate(item.pointInfo.createTime) }}</p>
                   <p class="share-info">{{ item.pointInfo.content }}</p>
@@ -133,7 +135,7 @@
 <script>
 import { mapState } from 'vuex'
 import { cycleDate } from '~/util'
-import { categoryMap } from '~/config/optionMap'
+import { tagMap } from '~/config/optionMap'
 export default {
   name: 'UserDynamic',
   props: {
@@ -153,7 +155,7 @@ export default {
   data () {
     return {
       cycleDate,
-      categoryMap,
+      tagMap,
       pagination: {
         list: [],
         pageNo: 1,

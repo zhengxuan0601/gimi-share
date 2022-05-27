@@ -18,21 +18,37 @@
                 :label-col="{ span: 6 }" 
                 :wrapper-col="{ span: 18 }">
                 <a-form-model-item label="文章分类" prop="category">
-                  <a-radio-group v-model="articleInfo.category">
-                    <a-radio 
+                  <a-select v-model="articleInfo.category" placeholder="请选择分类">
+                    <a-select-option 
                       v-for="item in categoryOption" 
                       :key="item.value" 
-                      :value="item.value">{{ item.label }}</a-radio>
-                  </a-radio-group>
+                      :value="item.value">
+                      {{ item.label }}
+                    </a-select-option>
+                  </a-select>
                 </a-form-model-item>
-                <a-form-model-item label="关键字" prop="tag">
-                  <a-input v-model="articleInfo.tag" placeholder="输入关键字，用;进行分隔" />
+                <a-form-model-item label="标签" prop="tag">
+                  <a-select 
+                    v-model="articleInfo.tag" 
+                    mode="multiple"
+                    show-arrow
+                    allow-clear
+                    :show-search="false"
+                    placeholder="请选择标签">
+                    <a-select-option 
+                      v-for="item in tagOptions.filter(i => i.pid === articleInfo.category)"
+                      :key="item.value" 
+                      :disabled="articleInfo.tag && articleInfo.tag.length > 1" 
+                      :value="item.value">
+                      {{ item.label }}
+                    </a-select-option>
+                  </a-select>
                 </a-form-model-item>
                 <a-form-model-item label="文章封面" style="margin-bottom: 0">
                   <a-upload
                     name="file"
                     list-type="picture-card"
-                    class="avatar-uploader"
+                    class="article-cover-uploader"
                     :show-upload-list="false"
                     action="https://zdxblog.cn/upload/uploadFile"
                     @change="handleChange"
@@ -50,12 +66,13 @@
                   <a-textarea v-model="articleInfo.description" placeholder="请输入文章描述" :rows="4" />
                 </a-form-model-item>
                 <a-form-model-item 
-                  style="margin-bottom: 0"
-                  :wrapper-col="{ span: 4, offset: 20 }">
+                  label=" "
+                  :colon="false"
+                  style="margin-bottom: 0;text-align: right;">
                   <a-button
                     :disabled="!articleInfo.articleTitle || !articleInfo.content"
                     type="primary"
-                    @click="saveShareArticle">发布</a-button>
+                    @click="saveShareArticle">确认并发布</a-button>
                 </a-form-model-item>
               </a-form-model>
             </div>
@@ -80,7 +97,7 @@
 
 <script>
 import axios from 'axios'
-import { categoryOption } from '~/config/optionMap'
+import { categoryOption, tagOptions } from '~/config/optionMap'
 import ServerLoading from '~/components/ServerLoading'
 export default {
   name: 'WriteCenter',
@@ -92,15 +109,18 @@ export default {
       return {
         id,
         initTitle: data.articleTitle,
-        articleInfo: data
+        articleInfo: {
+          ...data,
+          tag: data.tag.split(';')
+        }
       }
     } else {
       return {
         articleInfo: {
           articleTitle: '',
           content: '',
-          category: '',
-          tag: '',
+          category: undefined,
+          tag: undefined,
           coverImage: '',
           description: ''
         }
@@ -141,13 +161,14 @@ export default {
           { required: true, message: '请选择文章分类', trigger: 'change' }
         ],
         tag: [
-          { required: true, message: '请输入文章关键字', trigger: 'change' }
+          { required: true, message: '请输入标签', trigger: 'change' }
         ],
         description: [
           { required: true, message: '请输入文章描述', trigger: 'change' }
         ]
       },
-      categoryOption
+      categoryOption,
+      tagOptions
     }
   },
 
@@ -157,13 +178,23 @@ export default {
     }
   },
 
+  watch: {
+    'articleInfo.category' () {
+      this.articleInfo.tag = []
+    }
+  },
+
   methods: {
     saveShareArticle () {
       this.$refs.articleForm.validate(async valid => {
         if (valid) {
            try {
             const API = this.id ? '/api/v1/articles/updatearticle' : '/api/v1/articles/createarticle'
-            await this.$axios.post(API, this.articleInfo)
+            const searchParams = {
+              ...this.articleInfo,
+              tag: this.articleInfo.tag.join(';')
+            }
+            await this.$axios.post(API, searchParams)
             this.$message.success(this.id ? '编辑文章成功' : '发布文章成功')
             this.$router.replace('/')
           } catch (error) {
@@ -268,9 +299,35 @@ export default {
 
 .popover-form {
   width: 400px;
-  padding: 10px;
+  padding: 20px;
   ::v-deep.ant-form-item {
     margin-bottom: 10px;
+  }
+}
+</style>
+
+<style lang="less">
+.article-cover-uploader {
+  & > .ant-upload {
+    width: 128px;
+    height: auto;
+    max-height: 200px;
+    min-height: 65px;
+    .ant-upload {
+      padding: 0;
+      img {
+        width: 100%;
+      }
+      .anticon {
+        font-size: 20px;
+        margin-top: 10px;
+      }
+      .ant-upload-text {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 12px;
+      }
+    }
   }
 }
 </style>

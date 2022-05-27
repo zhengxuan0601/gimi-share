@@ -21,7 +21,9 @@
             <div class="user-info">
               <p @click.stop><nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
               <p>{{ cycleDate(item.createTime) }}</p>
-              <p>{{ categoryMap[item.category] }}</p>
+              <p>
+                <em v-for="itemName in item.tag.split(';')" :key="itemName">{{ tagMap[itemName] }}</em>
+              </p>
             </div>
             <p class="article-title">{{ item.articleTitle }}</p>
             <p class="article-desc">{{ item.description }}</p>
@@ -44,7 +46,7 @@
             placement="bottom">
             <template slot="content">
               <div class="artile-list-operate">
-                <nuxt-link :to="`/writecenter/${item.id}`">编辑</nuxt-link>
+                <nuxt-link target="_blank" :to="`/writecenter/${item.id}`">编辑</nuxt-link>
                 <p @click="deleteArticle(item.id)">删除</p>
               </div>
             </template>
@@ -61,7 +63,7 @@
 <script>
 import { mapState } from 'vuex'
 import { cycleDate } from '~/util'
-import { categoryMap } from '~/config/optionMap'
+import { tagMap } from '~/config/optionMap'
 export default {
   props: {
     articleList: {
@@ -77,7 +79,7 @@ export default {
   data () {
     return {
       cycleDate,
-      categoryMap
+      tagMap
     }
   },
 

@@ -238,12 +238,8 @@ export default {
       text-align: center;
       font-size: 20px;
       border-radius: 50%;
-      opacity: .8;
       margin-top: 20px;
       display: block;
-      .icon-arrow-to-top {
-        font-weight: bold;
-      }
     }
   }
 }

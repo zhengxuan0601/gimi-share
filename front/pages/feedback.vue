@@ -6,20 +6,20 @@
           <a-skeleton :paragraph="{ rows: 6 }" active :title="{ width: 160 }" />
         </div>
       </div>
-      <div style="margin-bottom: 30px; padding: 30px 10px 10px; background:#fff;">
+      <div style="margin-bottom: 30px; padding: 30px 10px 10px; background:#fff; border-radius: 4px;">
         <FeedbackSubmitModal 
           :user-info="userInfo"
           @success="pagination.pageNo = 1; findFeedbackList()" />
       </div>
       <div v-if="pagination.list.length" class="feedback-list-modal">
         <div v-for="item in pagination.list" :key="item.id" class="feedbak-block">
-          <nuxt-link class="left-avatar" :to="`/user/${item.userId}`">
+          <nuxt-link class="left-avatar" target="_blank" :to="`/user/${item.userId}`">
             <img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar">
           </nuxt-link>
           <div class="right-content">
             <div class="feed-title">
               <div>
-                <nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link>
+                <nuxt-link target="_blank" :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link>
                 <span>发布于{{ cycleDate(item.createTime) }}</span>
               </div>
               <div>

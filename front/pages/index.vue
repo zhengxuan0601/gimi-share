@@ -1,85 +1,106 @@
 <template>
-  <div class="home-index-page w-1100">
-    <client-only>
-      <div slot="placeholder">
-        <div style="padding:30px;background:#fff">
-          <a-skeleton :paragraph="{ rows: 6 }" active :title="{ width: 160 }" />
-        </div>
+  <div>
+    <div class="fixed-article-category">
+      <div class="category-tab w-1100">
+        <p 
+          :class="{ active: categoryValue === '' }"
+          @click="updateCategory('')">全部</p>
+        <p 
+          v-for="item in categoryOption"
+          :key="item.value" 
+          :class="{ active: categoryValue === item.value }"
+          @click="updateCategory(item.value)">{{ item.label }}</p>
       </div>
-      <div class="articlelist-content">
-        <div 
-          v-if="!pagination.list.length" 
-          style="padding: 30px 0;">
-          <a-empty 
-            description="空空如也" 
-            :image="require('@/assets/images/nodata.png')" /></div>
-        <div v-else>
-          <nuxt-link
-            v-for="item in pagination.list" 
-            :key="item.id" 
-            class="model" 
-            target="_blank"
-            :to="`/post/${item.id}`">
-            <div class="l">
-              <div class="user-info">
-                <p @click.stop><nuxt-link target="_blank" :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
-                <p>{{ cycleDate(item.createTime) }}</p>
-                <p>{{ categoryMap[item.category] }}</p>
-              </div>
-              <p class="article-title">{{ item.articleTitle }}</p>
-              <p class="article-desc">{{ item.description }}</p>
-              <div class="a-num">
-                <p><a-icon type="eye" /><span v-if="item.viewCounts">{{ item.viewCounts }}</span></p>
-                <p 
-                  :class="{ 'is-liker': item.isLiker }"
-                  @click.stop="isLikeArticle(item)">
-                  <a-icon type="like" />
-                  <span v-if="item.likeCounts">{{ item.likeCounts }}</span>
-                </p>
-                <p><a-icon type="message" /><span v-if="item.commentCounts">{{ item.commentCounts }}</span></p>
-              </div>
-            </div>
-            <div v-if="item.coverImage" class="r">
-              <img :src="item.coverImage" alt="cover-image">
-            </div>
-          </nuxt-link> 
-        </div> 
-      </div>
-      <div class="right-message">
-        <div class="tip">
-          <p><i class="iconfont icon-wenhouyin"></i>下午好！亲爱的{{ userInfo ? userInfo.nickname : '朋友' }}。</p>
-          <span>愿你心情愉悦，笑口常开！</span>
-        </div>
-        <div class="author-rank">
-          <div class="title">
-            <p>🎖️ 作者榜</p>
+    </div>
+    <div class="home-index-page w-1100">
+      <client-only>
+        <div slot="placeholder">
+          <div style="padding:30px;background:#fff">
+            <a-skeleton :paragraph="{ rows: 6 }" active :title="{ width: 160 }" />
           </div>
-          <div class="rank-list">
-            <nuxt-link 
-              v-for="item in userRankList" 
+        </div>
+        <div class="articlelist-content">
+          <div 
+            v-if="requestLoading" 
+            style="padding:20px 30px;background:#fff">
+            <a-skeleton  active :title="{ width: 160 }" />
+          </div>
+          <div 
+            v-if="!pagination.list.length && !requestLoading" 
+            style="padding: 30px 0;">
+            <a-empty 
+              description="空空如也" 
+              :image="require('@/assets/images/nodata.png')" /></div>
+          <div v-if="pagination.list.length && !requestLoading">
+            <nuxt-link
+              v-for="item in pagination.list" 
               :key="item.id" 
+              class="model" 
               target="_blank"
-              :to="`/user/${item.id}`" 
-              class="block">
-              <div class="left-avatar">
-                <img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar">
+              :to="`/post/${item.id}`">
+              <div class="l">
+                <div class="user-info">
+                  <p @click.stop><nuxt-link target="_blank" :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
+                  <p>{{ cycleDate(item.createTime) }}</p>
+                  <p>
+                    <em v-for="itemName in item.tag.split(';')" :key="itemName">{{ tagMap[itemName] }}</em>
+                  </p>
+                </div>
+                <p class="article-title">{{ item.articleTitle }}</p>
+                <p class="article-desc">{{ item.description }}</p>
+                <div class="a-num">
+                  <p><a-icon type="eye" /><span v-if="item.viewCounts">{{ item.viewCounts }}</span></p>
+                  <p 
+                    :class="{ 'is-liker': item.isLiker }"
+                    @click.stop="isLikeArticle(item)">
+                    <a-icon type="like" />
+                    <span v-if="item.likeCounts">{{ item.likeCounts }}</span>
+                  </p>
+                  <p><a-icon type="message" /><span v-if="item.commentCounts">{{ item.commentCounts }}</span></p>
+                </div>
               </div>
-              <div class="right-info">
-                <p>{{ item.nickname }}</p>
-                <span>{{ item.job || '--' }}</span>
+              <div v-if="item.coverImage" class="r">
+                <img :src="item.coverImage" alt="cover-image">
               </div>
-            </nuxt-link>
+            </nuxt-link> 
+          </div> 
+        </div>
+        <div class="right-message">
+          <div class="tip">
+            <p><i class="iconfont icon-wenhouyin"></i>下午好！亲爱的{{ userInfo ? userInfo.nickname : '朋友' }}。</p>
+            <span>愿你心情愉悦，笑口常开！</span>
+          </div>
+          <div class="author-rank">
+            <div class="title">
+              <p>🎖️ 作者榜</p>
+            </div>
+            <div class="rank-list">
+              <nuxt-link 
+                v-for="item in userRankList" 
+                :key="item.id" 
+                target="_blank"
+                :to="`/user/${item.id}`" 
+                class="block">
+                <div class="left-avatar">
+                  <img :src="item.avatar || require('~/assets/images/default.png')" alt="avatar">
+                </div>
+                <div class="right-info">
+                  <p>{{ item.nickname }}</p>
+                  <span>{{ item.job || '--' }}</span>
+                </div>
+              </nuxt-link>
+            </div>
           </div>
         </div>
-      </div>
-    </client-only>
+      </client-only>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { cycleDate } from '~/util'
-import { categoryMap } from '~/config/optionMap'
+import { tagMap, categoryOption } from '~/config/optionMap'
 export default {
   name: 'IndexPage',
   layout: 'BaseLayout',
@@ -88,14 +109,18 @@ export default {
     try {
       const { data } = await $axios.get(`/api/v1/articles?pageNo=${pageNo}&pageSize=${pageSize}`)
       return {
-        pagination: data
+        pagination: {
+          ...data,
+          pageSize
+        }
       }
     } catch (error) {
       return {
         pagination: {
           list: [],
           pageNo: 1,
-          total: 0
+          total: 0,
+          pageSize
         }
       }
     }
@@ -103,9 +128,12 @@ export default {
 
   data () {
     return {
-      categoryMap,
+      tagMap,
       cycleDate,
-      userRankList: []
+      categoryOption,
+      userRankList: [],
+      categoryValue: '',
+      requestLoading: false
     }
   },
 
@@ -150,20 +178,68 @@ export default {
         const { data } = await this.$axios.get(`/api/v1/statistics/userrank?pageNo=1&pageSize=3`)
         this.userRankList = data
       } catch (error) {}
+    },
+
+    async articleList () {
+      try {
+        const { pageNo, pageSize } = this.pagination
+        const { data } = await this.$axios.get(`/api/v1/articles?pageNo=${pageNo}&pageSize=${pageSize}&category=${this.categoryValue}`)
+        this.pagination = {
+          ...data,
+          pageSize
+        }
+      } catch (error) {} finally {
+        this.requestLoading = false
+      }
+    },
+
+    /**
+     * update article category
+     * @param { String } category
+     */
+    updateCategory (category) {
+      if (this.categoryValue === category) {
+        return
+      }
+      this.categoryValue = category
+      this.pagination.pageNo = 1
+      this.requestLoading = true
+      this.articleList()
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.fixed-article-category {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid #f1f1f1;
+  background: #fff;
+  z-index: 999;
+  .category-tab {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    p {
+      margin-right: 20px;
+      cursor: pointer;
+      &.active {
+        color: @hover-primary-color;
+      }
+    }
+  }
+}
 .home-index-page {
-  margin-top: 20px;
+  margin-top: 65px;
   .articlelist-content {
     width: 708px;
   }
   .right-message {
     position: fixed;
-    top: 80px;
+    top: 125px;
     margin-left: 736px;
     width: 240px;
     .tip {

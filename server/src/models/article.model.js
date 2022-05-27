@@ -14,7 +14,7 @@ class ArticleModel {
     try {
       const { pageNo = 1, pageSize = 10, ...object } = param
 
-      const { columnSet, values } = multipleColumnSet(object)
+      const { columnSet, values } = multipleColumnSet(object, ' AND ')
 
       let sql = `SELECT ${this.tableName}.*, user.nickname, user.avatar,
 
@@ -22,14 +22,16 @@ class ArticleModel {
 
         (SELECT COUNT(*) FROM article_comment AS ac WHERE ac.articleId = ${this.tableName}.id) AS commentCounts
 
-        FROM ${this.tableName}, user`
+        FROM ${this.tableName}
+        
+        LEFT JOIN user ON user.id = ${this.tableName}.userId`
 
       if (!columnSet) {
         const totalSql = `SELECT COUNT(*) as total FROM ${this.tableName}`
 
         const total = await db.query(totalSql)
 
-        sql += ` WHERE ${this.tableName}.userId = user.id ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+        sql += ` ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
         const list = await db.query(sql, [sessionId])
 
@@ -48,7 +50,7 @@ class ArticleModel {
         }
       }
 
-      sql += ` WHERE ${columnSet} AND ${this.tableName}.userId = user.id ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+      sql += ` WHERE ${columnSet} ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
 
       const totalSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE ${columnSet}`
 

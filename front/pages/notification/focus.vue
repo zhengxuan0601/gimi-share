@@ -13,7 +13,7 @@
       <div v-else>
         <div v-for="item in list" :key="item.id" class="notify-modal">
           <div class="left-avatar">
-            <nuxt-link :to="`/user/${item.sourceUserId}`">
+            <nuxt-link target="_blank" :to="`/user/${item.sourceUserId}`">
               <img :src="item.sourceAvatar || require('~/assets/images/default.png')" alt="avatar">
             </nuxt-link>
           </div>
@@ -21,7 +21,7 @@
             <div class="info">
               <div class="comment">
                 <p>
-                  <nuxt-link class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
+                  <nuxt-link target="_blank" class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
                   关注了你
                 </p>
                 <p class="time">{{ cycleDate(item.createTime) }}</p>

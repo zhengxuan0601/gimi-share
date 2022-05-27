@@ -13,7 +13,7 @@
       <div v-else>
         <div v-for="item in list" :key="item.id" class="notify-modal">
           <div class="left-avatar">
-            <nuxt-link :to="`/user/${item.sourceUserId}`">
+            <nuxt-link target="_blank" :to="`/user/${item.sourceUserId}`">
               <img :src="item.sourceAvatar || require('~/assets/images/default.png')" alt="avatar">
             </nuxt-link>
           </div>
@@ -21,22 +21,22 @@
             <div class="info">
               <div class="comment">
                 <p v-if="item.isReplyComment === '1'">
-                  <nuxt-link class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
+                  <nuxt-link target="_blank" class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
                   回复了你在{{ item.articleId ? '文章' : '' }}
-                  <nuxt-link v-if="item.articleId" :to="`/post/${item.articleId}`">{{ item.articleTitle }}</nuxt-link>
-                  <nuxt-link v-if="item.circleId" :to="`/sharecircle/${item.circleId}`">友圈分享</nuxt-link>
+                  <nuxt-link v-if="item.articleId" target="_blank" :to="`/post/${item.articleId}`">{{ item.articleTitle }}</nuxt-link>
+                  <nuxt-link v-if="item.circleId" target="_blank" :to="`/sharecircle/${item.circleId}`">友圈分享</nuxt-link>
                   下的评论
                 </p>
                 <p v-else>
-                  <nuxt-link class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
+                  <nuxt-link target="_blank" class="name" :to="`/user/${item.sourceUserId}`">{{ item.sourceNickname }}</nuxt-link>
                   评论了你的{{ item.articleId ? '文章' : '' }}
-                  <nuxt-link v-if="item.articleId" :to="`/post/${item.articleId}`">{{ item.articleTitle }}</nuxt-link>
-                  <nuxt-link v-if="item.circleId" :to="`/sharecircle/${item.circleId}`">友圈分享</nuxt-link>
+                  <nuxt-link v-if="item.articleId" target="_blank" :to="`/post/${item.articleId}`">{{ item.articleTitle }}</nuxt-link>
+                  <nuxt-link v-if="item.circleId" target="_blank" :to="`/sharecircle/${item.circleId}`">友圈分享</nuxt-link>
                 </p>
                 <div class="reply-comment">{{ item.comment }}</div>
               </div>
               <div v-if="item.circleContent" class="circlecontent">
-                <nuxt-link :to="`/sharecircle/${item.circleId}`">{{ item.circleContent }}</nuxt-link>
+                <nuxt-link target="_blank" :to="`/sharecircle/${item.circleId}`">{{ item.circleContent }}</nuxt-link>
               </div>
             </div>
             <div class="operate">

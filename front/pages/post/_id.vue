@@ -74,11 +74,9 @@
           <em>标签：</em>
           <span 
             v-for="(item, index) in articleDetail.tag.split(';')"
-            :key="index">{{ item }}</span>
+            :key="index">{{ tagMap[item] }}</span>
         </div>
-        <div class="bottom-jy">
-          SAY：以 「早起」、「运动」、「冥想」、「写作」、「阅读」这五件能够快速改变人生的事情为切入点，帮助大家建立良好的生活习惯，技术的成长绝不是一朝一夕，良好的习惯将会帮助我们更快的进步，但在技术之外，我更希望大家能在这些事情的坚持中，收获一份自信，多一份底气，对人生多一份积极。
-        </div>
+        <div class="bottom-jy"></div>
       </div>
       <ArticleComment
         :article-detail="articleDetail" />
@@ -91,6 +89,7 @@ import { mapState } from 'vuex'
 import ArticleComment from './components/ArticleComments.vue'
 import { validateUniqId } from '~/util'
 import CustomSkeleton from '~/components/CustomSkeleton'
+import { tagMap } from '~/config/optionMap'
 export default {
   name: 'PostIndex',
   components: { CustomSkeleton, ArticleComment },
@@ -112,6 +111,12 @@ export default {
         articleDetail: {},
         isFocususer: false
       }
+    }
+  },
+
+  data () {
+    return {
+      tagMap
     }
   },
 
