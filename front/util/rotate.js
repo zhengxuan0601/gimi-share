@@ -1,19 +1,38 @@
-const radius = 150
-const dtr = Math.PI / 180
-const d = 300
-const mcList = []
+let radius = 80
+let dtr = Math.PI / 180
+let d = 300
+let mcList = []
 let active = false
 let lasta = 1
 let lastb = 1
-const distr = true
-const tspeed = 2
-const size = 250
+let distr = true
+let tspeed = 1
+let size = 100
 let mouseX = 0
 let mouseY = 0
-const howElliptical = 1
-let aA = null
+let howElliptical = 1
+let aA = []
 let oDiv = null
 let sa, ca, sb, cb, sc, cc, per
+
+function init () {
+  radius = 80
+  dtr = Math.PI / 180
+  d = 300
+  mcList = []
+  active = false
+  lasta = 1
+  lastb = 1
+  distr = true
+  tspeed = 1
+  size = 100
+  mouseX = 0
+  mouseY = 0
+  howElliptical = 1
+  aA = []
+  oDiv = null
+  sa = ca = sb = cb = sc = cc = per = undefined
+}
 
 function update () {
   let a
@@ -144,13 +163,14 @@ function sineCosine (a, b, c) {
 }
 
 export default function () {
+  init()
   let i = 0
   let oTag = null
 
-  oDiv = document.getElementById('rotate')
+  oDiv = document.getElementById('link-rotate')
 
+  if (!oDiv) return 
   aA = oDiv.getElementsByTagName('a')
-
   for (i = 0; i < aA.length; i++) {
     oTag = {}
 

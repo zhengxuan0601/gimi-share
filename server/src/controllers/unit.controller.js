@@ -1,10 +1,31 @@
 const captcha = require('svg-captcha')
+const { setexAsync } = require('@/redis')
+const sendEmail = require('@/utils/email.util')
+const HttpUtil = require('@/utils/httpRequest.unit')
 const { newRandomId } = require('@/utils/common.util')
 const JsonResult = require('@/utils/httpResponse.unit')
-const sendEmail = require('@/utils/email.util')
-const { setexAsync } = require('@/redis')
 
 class UnitController {
+  /**
+   * get url link info
+   * @param {*} req
+   * @param {*} response
+   */
+  async getLinkInfo (req, response) {
+    try {
+      const url = req.query.url
+      const data = await HttpUtil.get(`juejin.cn/v1/link/info?url=${url}&src=web`)
+      JsonResult.success({
+        req,
+        response,
+        data: data.d,
+        message: '查询成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '查询失败' })
+    }
+  }
+
   /**
    * get captcha
    * @param {*} req

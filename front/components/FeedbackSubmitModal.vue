@@ -14,6 +14,7 @@
         placeholder="留下你宝贵的意见吧^^（最少输入20个字符）"
         :box-shadow="false"
         :autofocus="true"
+        ishljs
         @imgAdd="uploadImageServer">
       </mavon-editor>
     </div>
@@ -62,7 +63,7 @@ export default {
         save: false,
         navigation: false,
         preview: true
-      },
+      }
     }
   },
 
@@ -143,7 +144,7 @@ export default {
       position: absolute;
       top: 11px;
       right: 100%;
-      left: -8px;
+      left: -7px;
       display: block;
       width: 8px;
       height: 16px;
@@ -157,7 +158,7 @@ export default {
       position: absolute;
       top: 11px;
       right: 100%;
-      left: -8px;
+      left: -7px;
       display: block;
       width: 8px;
       height: 16px;

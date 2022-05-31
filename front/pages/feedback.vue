@@ -3,12 +3,12 @@
     <client-only>
       <div slot="placeholder">
         <div style="padding:30px;background:#fff">
-          <a-skeleton :paragraph="{ rows: 6 }" active :title="{ width: 160 }" />
+          <a-skeleton active :title="{ width: 160 }" />
         </div>
       </div>
       <div style="margin-bottom: 30px; padding: 30px 10px 10px; background:#fff; border-radius: 4px;">
         <FeedbackSubmitModal 
-          :user-info="userInfo"
+          :user-info="userInfo || null"
           @success="pagination.pageNo = 1; findFeedbackList()" />
       </div>
       <div v-if="pagination.list.length" class="feedback-list-modal">
@@ -306,6 +306,19 @@ export default {
               }
               img {
                 max-width: 120px;
+              }
+              pre {
+                border-radius: 4px;
+                &::-webkit-scrollbar {
+                  display: none;
+                }
+              }
+              mark {
+                background-color: #f6f6f6;
+                font-size: 14px;
+                color: #4c4c4c;
+                padding: 2px 8px;
+                border-radius: 4px;
               }
             }
             .v-note-img-wrapper {

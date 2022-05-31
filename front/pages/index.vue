@@ -91,6 +91,19 @@
               </nuxt-link>
             </div>
           </div>
+          <div class="author-rank">
+            <div class="title">
+              <p>🏷️ 标签集</p>
+            </div>
+            <div id="link-rotate" class="tag-rotate-list">
+              <nuxt-link 
+                v-for="item in tagOptions.slice(0, 24)"
+                :key="item.value"
+                class=""
+                to="#"
+                >{{ item.label }}</nuxt-link>
+            </div>
+          </div>
         </div>
       </client-only>
     </div>
@@ -100,7 +113,8 @@
 <script>
 import { mapState } from 'vuex'
 import { cycleDate } from '~/util'
-import { tagMap, categoryOption } from '~/config/optionMap'
+import rotate from '~/util/rotate'
+import { tagMap, categoryOption, tagOptions } from '~/config/optionMap'
 export default {
   name: 'IndexPage',
   layout: 'BaseLayout',
@@ -133,7 +147,8 @@ export default {
       categoryOption,
       userRankList: [],
       categoryValue: '',
-      requestLoading: false
+      requestLoading: false,
+      tagOptions
     }
   },
 
@@ -145,6 +160,11 @@ export default {
 
   created () {
     this.findUserRank()
+    if (process.browser) {
+      this.$nextTick(() => {
+        setTimeout(rotate)
+      })
+    }
   },
 
   methods: {
@@ -315,6 +335,15 @@ export default {
             }
           }
         }
+      }
+    }
+    .tag-rotate-list {
+      position: relative;
+      height: 240px; 
+      background: #fff; 
+      a {
+        position: absolute;
+        color: @primary-color;
       }
     }
   }

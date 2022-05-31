@@ -199,7 +199,7 @@ export default {
 
   head() {
     return {
-      title: 'GimiShare - 友圈分享',
+      title: '友圈分享 - GimiShare',
       meta: [
         { charset: 'utf-8' },
         { hid: 'description', name: 'description', content: 'GimiShare，友圈分享' }

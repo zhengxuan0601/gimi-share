@@ -76,6 +76,15 @@
             v-for="(item, index) in articleDetail.tag.split(';')"
             :key="index">{{ tagMap[item] }}</span>
         </div>
+        <div v-if="articleDetail.linkUrl && linkInfo" class="link-url">
+          <em>参考链接：</em>
+          <a-popover placement="topLeft">
+            <template slot="content">
+              
+            </template>
+            <p :href="articleDetail.linkUrl" target="blank">{{ articleDetail.linkUrl }}</p>
+          </a-popover>
+        </div>
         <div class="bottom-jy"></div>
       </div>
       <ArticleComment
@@ -116,7 +125,8 @@ export default {
 
   data () {
     return {
-      tagMap
+      tagMap,
+      linkInfo: null
     }
   },
 
@@ -135,6 +145,19 @@ export default {
     ...mapState({
       userInfo: state => state.userInfo
     })
+  },
+
+  watch: {
+    articleDetail: {
+      async handler (newVal) {
+        if (newVal && newVal.linkUrl) {
+          const { data } = await this.$axios.get(`/api/v1/unit/linkinfo?url=${newVal.linkUrl}`)
+          this.linkInfo = data
+        }
+      },
+      immediate: true,
+      deep: true
+    }
   },
 
   created () {
@@ -340,7 +363,7 @@ export default {
     margin-bottom: 20px;
     border-radius: 4px;
   }
-  .article-tag {
+  .article-tag, .link-url {
     margin-top: 20px;
     em {
       font-style: normal;
@@ -356,6 +379,11 @@ export default {
       line-height: 28px;
       display: inline-block;
       cursor: default;
+    }
+    p {
+      color: #4c4c4c;
+      display: inline;
+      cursor: pointer;
     }
   }
   .bottom-jy {
@@ -382,6 +410,19 @@ export default {
   }
   img {
     max-width: 40%;
+  }
+  pre {
+    border-radius: 4px;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  mark {
+    background-color: #f6f6f6;
+    font-size: 14px;
+    color: #4c4c4c;
+    padding: 2px 8px;
+    border-radius: 4px;
   }
 }
 </style>

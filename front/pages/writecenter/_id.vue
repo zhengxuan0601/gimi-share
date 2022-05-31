@@ -62,6 +62,9 @@
                     </div>
                   </a-upload>
                 </a-form-model-item>
+                <a-form-model-item label="参考链接" prop="linkUrl">
+                  <a-input v-model="articleInfo.linkUrl" placeholder="请输入文章参考链接" />
+                </a-form-model-item>
                 <a-form-model-item label="文章描述" prop="description">
                   <a-textarea v-model="articleInfo.description" placeholder="请输入文章描述" :rows="4" />
                 </a-form-model-item>
@@ -122,7 +125,8 @@ export default {
           category: undefined,
           tag: undefined,
           coverImage: '',
-          description: ''
+          description: '',
+          linkUrl: ''
         }
       }
     }

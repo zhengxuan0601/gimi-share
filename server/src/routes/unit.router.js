@@ -30,4 +30,14 @@ router.get('/getpublickey', unitController.getPublicKey)
  */
 router.get('/emailcode', unitController.sendEmailCode)
 
+/**
+ * url链接解析title
+ * @route GET /unit/linkinfo
+ * @param {string} url.query.required
+ * @group 通用工具
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ */
+router.get('/linkinfo', unitController.getLinkInfo)
+
 module.exports = router

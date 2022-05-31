@@ -53,46 +53,50 @@
   }
 }
 
-.ant-btn-primary {
-  background-color: @primary-color;
+.ant-btn {
   padding: 0 20px;
-  height: 36px;
-  border: 1px solid @primary-color;
   border-radius: 2px;
-  span {
-    font-size: 12px;
-    color: #fff;
-  }
-  &:focus, &:hover {
-    background-color: @hover-primary-color;
-    border: 1px solid @hover-primary-color;
-  }
-  &:disabled, &.ant-btn-loading {
-    background-color: @primary-color;
+  font-size: 12px;
+  line-height: 34px;
+  height: 36px;
+  &-primary {
     border: 1px solid @primary-color;
-    cursor: not-allowed;
-    opacity: .5;
-  }
-  &.ant-btn-loading {
-    .anticon-loading {
+    background-color: @primary-color;
+    span {
+      font-size: 12px;
       color: #fff;
     }
+    &:focus, &:hover {
+      background-color: @hover-primary-color;
+      border: 1px solid @hover-primary-color;
+    }
+    &:disabled, &.ant-btn-loading {
+      background-color: @primary-color;
+      border: 1px solid @primary-color;
+      cursor: not-allowed;
+      opacity: .5;
+    }
+    &.ant-btn-loading {
+      .anticon-loading {
+        color: #fff;
+      }
+    }
   }
-}
 
-.ant-btn-dashed {
-  background: transparent;
-  border: 1px solid #80dd9a;
-  color: @primary-color;
-  background: #19c54a1a;
-  span {
-    font-size: 12px;
-  }
-  .anticon {
-    position: relative;
-    top: 1px;
-    & + span {
-      margin-left: 6px;
+  &-dashed {
+    background: transparent;
+    border: 1px solid #80dd9a;
+    color: @primary-color;
+    background: #19c54a1a;
+    span {
+      font-size: 12px;
+    }
+    .anticon {
+      position: relative;
+      top: 1px;
+      & + span {
+        margin-left: 6px;
+      }
     }
   }
 }
