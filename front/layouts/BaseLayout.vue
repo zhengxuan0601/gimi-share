@@ -15,7 +15,12 @@
         <div class="right-operate">
           <div class="search-model">
             <a-icon type="search" />
-            <input type="text" placeholder="关键字搜索" class="s-input">
+            <input 
+              v-model="searchValue" 
+              type="text" 
+              placeholder="关键字搜索" 
+              class="s-input"
+              @keypress.enter="vagueSearch">
           </div>
           <a-button 
             type="primary"
@@ -79,6 +84,11 @@ import { mapState } from 'vuex'
 import LoginModal from '~/components/LoginModal'
 export default {
   components: { LoginModal },
+  data () {
+    return {
+      searchValue: ''
+    }
+  },
   computed: {
     ...mapState({
       loginModalVisible: state => state.loginModalVisible,
@@ -87,7 +97,7 @@ export default {
       previewImgSrc: state => state.previewImgSrc
     })
   },
-
+  
   created () {
     if (this.userInfo && process.client) {
       this.getNotifyCount()
@@ -117,6 +127,18 @@ export default {
         const { data } = await this.$axios.get('/api/v1/messages/count')
         this.$store.commit('UPDATE_NOTIFY_COUNT', data.allCount)
       } catch (error) {}
+    },
+
+    vagueSearch () {
+      if (this.searchValue) {
+        this.$router.push({
+          path: '/search',
+          query: {
+            value: this.searchValue,
+            type: '1'
+          }
+        })
+      }
     }
   }
 }

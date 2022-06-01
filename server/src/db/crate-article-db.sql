@@ -3,7 +3,7 @@
 CREATE TABLE article (
   `id` varchar(24) NOT NULL COMMENT '文章标识',
   `userId` varchar(24) NOT NULL COMMENT '文章所属用户标识',
-  `articleTitle` varchar(64) NOT NULL COMMENT '文章标题',
+  `articleTitle` varchar(255) NOT NULL COMMENT '文章标题',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文章markdown字符内容',
   `category` varchar(16) NOT NULL COMMENT '文章所属分类',
   `tag` varchar(255) NOT NULL COMMENT '文章标签',

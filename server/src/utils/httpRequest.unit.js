@@ -43,7 +43,6 @@ HttpUtil.prototype.get = function (url) {
     method: 'GET',
     path
   }
-  console.log(options)
   return new Promise((resolve, reject) => {
     https.request(options, res => {
       if (res.statusCode === 200) {

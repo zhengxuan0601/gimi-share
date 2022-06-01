@@ -292,6 +292,47 @@ class ArticleModel {
       throw new Error(error)
     }
   }
+
+  /**
+   * search article by kwywords
+   * @param {*} pageNo
+   * @param {*} pageSize
+   * @param {*} value
+   * @returns
+   */
+  async vagueFind ({ pageNo, pageSize, value }) {
+    try {
+      const sql = `SELECT arc.id, arc.userId, arc.articleTitle, arc.description, arc.viewCounts, arc.likeCounts, arc.coverImage,
+      
+      (SELECT user.nickname FROM user WHERE arc.userId = user.id) AS authorNickname,
+
+      (SELECT COUNT(*) FROM article_comment AS ac WHERE arc.id = ac.articleId) AS commentCounts
+      
+      FROM ${this.tableName} AS arc 
+      
+      WHERE arc.articleTitle LIKE ? 
+      
+      OR arc.description LIKE ? LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+
+      const totalSql = `SELECT COUNT(*) AS total FROM ${this.tableName} AS arc
+      
+      WHERE arc.articleTitle LIKE ? 
+      
+      OR arc.description LIKE ?`
+
+      const [list, total] = [await db.query(sql, [`%${value}%`, `%${value}%`]), await db.query(totalSql, [`%${value}%`, `%${value}%`])]
+
+      return {
+        list,
+
+        total: total[0].total,
+
+        pageNo: Number(pageNo)
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
 }
 
 module.exports = new ArticleModel()

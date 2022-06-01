@@ -152,6 +152,51 @@ class UserModel {
       throw new Error(error)
     }
   }
+
+  /**
+   * search user by kwywords
+   * @param {*} pageNo
+   * @param {*} pageSize
+   * @param {*} value
+   */
+  async vagueFind ({ pageNo, pageSize, value }, sessionId) {
+    try {
+      const sql = `SELECT id, avatar, nickname, job,
+
+        (SELECT COUNT(*) FROM article AS a WHERE a.userId = t.id) AS articleCount,
+
+        (SELECT COUNT(*) FROM user_focus_user AS ufu WHERE ufu.focusId = t.id) AS focusedCount,
+
+        (SELECT COUNT(*) FROM share_circle AS sc WHERE sc.userId = t.id) AS circleCount,
+
+        (SELECT userId FROM user_focus_user AS ufu WHERE ufu.focusId = t.id AND ufu.userId = ?) AS isFocuser
+      
+        FROM ${this.tableName}
+        
+        AS t WHERE t.nickname LIKE ?
+        
+        LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`
+
+      const totalSql = `SELECT COUNT(*) AS total FROM ${this.tableName} AS t WHERE t.nickname LIKE ?`
+
+      const [list, total] = [await db.query(sql, [sessionId, `%${value}%`]), await db.query(totalSql, [`%${value}%`])]
+
+      return {
+        list: list.map(u => {
+          return {
+            ...u,
+            isFocuser: Boolean(u.isFocuser)
+          }
+        }),
+
+        total: total[0].total,
+
+        pageNo: Number(pageNo)
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
 }
 
 module.exports = new UserModel()

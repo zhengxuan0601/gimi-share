@@ -80,7 +80,13 @@
           <em>参考链接：</em>
           <a-popover placement="topLeft">
             <template slot="content">
-              
+              <a style="display: flex; padding: 10px 16px; align-items: center;" target="_blank" :href="articleDetail.linkUrl">
+                <img style="width: 32px" src="~/assets/images/link.svg" alt="link_img">
+                <div style="margin-left: 6px; font-size: 12px; line-height: normal;">
+                  <p style="color: #4c4c4c;">{{ linkInfo.title }}</p>
+                  <span style="color: #999;">{{ linkInfo.url.split('/')[2] }}</span>
+                </div>
+              </a>
             </template>
             <p :href="articleDetail.linkUrl" target="blank">{{ articleDetail.linkUrl }}</p>
           </a-popover>
