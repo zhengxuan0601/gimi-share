@@ -11,12 +11,11 @@
           description="空空如也" 
           :image="require('@/assets/images/nodata.png')" /></div>
       <div v-else>
-        <nuxt-link
+        <div
           v-for="item in articleList" 
           :key="item.id" 
           class="model" 
-          target="_blank"
-          :to="`/post/${item.id}`">
+          @click="openLink(item.id)">
           <div class="l">
             <div class="user-info">
               <p @click.stop><nuxt-link :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
@@ -54,7 +53,7 @@
               <a-icon type="more" />
             </div>
           </a-popover>
-        </nuxt-link>  
+        </div>  
       </div>
     </client-only>
   </div>
@@ -132,7 +131,12 @@ export default {
             console.log(error)
           }
         }
-      });
+      })
+    },
+
+    openLink (id) {
+      const { href } = this.$router.resolve(`/post/${id}`)
+      window.open(href, '_blank')
     }
   }
 }

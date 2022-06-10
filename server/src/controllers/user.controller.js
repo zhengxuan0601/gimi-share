@@ -234,6 +234,49 @@ class UserController {
   }
 
   /**
+   * change user password
+   * @param {*} req
+   * @param {*} response
+   */
+  async userChangePassword (req, response) {
+    try {
+      const sessionId = await getSessionuserId(req)
+      const { type, newpassword, oldpassword, code, email } = req.body
+      const sessionCode = await getAsync(email)
+      const { aesKey, aesIv } = req.session.publicAes
+      const userdepassword = decrypt(newpassword, aesKey, aesIv)
+      // 邮箱验证码修改
+      if (type === '0') {
+        const user = await UserModel.findOne({ email, id: sessionId })
+        if (!user) {
+          return JsonResult.fail({ req, response, message: '邮箱不正确' })
+        }
+        if (sessionCode !== code) {
+          return JsonResult.fail({ req, response, message: '邮箱验证码不正确' })
+        }
+      } else if (type === '1') {
+        // 原密码修改
+        const enoldpassword = encrypt(decrypt(oldpassword, aesKey, aesIv), trash.aesKey, trash.aesIIv)
+        const user = await UserModel.findOne({ id: sessionId, password: enoldpassword })
+        if (!user) {
+          return JsonResult.fail({ req, response, message: '原密码不正确' })
+        }
+      } else {
+        return JsonResult.fail({ req, response, message: 'type异常，修改密码失败' })
+      }
+      const password = encrypt(userdepassword, trash.aesKey, trash.aesIIv)
+      await UserModel.updatePassword(password, sessionId)
+      JsonResult.success({
+        req,
+        response,
+        message: '修改密码成功'
+      })
+    } catch (error) {
+      JsonResult.fail({ req, response, error, message: '修改密码失败' })
+    }
+  }
+
+  /**
    * user collect article
    * @param {*} req
    * @param {*} response

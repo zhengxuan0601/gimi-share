@@ -60,7 +60,7 @@ class UserModel {
    */
   async findOne (param, hidepassword) {
     try {
-      const { columnSet, values } = multipleColumnSet(param)
+      const { columnSet, values } = multipleColumnSet(param, ' AND ')
 
       const sql = `SELECT * FROM ${this.tableName} WHERE ${columnSet}`
 
@@ -124,6 +124,21 @@ class UserModel {
     try {
       const sql = `UPDATE ${this.tableName} SET ${columnSet} WHERE id = ?`
       await db.query(sql, [...values, id])
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * update user password
+   * @param {*} password
+   * @param {*} id
+   */
+  async updatePassword (password, id) {
+    try {
+      const sql = `UPDATE ${this.tableName} SET password = ? WHERE id = ?`
+
+      await db.query(sql, [password, id])
     } catch (error) {
       throw new Error(error)
     }

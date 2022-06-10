@@ -32,12 +32,11 @@
               description="空空如也" 
               :image="require('@/assets/images/nodata.png')" /></div>
           <div v-if="pagination.list.length && !requestLoading">
-            <nuxt-link
+            <div
               v-for="item in pagination.list" 
               :key="item.id" 
-              class="model" 
-              target="_blank"
-              :to="`/post/${item.id}`">
+              class="model"
+              @click="openLink(item.id)">
               <div class="l">
                 <div class="user-info">
                   <p @click.stop><nuxt-link target="_blank" :to="`/user/${item.userId}`">{{ item.nickname }}</nuxt-link></p>
@@ -52,7 +51,7 @@
                   <p><a-icon type="eye" /><span v-if="item.viewCounts">{{ item.viewCounts }}</span></p>
                   <p 
                     :class="{ 'is-liker': item.isLiker }"
-                    @click.stop="isLikeArticle(item)">
+                    @click.stop="isLikeArticle($event, item)">
                     <a-icon type="like" />
                     <span v-if="item.likeCounts">{{ item.likeCounts }}</span>
                   </p>
@@ -62,7 +61,7 @@
               <div v-if="item.coverImage" class="r">
                 <img :src="item.coverImage" alt="cover-image">
               </div>
-            </nuxt-link> 
+            </div> 
           </div> 
         </div>
         <div class="right-message">
@@ -172,7 +171,7 @@ export default {
      * article liker
      * @param { Object } articleItem
      */
-    async isLikeArticle (articleItem) {
+    async isLikeArticle (e, articleItem) {
       if (!this.userInfo) {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
@@ -225,6 +224,11 @@ export default {
       this.pagination.pageNo = 1
       this.requestLoading = true
       this.articleList()
+    },
+
+    openLink (id) {
+      const { href } = this.$router.resolve(`/post/${id}`)
+      window.open(href, '_blank')
     }
   }
 }

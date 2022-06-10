@@ -46,18 +46,22 @@ export const cycleDate = (date) => {
   const hour = minute * 60
   const day = hour * 24
   const month = day * 30
+  const year = month * 12
   const now = new Date().getTime()
   const diffValue = now - dateTimeStamp
   if (diffValue < 0) {
     return ''
   }
+  const yearC = diffValue / year
   const monthC = diffValue / month
   const weekC = diffValue / (7 * day)
   const dayC = diffValue / day
   const hourC = diffValue / hour
   const minC = diffValue / minute
-  if (monthC >= 1) {
-    return parseInt(monthC) + '月前'
+  if (yearC >= 1) {
+    return parseInt(yearC) + '年前'
+  } else if (monthC >= 1) {
+    return parseInt(monthC) + '个月前'
   } else if (weekC >= 1) {
     return parseInt(weekC) + '周前'
   } else if (dayC >= 1) {

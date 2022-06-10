@@ -13,12 +13,15 @@
         description="空空如也" 
         :image="require('~/assets/images/nodata.png')" /></div>
     <div v-if="!loading" class="content">
-      <div v-for="item in list" :key="item.id" class="modal">
+      <nuxt-link
+        v-for="item in list" 
+        :key="item.id"
+        target="_blank" :to="`/post/${item.id}`" class="modal">
         <div class="left">
-          <nuxt-link target="_blank" :to="`/post/${item.id}`" class="arc-title">
+          <p class="arc-title">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="item.articleTitle"></span>
-          </nuxt-link>
+          </p>
           <p class="arc-desc">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="item.description"></span>
@@ -32,7 +35,7 @@
           <img 
             :src="item.coverImage" alt="articlecover">
         </div>
-      </div>
+      </nuxt-link>
     </div>
   </div>
 </template>

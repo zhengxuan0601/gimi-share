@@ -10,24 +10,30 @@
       <div class="label-form">
         <p>密码</p>
         <span>******</span>
-        <em>重置</em>
+        <em @click="passwordModalVisible = true">重置</em>
       </div>
     </div>
     <EmailModal
       v-if="emailModalVisible"
       @close-modal="emailModalVisible = false" />
+
+    <UpdatePassword
+      v-if="passwordModalVisible"
+      @close-modal="passwordModalVisible = false" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import UpdatePassword from '@/components/UpdatePassword'
 import EmailModal from '~/components/EmailModal.vue'
 export default {
   name: 'AccountPage',
-  components: { EmailModal },
+  components: { EmailModal, UpdatePassword },
   data () {
     return {
-      emailModalVisible: false
+      emailModalVisible: false,
+      passwordModalVisible: false
     }
   },
 

@@ -6,6 +6,15 @@
  */
 
 /**
+ * @typedef UpdatePassword
+ * @property {string} type.required -修改密码类型
+ * @property {string} newpassword.required -新密码
+ * @property {string} code -验证码
+ * @property {string} email -邮箱
+ * @property {string} oldpassword -原密码
+ */
+
+/**
  * @typedef UpdateInfo
  * @property {string} nickname -用户昵称
  * @property {enum} gender -用户性别 0 - 男 1 - 女
@@ -68,6 +77,17 @@ router.get('/sessionuserinfo', auth(), handlerValidate(userController.getSession
  * @security JWT
  */
 router.get('/deleteuser', auth(), userController.deleteById)
+
+/**
+ * 用户更新密码
+ * @route POST /users/updatepassword
+ * @group 用户管理
+ * @param {UpdatePassword.model} updatePassword.body.required
+ * @returns {object} 200
+ * @returns {Error}  default - Unexpected error
+ * @security JWT
+ */
+router.post('/updatepassword', auth(), userController.userChangePassword)
 
 /**
  * 用户注册
