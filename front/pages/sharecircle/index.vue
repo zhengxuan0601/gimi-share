@@ -155,35 +155,24 @@ import { mapState } from 'vuex'
 import SimpleComment from './components/SimpleComment'
 import { getBase64, cycleDate } from '~/util'
 import EmojiPicker from '~/components/EmojiPicker'
+import ScrollLoadEvent from '~/util/scrollLoadEvent'
 export default {
   name: 'ShareCircle',
   components: { EmojiPicker, SimpleComment },
   layout: 'BaseLayout',
   async asyncData ({ $axios }) {
-    const [pageNo, pageSize] = [1, 20]
+    const [pageNo, pageSize] = [1, 10]
     try {
       const { data } = await $axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
       const list = data.list.map(o => {
-       return {
-          ...o,
-        replyState: false
-       }
+       return { ...o, replyState: false }
       })
       return {
-        pagination: {
-          ...data,
-          list,
-          pageSize
-        }
+        pagination: { ...data, list, pageSize  }
       }
     } catch (error) {
       return {
-        pagination: {
-          pageNo: 1,
-          pageSize: 20,
-          list: [],
-          total: 0
-        }
+        pagination: { pageNo: 1,  pageSize: 20, list: [], total: 0 }
       }
     }
   },
@@ -193,7 +182,8 @@ export default {
       content: '',
       fileList: [],
       publishLoading: false,
-      staticsCount: ''
+      staticsCount: '',
+      scrollLoadEvent: null
     }
   },
 
@@ -223,7 +213,42 @@ export default {
     }
   },
 
+  created () {
+    this.scrollLoadEvent = new ScrollLoadEvent(this.scrollLoadShareCircle.bind(this))
+    if (process.browser) {
+      this.$nextTick(() => {
+        this.scrollLoadEvent.bindScrollEvent()
+      })
+    }
+  },
+
+  beforeDestroy () {
+    this.scrollLoadEvent.removeScrollEvent()
+  },
+
   methods: {
+    /**
+     * scroll load shareCircle list
+     */
+    async scrollLoadShareCircle () {
+      this.scrollLoadEvent.loadState = false
+      try {
+        this.pagination.pageNo++
+        const { pageNo, pageSize } = this.pagination
+        const { data } = await this.$axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
+        this.pagination.list.push(...(data.list.map(o => {
+          return { ...o, replyState: false }
+        })))
+        if (pageNo >= Math.ceil(data.total / pageSize)) {
+          this.scrollLoadEvent.loadState = false
+        } else {
+          this.scrollLoadEvent.loadState = true
+        }
+      } catch (error) {
+        this.scrollLoadEvent.loadState = true
+      }
+    },
+
     /**
      * publish share circle 
      */
@@ -240,39 +265,17 @@ export default {
         })
         try {
           await this.$axios.post('/api/v1/shares/createshare', data)
-          this.pagination.pageNo = 1
           this.content = ''
           this.fileList = []
-          this.refreshShareList()
+          this.pagination.list = []
+          this.pagination.pageNo = 0
+          this.scrollLoadShareCircle()
           this.$message.success('发布友圈成功')
         } catch (error) {
           console.log(error)
         } finally {
           this.publishLoading = false
         }
-      }
-    },
-
-    /**
-     * refresh share circle page list
-     */
-    async refreshShareList () {
-      const [pageNo, pageSize] = [1, this.pagination.pageSize]
-      try {
-        const { data } = await this.$axios.get(`/api/v1/shares?pageNo=${pageNo}&pageSize=${pageSize}`)
-        const list = data.list.map(o => {
-          return {
-              ...o,
-            replyState: false
-          }
-        })
-        this.pagination = {
-          ...this.pagination,
-          ...data,
-          list
-        }
-      } catch (error) {
-        console.log(error)
       }
     },
 

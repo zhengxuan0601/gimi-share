@@ -114,27 +114,20 @@ import { mapState } from 'vuex'
 import { cycleDate } from '~/util'
 import rotate from '~/util/rotate'
 import { tagMap, categoryOption, tagOptions } from '~/config/optionMap'
+import ScrollLoadEvent from '~/util/scrollLoadEvent'
 export default {
   name: 'IndexPage',
   layout: 'BaseLayout',
   async asyncData ({ $axios }) {
-    const [pageNo, pageSize] = [1, 20]
+    const [pageNo, pageSize] = [1, 10]
     try {
       const { data } = await $axios.get(`/api/v1/articles?pageNo=${pageNo}&pageSize=${pageSize}`)
       return {
-        pagination: {
-          ...data,
-          pageSize
-        }
+        pagination: { ...data, pageSize }
       }
     } catch (error) {
       return {
-        pagination: {
-          list: [],
-          pageNo: 1,
-          total: 0,
-          pageSize
-        }
+        pagination: { list: [], pageNo: 1, total: 0, pageSize }
       }
     }
   },
@@ -147,7 +140,8 @@ export default {
       userRankList: [],
       categoryValue: '',
       requestLoading: false,
-      tagOptions
+      tagOptions,
+      scrollLoadEvent: null
     }
   },
 
@@ -158,20 +152,48 @@ export default {
   },
 
   created () {
+    this.scrollLoadEvent = new ScrollLoadEvent(this.scrollLoadArticle.bind(this))
     this.findUserRank()
     if (process.browser) {
       this.$nextTick(() => {
+        this.scrollLoadEvent.bindScrollEvent()
         setTimeout(rotate)
       })
     }
   },
 
+  beforeDestroy () {
+    this.scrollLoadEvent.removeScrollEvent()
+  },
+
   methods: {
+    /**
+     * scroll load articleList
+     */
+    async scrollLoadArticle () {
+      this.scrollLoadEvent.loadState = false
+      try {
+        this.pagination.pageNo++
+        const { pageNo, pageSize } = this.pagination
+        const { data } = await this.$axios.get(`/api/v1/articles?pageNo=${pageNo}&pageSize=${pageSize}&category=${this.categoryValue}`)
+        this.pagination.list.push(...data.list)
+        if (pageNo >= Math.ceil(data.total / pageSize)) {
+          this.scrollLoadEvent.loadState = false
+        } else {
+          this.scrollLoadEvent.loadState = true
+        }
+      } catch (error) {
+        this.scrollLoadEvent.loadState = true
+      } finally {
+        this.requestLoading = false
+      }
+    },
+
     /**
      * article liker
      * @param { Object } articleItem
      */
-    async isLikeArticle (e, articleItem) {
+    async isLikeArticle (_e, articleItem) {
       if (!this.userInfo) {
         return this.$store.commit('UPDATE_LOGIN_VISIBLE', true)
       }
@@ -184,9 +206,7 @@ export default {
           articleItem.likeCounts += 1
         }
         articleItem.isLiker = !articleItem.isLiker
-      } catch (error) {
-        console.log(error)
-      }
+      } catch (error) {}
     },
 
     /**
@@ -199,19 +219,6 @@ export default {
       } catch (error) {}
     },
 
-    async articleList () {
-      try {
-        const { pageNo, pageSize } = this.pagination
-        const { data } = await this.$axios.get(`/api/v1/articles?pageNo=${pageNo}&pageSize=${pageSize}&category=${this.categoryValue}`)
-        this.pagination = {
-          ...data,
-          pageSize
-        }
-      } catch (error) {} finally {
-        this.requestLoading = false
-      }
-    },
-
     /**
      * update article category
      * @param { String } category
@@ -221,9 +228,10 @@ export default {
         return
       }
       this.categoryValue = category
-      this.pagination.pageNo = 1
+      this.pagination.pageNo = 0
+      this.pagination.list = []
       this.requestLoading = true
-      this.articleList()
+      this.scrollLoadArticle()
     },
 
     openLink (id) {

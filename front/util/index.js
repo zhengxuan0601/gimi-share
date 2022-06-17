@@ -49,9 +49,6 @@ export const cycleDate = (date) => {
   const year = month * 12
   const now = new Date().getTime()
   const diffValue = now - dateTimeStamp
-  if (diffValue < 0) {
-    return ''
-  }
   const yearC = diffValue / year
   const monthC = diffValue / month
   const weekC = diffValue / (7 * day)

@@ -4,7 +4,7 @@
     "port": 5555
   },
   "mysql": {
-    "host": "localhost",
+    "host": "101.34.16.145",
     "user": "root",
     "port": "3306",
     "database": "gimibase",
