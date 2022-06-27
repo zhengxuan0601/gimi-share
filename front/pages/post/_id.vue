@@ -68,6 +68,9 @@
           :toolbars-flag="false"
           :editable="false"
           :image-click="imagePreview"
+          :box-shadow="false"
+          preview-background="#fff"
+          :transition="false"
           style="padding:20px">
         </mavon-editor>
         <div class="article-tag">
@@ -403,6 +406,10 @@ export default {
 ::v-deep.markdown-body {
   padding: 0 !important;
   z-index: 998;
+  border: none;
+  .v-show-content {
+    padding: 0 35px 15px !important;
+  }
   ol, ul {
     li {
       font-size: 14px;
@@ -424,11 +431,15 @@ export default {
     }
   }
   mark {
-    background-color: #f6f6f6;
-    font-size: 14px;
-    color: #4c4c4c;
-    padding: 2px 8px;
-    border-radius: 4px;
+    background-color: rgb(189 98 98 / 20%);
+    font-size: 13px;
+    color: #e94d4d;
+    padding: 0px 5px;
+    border-radius: 2px;
+    margin: 0 2px;
+  }
+  .v-note-show.single-show {
+    transition: none !important;
   }
 }
 </style>

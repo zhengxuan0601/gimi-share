@@ -87,7 +87,7 @@ export default {
       const formdata = new FormData();
       formdata.append('file', $file);
       axios({
-        url: 'https://zdxblog.cn/upload/uploadFile',
+        url: 'https://image.zdxblog.cn/upload/uploadFile',
         method: 'post',
         data: formdata,
         headers: { 'Content-Type': 'multipart/form-data' },

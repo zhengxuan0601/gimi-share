@@ -18,7 +18,7 @@
           class="avatar-uploader"
           list-type="picture-card"
           :show-upload-list="false"
-          action="https://zdxblog.cn/upload/uploadFile"
+          action="https://image.zdxblog.cn/upload/uploadFile"
           :before-upload="beforeUpload"
           @change="handleChange"
         >

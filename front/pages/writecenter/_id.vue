@@ -50,7 +50,7 @@
                     list-type="picture-card"
                     class="article-cover-uploader"
                     :show-upload-list="false"
-                    action="https://zdxblog.cn/upload/uploadFile"
+                    action="https://image.zdxblog.cn/upload/uploadFile"
                     @change="handleChange"
                   >
                     <img v-if="articleInfo.coverImage" :src="articleInfo.coverImage" alt="avatar" />
@@ -212,7 +212,7 @@ export default {
       const formdata = new FormData();
       formdata.append('file', $file);
       axios({
-        url: 'https://zdxblog.cn/upload/uploadFile',
+        url: 'https://image.zdxblog.cn/upload/uploadFile',
         method: 'post',
         data: formdata,
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -291,6 +291,14 @@ export default {
       }
       h5 {
         font-size: 15px;
+      }
+      mark {
+        background-color: rgb(189 98 98 / 20%);
+        font-size: 13px;
+        color: #e94d4d;
+        padding: 0px 5px;
+        border-radius: 2px;
+        margin: 0 2px;
       }
     }
   }

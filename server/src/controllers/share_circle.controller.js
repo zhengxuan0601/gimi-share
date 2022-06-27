@@ -58,7 +58,7 @@ class ShareCircleController {
       const { content } = req.body
       const fileResponse = await Promise.all(req.files.map(file => {
         const fileNameDate = new Date().getTime()
-        return httpRequest.post('zdxblog.cn/upload/uploadFile',
+        return httpRequest.post('image.zdxblog.cn/upload/uploadFile',
           {
             file: httpRequest.file(`${fileNameDate}${encodeURI(file.originalname)}`, file.path)
           }, true)

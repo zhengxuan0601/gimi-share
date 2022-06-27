@@ -31,6 +31,7 @@ export const tagOptions = [
   { label: '面试', value: 'ms', pid: '2' },
   { label: '架构', value: 'jiagou', pid: '2' },
   { label: 'Vue.js', value: 'vue', pid: '2' },
+  { label: 'Nuxt.js', value: 'nuxt', pid: '2' },
   { label: 'React.js', value: 'react', pid: '2' },
   { label: 'Jquery', value: 'jquery', pid: '2' },
   { label: '微信小程序', value: 'wxapp', pid: '2' },
