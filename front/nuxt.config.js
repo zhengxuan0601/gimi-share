@@ -73,7 +73,14 @@ export default {
       pathRewrite: {
         '^/gimishare': ''
       },
-    }
+    },
+    '/upload': {
+      target: "http://localhost:3031/upload", // 代理地址
+      changeOrigin: true,
+      pathRewrite: {
+        '^/upload': ''
+      },
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

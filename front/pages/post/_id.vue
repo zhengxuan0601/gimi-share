@@ -422,7 +422,8 @@ export default {
     font-size: 15px;
   }
   img {
-    max-width: 40%;
+    max-width: 100%;
+    max-height: 260px;
   }
   pre {
     border-radius: 4px;
