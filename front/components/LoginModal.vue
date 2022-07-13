@@ -144,36 +144,57 @@ export default {
      * username or email login
      */
     submituserInfo () {
-      this.$refs.loginForm.validate(async value => {
+      this.$refs.loginForm.validate(value => {
         if (value) {
-          try {
-            const API = this.isRegister ? '/users/registeruser' : '/users/login'
-            const aesPublicKey = (await this.$axios.get('/api/v1/unit/getpublickey')).data
-            const { data } = await this.$axios.post(`/api/v1${API}`, this.isEmailVisible ? {
-              email: this.loginForm.email,
-              code: this.loginForm.emailCode,
-              emailLogin: true
-            } : {
-              ...this.loginForm,
-              password: encrypt(this.loginForm.password, aesPublicKey.aesKey, aesPublicKey.aesIv)
-            })
-            this.$message.success(this.isRegister ? '注册成功' : '登录成功')
-            if (!this.isRegister) {
-              this.$cookies.set('ACCESS_TOKEN', data.accessToken, {
-                path: '/', 
-                maxAge: 60 * 60 * 24
-              })
-              this.$store.commit('UPDATE_LOGIN_VISIBLE', false)
-              this.$store.commit('UPDATE_USER_INFO', data)
-              location.reload()
-            } else {
-              this.getVerificationcode()
-            }
-          } catch (error) {
-            console.log(error)
+          if (!this.isRegister) {
+            this.userEnterLogin()
+          } else {
+            this.userEnterRegister()
           }
         }
       })
+    },
+
+    /**
+     * user login
+     * @param { Boolean } isRegisterEnter 是否注册后直接登录
+     */
+    async userEnterLogin (isRegisterEnter) {
+      try {
+        const aesPublicKey = (await this.$axios.get('/api/v1/unit/getpublickey')).data
+        const searchParams = this.isEmailVisible ? {
+          email: this.loginForm.email,
+          code: this.loginForm.emailCode,
+          emailLogin: true
+        } : {
+          ...this.loginForm,
+          password: encrypt(this.loginForm.password, aesPublicKey.aesKey, aesPublicKey.aesIv)
+        }
+        const { data } = await this.$axios.post(`/api/v1/users/login`, searchParams)
+        !isRegisterEnter && this.$message.success('登录成功')
+        this.$cookies.set('ACCESS_TOKEN', data.accessToken, {
+          path: '/', 
+          maxAge: 60 * 60 * 24
+        })
+        this.$store.commit('UPDATE_USER_INFO', data)
+        location.reload()
+      } catch (error) {}
+    },
+
+    /**
+     * user register
+     */
+    async userEnterRegister () {
+      const aesPublicKey = (await this.$axios.get('/api/v1/unit/getpublickey')).data
+      try {
+        const searchParams = {
+          ...this.loginForm,
+          password: encrypt(this.loginForm.password, aesPublicKey.aesKey, aesPublicKey.aesIv)
+        }
+        await this.$axios.post(`/api/v1/users/registeruser`, searchParams)
+        this.$message.success('注册成功')
+        this.userEnterLogin(true)
+      } catch (error) {}
     },
 
     /**

@@ -87,7 +87,7 @@
         <mavon-editor 
           ref='md'
           v-model="articleInfo.content"
-          :toolbars="toolbars" 
+          :toolbars="toolbars"
           :tab-size="4"
           :box-shadow="false"
           @imgAdd="uploadImageServer">
